@@ -1,0 +1,47 @@
+export function verificationCodeEmail(code: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#000;">
+  <div style="font-family:'Segoe UI',Arial,sans-serif;background:#000;color:#fff;max-width:480px;margin:0 auto;border-radius:16px;overflow:hidden;">
+    <div style="padding:40px 32px;text-align:center;">
+      <h1 style="font-size:28px;font-weight:bold;margin:0 0 4px;">VOID <span style="font-weight:300;color:#c0c0c0;">Systems</span></h1>
+      <p style="color:#666;font-size:13px;margin:0 0 32px;">Verificacao de conta</p>
+      <p style="color:#999;font-size:14px;margin:0 0 16px;">Use o codigo abaixo para verificar seu email:</p>
+      <div style="background:#111;border:1px solid #222;border-radius:12px;padding:24px;margin:0 0 24px;">
+        <span style="font-size:36px;font-weight:bold;letter-spacing:12px;color:#fff;">${code}</span>
+      </div>
+      <p style="color:#555;font-size:12px;margin:0 0 8px;">Este codigo e valido por tempo limitado.</p>
+      <p style="color:#444;font-size:11px;margin:0;">Se voce nao criou uma conta na VOID Systems, ignore este email.</p>
+    </div>
+    <div style="border-top:1px solid #1a1a1a;padding:20px 32px;text-align:center;">
+      <p style="color:#333;font-size:11px;margin:0;">2026 VOID Systems - voidsystems.store</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+export function resetPasswordEmail(code: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#000;">
+  <div style="font-family:'Segoe UI',Arial,sans-serif;background:#000;color:#fff;max-width:480px;margin:0 auto;border-radius:16px;overflow:hidden;">
+    <div style="padding:40px 32px;text-align:center;">
+      <h1 style="font-size:28px;font-weight:bold;margin:0 0 4px;">VOID <span style="font-weight:300;color:#c0c0c0;">Systems</span></h1>
+      <p style="color:#666;font-size:13px;margin:0 0 32px;">Recuperacao de senha</p>
+      <p style="color:#999;font-size:14px;margin:0 0 16px;">Use o codigo abaixo para redefinir sua senha:</p>
+      <div style="background:#111;border:1px solid #222;border-radius:12px;padding:24px;margin:0 0 24px;">
+        <span style="font-size:36px;font-weight:bold;letter-spacing:12px;color:#fff;">${code}</span>
+      </div>
+      <p style="color:#555;font-size:12px;margin:0 0 8px;">Este codigo e valido por tempo limitado.</p>
+      <p style="color:#444;font-size:11px;margin:0;">Se voce nao solicitou a recuperacao, ignore este email.</p>
+    </div>
+    <div style="border-top:1px solid #1a1a1a;padding:20px 32px;text-align:center;">
+      <p style="color:#333;font-size:11px;margin:0;">2026 VOID Systems - voidsystems.store</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
