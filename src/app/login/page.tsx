@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { VoidBackground } from "@/components/landing/void-background";
 import { LoginCarousel } from "@/components/login-carousel";
-import { OtpInput } from "@/components/otp-input";
 
 const inputClass = "w-full bg-white/[0.04] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/30 backdrop-blur-sm";
 
