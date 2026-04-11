@@ -8,7 +8,7 @@ import { FadeIn } from "@/components/landing/fade-in";
 import { VoidCard } from "@/components/landing/void-card";
 
 interface Product {
-  id: string; name: string; price: number; description: string | null; category: string | null; badge: string | null; billing: string;
+  id: string; name: string; price: number; description: string | null; category: string | null; badge: string | null; billing: string; tags: string | null;
 }
 
 const DISCORD_LINK = "https://discord.gg/voidsystems";
@@ -23,6 +23,8 @@ export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Todos");
+  const [badgeFilter, setBadgeFilter] = useState("Todos");
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -33,7 +35,21 @@ export default function ProdutosPage() {
   }, []);
 
   const categories = ["Todos", ...Array.from(new Set(products.map((p) => p.category || "Geral")))];
-  const filtered = filter === "Todos" ? products : products.filter((p) => (p.category || "Geral") === filter);
+  const badges = ["Todos", ...Array.from(new Set(products.map((p) => p.badge).filter(Boolean) as string[]))];
+  const allTags = Array.from(new Set(products.flatMap((p) => (p.tags || "").split(",").map((t) => t.trim()).filter(Boolean))));
+
+  const filtered = products.filter((p) => {
+    if (filter !== "Todos" && (p.category || "Geral") !== filter) return false;
+    if (badgeFilter !== "Todos" && p.badge !== badgeFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const matchName = p.name.toLowerCase().includes(q);
+      const matchCat = (p.category || "").toLowerCase().includes(q);
+      const matchTags = (p.tags || "").toLowerCase().includes(q);
+      if (!matchName && !matchCat && !matchTags) return false;
+    }
+    return true;
+  });
 
   return (
     <>
@@ -48,20 +64,49 @@ export default function ProdutosPage() {
           </p>
         </FadeIn>
 
-        {categories.length > 2 && (
-          <FadeIn className="flex items-center justify-center gap-2 mb-10 flex-wrap">
-            {categories.map((cat) => (
-              <button key={cat} onClick={() => setFilter(cat)}
-                className="text-xs px-4 py-2 rounded-full transition-all duration-200 cursor-pointer"
-                style={{
-                  backgroundColor: filter === cat ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.03)",
-                  border: `1px solid rgba(255,255,255,${filter === cat ? 0.2 : 0.06})`,
-                  color: filter === cat ? "#fff" : "rgba(192,192,192,0.5)",
-                }}
-              >{cat}</button>
-            ))}
-          </FadeIn>
-        )}
+        {/* Filtros */}
+        <FadeIn className="mb-10 space-y-4">
+          {/* Busca */}
+          <div className="max-w-md mx-auto">
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome, categoria ou tag..."
+              className="w-full bg-white/[0.04] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/20 backdrop-blur-sm text-center"
+              style={{ borderColor: "rgba(255,255,255,0.08)" }} />
+          </div>
+
+          {/* Categoria */}
+          {categories.length > 2 && (
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <span className="text-[10px] text-silver/30 uppercase tracking-wider mr-2">Categoria:</span>
+              {categories.map((cat) => (
+                <button key={cat} onClick={() => setFilter(cat)}
+                  className="text-xs px-4 py-2 rounded-full transition-all duration-200 cursor-pointer"
+                  style={{
+                    backgroundColor: filter === cat ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.03)",
+                    border: `1px solid rgba(255,255,255,${filter === cat ? 0.2 : 0.06})`,
+                    color: filter === cat ? "#fff" : "rgba(192,192,192,0.5)",
+                  }}
+                >{cat}</button>
+              ))}
+            </div>
+          )}
+
+          {/* Badge */}
+          {badges.length > 1 && (
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <span className="text-[10px] text-silver/30 uppercase tracking-wider mr-2">Badge:</span>
+              {badges.map((b) => (
+                <button key={b} onClick={() => setBadgeFilter(b)}
+                  className="text-xs px-4 py-2 rounded-full transition-all duration-200 cursor-pointer"
+                  style={{
+                    backgroundColor: badgeFilter === b ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.03)",
+                    border: `1px solid rgba(255,255,255,${badgeFilter === b ? 0.2 : 0.06})`,
+                    color: badgeFilter === b ? "#fff" : "rgba(192,192,192,0.5)",
+                  }}
+                >{b}</button>
+              ))}
+            </div>
+          )}
+        </FadeIn>
 
         {loading ? (
           <div className="text-center py-20 text-silver/30 text-sm">Carregando produtos...</div>
@@ -89,6 +134,16 @@ export default function ProdutosPage() {
                           className="flex items-center gap-1.5 text-xs text-silver/40 hover:text-white transition-colors cursor-pointer mb-2">
                           <Eye className="w-3.5 h-3.5" /> Ver detalhes
                         </button>
+                      )}
+                      {product.tags && (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {product.tags.split(",").map((tag) => tag.trim()).filter(Boolean).map((tag) => (
+                            <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full"
+                              style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>

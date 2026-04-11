@@ -94,6 +94,7 @@ model Product {
   category    String?
   badge       String?
   billing     String   @default("monthly")
+  tags        String?
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
 }

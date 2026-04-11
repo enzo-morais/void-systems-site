@@ -14,11 +14,11 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-  const { name, price, category, description, badge, billing } = await req.json();
+  const { name, price, category, description, badge, billing, tags } = await req.json();
   if (!name || price == null) return NextResponse.json({ error: "Nome e preço obrigatórios" }, { status: 400 });
 
   const product = await prisma.product.create({
-    data: { name, price: Number(price), category: category || null, description: description || null, badge: badge || null, billing: billing || "monthly" },
+    data: { name, price: Number(price), category: category || null, description: description || null, badge: badge || null, billing: billing || "monthly", tags: tags || null },
   });
 
   await prisma.log.create({

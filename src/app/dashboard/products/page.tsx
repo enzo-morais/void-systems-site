@@ -22,6 +22,7 @@ export default function ProductsPage() {
   const [description, setDescription] = useState("");
   const [badge, setBadge] = useState("");
   const [billing, setBilling] = useState("monthly");
+  const [tags, setTags] = useState("");
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -43,11 +44,11 @@ export default function ProductsPage() {
     setSaving(true);
     const res = await fetch("/api/products", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, price: parseFloat(price), category: category || undefined, description: description || undefined, badge: badge || undefined, billing }),
+      body: JSON.stringify({ name, price: parseFloat(price), category: category || undefined, description: description || undefined, badge: badge || undefined, billing, tags: tags || undefined }),
     });
     setSaving(false);
     if (res.ok) {
-      setName(""); setPrice(""); setCategory(""); setDescription(""); setBadge(""); setBilling("monthly");
+      setName(""); setPrice(""); setCategory(""); setDescription(""); setBadge(""); setBilling("monthly"); setTags("");
       setSuccess(true); fetchProducts();
       setTimeout(() => setSuccess(false), 3000);
     }
@@ -111,6 +112,10 @@ export default function ProductsPage() {
           <div className="sm:col-span-2 lg:col-span-4">
             <label className="block text-xs text-silver/40 mb-1.5">Descrição (visível na loja)</label>
             <textarea value={description} onChange={(e) => { setDescription(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }} placeholder="Descrição do produto" rows={1} className={inputClass + " resize-none overflow-hidden"} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+          </div>
+          <div className="sm:col-span-2 lg:col-span-4">
+            <label className="block text-xs text-silver/40 mb-1.5">Tags (separadas por vírgula)</label>
+            <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Ex: DayZ, Discord, Jogo, Automação" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
         </div>
         {success && <p className="text-green-400 text-sm mb-4 flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Produto cadastrado</p>}
