@@ -7,7 +7,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { CustomSelect } from "@/components/dashboard/custom-select";
 
 interface Product {
-  id: string; name: string; price: number; category: string | null; active: boolean; createdAt: string;
+  id: string; name: string; price: number; description: string | null; category: string | null; badge: string | null; billing: string; tags: string | null; active: boolean; createdAt: string;
 }
 
 const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
@@ -27,8 +27,9 @@ export default function ProductsPage() {
   const [success, setSuccess] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { confirm, modalProps } = useConfirm();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editPrice, setEditPrice] = useState("");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editData, setEditData] = useState({ name: "", price: "", category: "", description: "", badge: "", billing: "monthly", tags: "" });
+  const [editLoading, setEditLoading] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -63,13 +64,28 @@ export default function ProductsPage() {
     fetchProducts();
   }
 
-  async function handleEditPrice(id: string) {
-    if (!editPrice) return;
-    await fetch(`/api/products/${id}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ price: parseFloat(editPrice) }),
+  function startEdit(p: Product) {
+    setEditingProduct(p);
+    setEditData({
+      name: p.name, price: String(p.price), category: p.category || "",
+      description: p.description || "", badge: p.badge || "", billing: p.billing || "monthly", tags: p.tags || "",
     });
-    setEditingId(null); setEditPrice("");
+  }
+
+  async function handleSaveEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingProduct) return;
+    setEditLoading(true);
+    await fetch(`/api/products/${editingProduct.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: editData.name, price: parseFloat(editData.price), category: editData.category || null,
+        description: editData.description || null, badge: editData.badge || null, billing: editData.billing, tags: editData.tags || null,
+      }),
+    });
+    setEditLoading(false);
+    setEditingProduct(null);
     fetchProducts();
   }
 
@@ -142,7 +158,7 @@ export default function ProductsPage() {
                   {p.category && <p className="text-xs text-silver/40 mt-0.5">{p.category}</p>}
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => { setEditingId(p.id); setEditPrice(p.price.toString()); }}
+                  <button onClick={() => startEdit(p)}
                     className="p-1.5 rounded-md transition-colors cursor-pointer" style={{ color: "#666" }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#fff"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#666"; }}
@@ -154,19 +170,69 @@ export default function ProductsPage() {
                   >{deletingId === p.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}</button>
                 </div>
               </div>
-
-              {editingId === p.id ? (
-                <div className="flex gap-2">
-                  <input type="number" step="0.01" value={editPrice} onChange={(e) => setEditPrice(e.target.value)}
-                    className="flex-1 bg-black border rounded-lg px-3 py-1.5 text-sm" style={{ borderColor: "rgba(255,255,255,0.2)" }} />
-                  <button onClick={() => handleEditPrice(p.id)} className="text-xs px-3 py-1.5 bg-white text-black rounded-lg font-medium cursor-pointer">Salvar</button>
-                  <button onClick={() => setEditingId(null)} className="text-xs px-3 py-1.5 rounded-lg cursor-pointer" style={{ color: "#666" }}>Cancelar</button>
+              <p className="text-2xl font-bold text-green-400">R${p.price.toFixed(2).replace(".", ",")}</p>
+              {p.tags && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {p.tags.split(",").map((t: string) => t.trim()).filter(Boolean).map((t: string) => (
+                    <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>{t}</span>
+                  ))}
                 </div>
-              ) : (
-                <p className="text-2xl font-bold text-green-400">R${p.price.toFixed(2).replace(".", ",")}</p>
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Edit modal */}
+      {editingProduct && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={() => setEditingProduct(null)}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="relative rounded-xl w-full max-w-lg mx-4 p-6" onClick={(e) => e.stopPropagation()}
+            style={{ background: "rgba(10,10,10,0.95)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <h2 className="text-lg font-semibold mb-4">Editar Produto</h2>
+            <form onSubmit={handleSaveEdit} className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-silver/40 mb-1">Nome</label>
+                  <input type="text" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} required className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+                </div>
+                <div>
+                  <label className="block text-xs text-silver/40 mb-1">Preço (R$)</label>
+                  <input type="number" step="0.01" value={editData.price} onChange={(e) => setEditData({ ...editData, price: e.target.value })} required className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+                </div>
+                <div>
+                  <label className="block text-xs text-silver/40 mb-1">Categoria</label>
+                  <input type="text" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })} className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+                </div>
+                <div>
+                  <label className="block text-xs text-silver/40 mb-1">Badge</label>
+                  <CustomSelect value={editData.badge} onChange={(v) => setEditData({ ...editData, badge: v })} options={[
+                    { value: "", label: "Nenhum" }, { value: "Popular", label: "Popular" }, { value: "Novo", label: "Novo" }, { value: "Destaque", label: "Destaque" },
+                  ]} placeholder="Selecione" />
+                </div>
+                <div>
+                  <label className="block text-xs text-silver/40 mb-1">Pagamento</label>
+                  <CustomSelect value={editData.billing} onChange={(v) => setEditData({ ...editData, billing: v })} options={[
+                    { value: "monthly", label: "Mensal" }, { value: "once", label: "Pagamento único" },
+                  ]} placeholder="Selecione" />
+                </div>
+                <div>
+                  <label className="block text-xs text-silver/40 mb-1">Tags</label>
+                  <input type="text" value={editData.tags} onChange={(e) => setEditData({ ...editData, tags: e.target.value })} placeholder="DayZ, Discord..." className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-silver/40 mb-1">Descrição</label>
+                <textarea value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} rows={3} className={inputClass + " resize-none"} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button type="submit" disabled={editLoading} className="bg-white text-black font-medium px-6 py-2.5 rounded-lg text-sm transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
+                  {editLoading && <Loader2 className="w-4 h-4 animate-spin" />} Salvar
+                </button>
+                <button type="button" onClick={() => setEditingProduct(null)} className="text-sm text-silver/40 hover:text-white cursor-pointer px-4">Cancelar</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
