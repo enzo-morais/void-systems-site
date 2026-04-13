@@ -3,18 +3,17 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { PrismaClient } from "@prisma/client";
 import { restartBot } from "@/lib/discloud-api";
+import { userOwnsBot } from "@/lib/bot-auth";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id ?? (session?.user as any)?.discordId;
-
-  if (!userId) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+  if (!session) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const bot = await prisma.discloudBot.findUnique({ where: { id } });
-  if (!bot || bot.userId !== userId) return NextResponse.json({ error: "Bot não encontrado" }, { status: 404 });
+  if (!bot || !userOwnsBot(bot, session)) return NextResponse.json({ error: "Bot não encontrado" }, { status: 404 });
 
   try {
     await restartBot(bot.discloudAppId);

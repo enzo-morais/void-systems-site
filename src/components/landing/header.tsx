@@ -21,6 +21,8 @@ export function Header() {
 
   useEffect(() => {
     if (session && !isStaff) {
+      const discordId = (session.user as any)?.discordId;
+      const userId = (session.user as any)?.id;
       fetch("/api/bots")
         .then(r => r.ok ? r.json() : { bots: [] })
         .then(data => setHasBots((data.bots?.length ?? 0) > 0))

@@ -19,13 +19,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Busca por userId do banco OU pelo discordId (caso o bot foi criado antes do login)
-    const discordId = session?.user?.discordId;
+    const discordId = (session as any)?.user?.discordId;
     const bots = await prisma.discloudBot.findMany({
       where: {
         OR: [
           { userId },
-          ...(discordId ? [{ userId: discordId }] : [])
+          ...(discordId && discordId !== userId ? [{ userId: discordId }] : [])
         ]
       },
       orderBy: { createdAt: "desc" }
