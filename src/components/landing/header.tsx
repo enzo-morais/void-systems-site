@@ -20,15 +20,13 @@ export function Header() {
   const [hasBots, setHasBots] = useState(false);
 
   useEffect(() => {
-    if (session && !isStaff) {
-      const discordId = (session.user as any)?.discordId;
-      const userId = (session.user as any)?.id;
+    if (session) {
       fetch("/api/bots")
         .then(r => r.ok ? r.json() : { bots: [] })
         .then(data => setHasBots((data.bots?.length ?? 0) > 0))
         .catch(() => {});
     }
-  }, [session, isStaff]);
+  }, [session]);
 
   return (
     <header
@@ -61,8 +59,9 @@ export function Header() {
                   Painel Staff
                 </Link>
               )}
-              {!isStaff && hasBots && (
-                <Link href="/discloud" className="text-sm px-4 py-2 rounded-lg font-medium text-black bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all duration-300 flex items-center gap-1.5">
+              {hasBots && (
+                <Link href="/discloud" className="text-sm px-4 py-2 rounded-lg font-medium text-silver hover:text-white transition-all duration-300 flex items-center gap-1.5"
+                  style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
                   <Bot className="w-4 h-4" /> Meus Bots
                 </Link>
               )}
@@ -110,8 +109,9 @@ export function Header() {
                     Painel Staff
                   </Link>
                 )}
-                {!isStaff && hasBots && (
-                  <Link href="/discloud" onClick={() => setMobileOpen(false)} className="block text-sm text-center py-2 rounded-lg bg-white text-black font-medium flex items-center justify-center gap-1.5">
+                {hasBots && (
+                  <Link href="/discloud" onClick={() => setMobileOpen(false)} className="block text-sm text-center py-2 rounded-lg text-silver flex items-center justify-center gap-1.5"
+                    style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
                     <Bot className="w-4 h-4" /> Meus Bots
                   </Link>
                 )}
