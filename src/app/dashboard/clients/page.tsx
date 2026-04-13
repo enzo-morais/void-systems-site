@@ -13,6 +13,10 @@ interface DiscloudBot {
   id: string; name: string; discloudAppId: string; status: string; userId: string;
 }
 
+interface DiscordClient {
+  id: string; username: string; displayName: string; avatar: string;
+}
+
 const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
 const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/30 backdrop-blur-sm";
 
@@ -31,6 +35,8 @@ export default function ClientsPage() {
   // Bot assignment state
   const [bots, setBots] = useState<DiscloudBot[]>([]);
   const [users, setUsers] = useState<{id: string; name: string | null; email: string | null}[]>([]);
+  const [discordClients, setDiscordClients] = useState<DiscordClient[]>([]);
+  const [loadingDiscord, setLoadingDiscord] = useState(false);
   const [botUserId, setBotUserId] = useState("");
   const [botAppId, setBotAppId] = useState("");
   const [botName, setBotName] = useState("");
@@ -55,7 +61,17 @@ export default function ClientsPage() {
     if (res.ok) setUsers(await res.json());
   }, []);
 
-  useEffect(() => { fetchClients(); fetchBots(); fetchUsers(); }, [fetchClients, fetchBots, fetchUsers]);
+  const fetchDiscordClients = useCallback(async () => {
+    setLoadingDiscord(true);
+    const res = await fetch("/api/staff/discord-clients");
+    if (res.ok) {
+      const data = await res.json();
+      setDiscordClients(data.clients || []);
+    }
+    setLoadingDiscord(false);
+  }, []);
+
+  useEffect(() => { fetchClients(); fetchBots(); fetchUsers(); fetchDiscordClients(); }, [fetchClients, fetchBots, fetchUsers, fetchDiscordClients]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -183,6 +199,52 @@ export default function ClientsPage() {
       {/* Seção de Bots */}
       <h2 className="text-xl font-bold flex items-center gap-2 pt-4"><Bot className="w-5 h-5" /> Bots dos Clientes</h2>
 
+      {/* Clientes do Discord com cargo */}
+      <div className="rounded-lg p-6" style={cardStyle}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-silver/60 uppercase tracking-wider">Clientes no Discord</h3>
+          <button onClick={fetchDiscordClients} disabled={loadingDiscord}
+            className="text-xs text-silver/40 hover:text-white transition-colors px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
+            style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+            {loadingDiscord ? <Loader2 className="w-3 h-3 animate-spin" /> : "↻"} Atualizar
+          </button>
+        </div>
+        {loadingDiscord ? (
+          <div className="flex items-center gap-2 text-silver/40 text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Buscando membros...</div>
+        ) : discordClients.length === 0 ? (
+          <p className="text-silver/30 text-sm">Nenhum membro com o cargo de cliente encontrado. Verifique se <code className="text-silver/50">DISCORD_CLIENT_ROLE_ID</code> está configurado.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {discordClients.map((c) => {
+              const hasBot = bots.some(b => b.userId === c.id);
+              return (
+                <div key={c.id} className="flex items-center justify-between p-3 rounded-lg"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div className="flex items-center gap-3">
+                    <img src={c.avatar} alt="" className="w-8 h-8 rounded-full" />
+                    <div>
+                      <p className="text-sm font-medium">{c.displayName}</p>
+                      <p className="text-xs text-silver/40 font-mono">{c.id}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { setBotUserId(c.id); setBotName(""); setBotAppId(""); }}
+                    className="text-xs px-2 py-1 rounded-md transition-colors cursor-pointer whitespace-nowrap"
+                    style={{
+                      backgroundColor: hasBot ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.08)",
+                      color: hasBot ? "#22c55e" : "rgba(255,255,255,0.6)",
+                      border: `1px solid ${hasBot ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)"}`
+                    }}
+                  >
+                    {hasBot ? "✓ Bot" : "+ Bot"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       <form onSubmit={handleAssignBot} className="rounded-lg p-6" style={cardStyle}>
         <h2 className="text-sm font-semibold text-silver/60 uppercase tracking-wider mb-4 flex items-center gap-2"><Plus className="w-4 h-4" /> Atribuir Bot a Cliente</h2>
         <p className="text-xs text-silver/40 mb-4">Selecione o cliente que já fez login no site.</p>
@@ -190,10 +252,13 @@ export default function ClientsPage() {
           <div>
             <label className="block text-xs text-silver/40 mb-1.5">Cliente *</label>
             <select value={botUserId} onChange={(e) => setBotUserId(e.target.value)} required
-              className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+              className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(0,0,0,0.4)" }}>
               <option value="">Selecione um cliente...</option>
-              {users.map(u => (
-                <option key={u.id} value={u.id}>{u.name || u.email || u.id}</option>
+              {discordClients.map(c => (
+                <option key={c.id} value={c.id}>{c.displayName} ({c.id})</option>
+              ))}
+              {users.filter(u => !discordClients.find(d => d.id === u.id)).map(u => (
+                <option key={u.id} value={u.id}>{u.name || u.email} (site)</option>
               ))}
             </select>
           </div>
