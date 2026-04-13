@@ -1,161 +1,74 @@
-/**
- * Cliente da API da Discloud
- * NUNCA expõe a API key no frontend
- */
-
-const DISCLOUD_API_URL = process.env.DISCLOUD_API_URL || "https://api.discloud.app";
+const DISCLOUD_API_URL = "https://api.discloud.app/v2";
 const DISCLOUD_API_KEY = process.env.DISCLOUD_API_KEY;
 
-if (!DISCLOUD_API_KEY) {
-  console.error("⚠️ DISCLOUD_API_KEY não configurada no .env.local");
+function headers() {
+  return {
+    "api-token": DISCLOUD_API_KEY ?? "",
+    "Content-Type": "application/json",
+  };
 }
 
-interface DiscloudBotStatus {
+export interface DiscloudBotStatus {
   appId: string;
   name: string;
   status: "online" | "offline" | "starting" | "stopping" | "error";
   uptime?: number;
-  cpu?: number;
-  memory?: number;
+  cpu?: string;
+  memory?: string;
 }
 
-/**
- * Obter status de um bot
- */
 export async function getBotStatus(appId: string): Promise<DiscloudBotStatus> {
-  try {
-    const response = await fetch(`${DISCLOUD_API_URL}/v1/app/${appId}/status`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${DISCLOUD_API_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
+  const res = await fetch(`${DISCLOUD_API_URL}/app/${appId}/status`, { headers: headers() });
+  const data = await res.json();
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || "Erro ao obter status do bot");
-    }
+  if (!res.ok) throw new Error(data.message || "Erro ao obter status");
 
-    const data = await response.json();
-    return {
-      appId: data.appId,
-      name: data.name,
-      status: data.status,
-      uptime: data.uptime,
-      cpu: data.cpu,
-      memory: data.memory
-    };
-  } catch (error) {
-    console.error("Erro ao obter status do bot:", error);
-    throw error;
-  }
+  // A Discloud retorna { status: "ok", apps: { ... } } ou { apps: [...] }
+  const app = data.apps ?? data.app ?? data;
+  const appData = Array.isArray(app) ? app[0] : app;
+
+  return {
+    appId: appData.id ?? appId,
+    name: appData.name ?? appId,
+    status: appData.container === "Online" ? "online" : "offline",
+    uptime: appData.startedAt,
+    cpu: appData.cpu,
+    memory: appData.memory,
+  };
 }
 
-/**
- * Iniciar um bot
- */
 export async function startBot(appId: string): Promise<{ success: boolean }> {
-  try {
-    const response = await fetch(`${DISCLOUD_API_URL}/v1/app/${appId}/start`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${DISCLOUD_API_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || "Erro ao iniciar o bot");
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("Erro ao iniciar bot:", error);
-    throw error;
+  const res = await fetch(`${DISCLOUD_API_URL}/app/${appId}/start`, {
+    method: "PUT",
+    headers: headers(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Erro ao iniciar bot");
   }
+  return { success: true };
 }
 
-/**
- * Parar um bot
- */
 export async function stopBot(appId: string): Promise<{ success: boolean }> {
-  try {
-    const response = await fetch(`${DISCLOUD_API_URL}/v1/app/${appId}/stop`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${DISCLOUD_API_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || "Erro ao parar o bot");
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("Erro ao parar bot:", error);
-    throw error;
+  const res = await fetch(`${DISCLOUD_API_URL}/app/${appId}/stop`, {
+    method: "PUT",
+    headers: headers(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Erro ao parar bot");
   }
+  return { success: true };
 }
 
-/**
- * Reiniciar um bot
- */
 export async function restartBot(appId: string): Promise<{ success: boolean }> {
-  try {
-    const response = await fetch(`${DISCLOUD_API_URL}/v1/app/${appId}/restart`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${DISCLOUD_API_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || "Erro ao reiniciar o bot");
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("Erro ao reiniciar bot:", error);
-    throw error;
+  const res = await fetch(`${DISCLOUD_API_URL}/app/${appId}/restart`, {
+    method: "PUT",
+    headers: headers(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Erro ao reiniciar bot");
   }
-}
-
-/**
- * Listar todos os bots do usuário
- */
-export async function listBots(): Promise<DiscloudBotStatus[]> {
-  try {
-    const response = await fetch(`${DISCLOUD_API_URL}/v1/app`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${DISCLOUD_API_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || "Erro ao listar bots");
-    }
-
-    const data = await response.json();
-    return data.map((bot: any) => ({
-      appId: bot.appId,
-      name: bot.name,
-      status: bot.status,
-      uptime: bot.uptime,
-      cpu: bot.cpu,
-      memory: bot.memory
-    }));
-  } catch (error) {
-    console.error("Erro ao listar bots:", error);
-    throw error;
-  }
+  return { success: true };
 }

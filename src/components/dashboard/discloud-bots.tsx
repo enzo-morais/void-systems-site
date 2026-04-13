@@ -84,14 +84,19 @@ export function DiscloudBots() {
     }
   }
 
-  // Atualizar status (apenas recarrega do banco, sem chamar Discloud)
+  // Atualizar status via Discloud
   async function updateStatus(botId: string) {
     setStatusUpdating(botId);
     setError(null);
     try {
-      await loadBots();
+      const response = await fetch(`/api/bots/${botId}`);
+      if (!response.ok) throw new Error("Erro ao atualizar status");
+      const data = await response.json();
+      setBots(prev => prev.map(b =>
+        b.id === botId ? { ...b, status: data.status?.status ?? b.status } : b
+      ));
     } catch (err) {
-      setError("Erro ao atualizar status");
+      setError(err instanceof Error ? err.message : "Erro ao atualizar status");
     } finally {
       setStatusUpdating(null);
     }
