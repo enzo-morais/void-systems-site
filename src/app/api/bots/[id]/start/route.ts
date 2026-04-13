@@ -16,6 +16,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   try {
     await startBot(bot.discloudAppId);
     await prisma.discloudBot.update({ where: { id }, data: { status: "starting", lastAction: new Date() } });
+    await prisma.log.create({ data: {
+      userId: bot.userId,
+      action: "bot_start",
+      details: `Bot ${bot.name} iniciado`,
+      staffName: (session.user as any)?.name || "Cliente"
+    }});
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "Erro ao iniciar" }, { status: 500 });

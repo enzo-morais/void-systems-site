@@ -1,359 +1,283 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Bot, Play, Square, RotateCw, Plus, Trash2, AlertCircle, RefreshCw } from "lucide-react";
-import { VoidCard } from "@/components/landing/void-card";
+import { useState, useEffect, useCallback } from "react";
+import { Bot, Play, Square, RotateCw, RefreshCw, AlertCircle, Activity, Clock } from "lucide-react";
 
 interface DiscloudBot {
   id: string;
   name: string;
   discloudAppId: string;
-  status: "online" | "offline" | "starting" | "stopping" | "error";
+  status: string;
+  lastAction: string | null;
   createdAt: string;
 }
 
-interface BotStatus {
-  appId: string;
-  name: string;
-  status: "online" | "offline" | "starting" | "stopping" | "error";
-  uptime?: number;
-  cpu?: number;
-  memory?: number;
+interface BotLog {
+  id: string;
+  action: string;
+  details: string | null;
+  staffName: string;
+  createdAt: string;
+}
+
+const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; pulse: boolean }> = {
+  online:   { color: "#22c55e", bg: "rgba(34,197,94,0.12)",   label: "Online",      pulse: true  },
+  offline:  { color: "#ef4444", bg: "rgba(239,68,68,0.12)",   label: "Offline",     pulse: false },
+  starting: { color: "#eab308", bg: "rgba(234,179,8,0.12)",   label: "Iniciando...", pulse: true  },
+  stopping: { color: "#f97316", bg: "rgba(249,115,22,0.12)",  label: "Parando...",  pulse: true  },
+  error:    { color: "#ef4444", bg: "rgba(239,68,68,0.12)",   label: "Erro",        pulse: false },
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.offline;
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+      style={{ backgroundColor: cfg.bg, color: cfg.color }}>
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.pulse ? "animate-pulse" : ""}`}
+        style={{ backgroundColor: cfg.color }} />
+      {cfg.label}
+    </span>
+  );
 }
 
 export function DiscloudBots() {
   const [bots, setBots] = useState<DiscloudBot[]>([]);
+  const [logs, setLogs] = useState<BotLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [addingBot, setAddingBot] = useState(false);
-  const [newBotAppId, setNewBotAppId] = useState("");
-  const [newBotName, setNewBotName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"bots" | "logs">("bots");
 
-  // Carregar bots
-  useEffect(() => {
-    loadBots();
-  }, []);
-
-  async function loadBots() {
+  const loadBots = useCallback(async () => {
     try {
-      const response = await fetch("/api/bots");
-      if (!response.ok) throw new Error("Erro ao carregar bots");
-      const data = await response.json();
-      setBots(data.bots);
-    } catch (err) {
-      console.error(err);
-      setError("Erro ao carregar bots");
+      const res = await fetch("/api/bots");
+      if (!res.ok) throw new Error("Erro ao carregar bots");
+      const data = await res.json();
+      setBots(data.bots ?? []);
+    } catch (e: any) {
+      setError(e.message);
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  // Adicionar bot
-  async function handleAddBot() {
-    if (!newBotAppId || !newBotName) {
-      setError("Preencha todos os campos");
-      return;
-    }
-
-    setAddingBot(true);
-    setError(null);
-
+  const loadLogs = useCallback(async () => {
     try {
-      const response = await fetch("/api/bots", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          discloudAppId: newBotAppId,
-          name: newBotName
+      const res = await fetch("/api/bots/logs");
+      if (res.ok) setLogs(await res.json());
+    } catch {}
+  }, []);
+
+  // Polling de status a cada 30s
+  useEffect(() => {
+    loadBots();
+    loadLogs();
+    const interval = setInterval(() => {
+      refreshAllStatus();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [loadBots, loadLogs]);
+
+  async function refreshAllStatus() {
+    try {
+      const res = await fetch("/api/bots");
+      if (!res.ok) return;
+      const data = await res.json();
+      // Para cada bot, busca status real da Discloud
+      const updated = await Promise.all(
+        (data.bots ?? []).map(async (bot: DiscloudBot) => {
+          try {
+            const r = await fetch(`/api/bots/${bot.id}`);
+            if (r.ok) {
+              const d = await r.json();
+              return { ...bot, status: d.status?.status ?? bot.status };
+            }
+          } catch {}
+          return bot;
         })
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Erro ao adicionar bot");
-      }
-
-      setNewBotAppId("");
-      setNewBotName("");
-      loadBots();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro desconhecido");
-    } finally {
-      setAddingBot(false);
-    }
+      );
+      setBots(updated);
+    } catch {}
   }
 
-  // Atualizar status via Discloud
-  async function updateStatus(botId: string) {
-    setStatusUpdating(botId);
+  async function handleAction(botId: string, action: "start" | "stop" | "restart") {
+    setActionLoading(`${botId}-${action}`);
     setError(null);
     try {
-      const response = await fetch(`/api/bots/${botId}`);
-      if (!response.ok) throw new Error("Erro ao atualizar status");
-      const data = await response.json();
-      setBots(prev => prev.map(b =>
-        b.id === botId ? { ...b, status: data.status?.status ?? b.status } : b
-      ));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao atualizar status");
-    } finally {
-      setStatusUpdating(null);
-    }
-  }
-
-  // Iniciar bot
-  async function handleStart(botId: string) {
-    setStatusUpdating(botId);
-    setError(null);
-
-    try {
-      const response = await fetch(`/api/bots/${botId}/start`, {
-        method: "POST"
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Erro ao iniciar bot");
+      const res = await fetch(`/api/bots/${botId}/${action}`, { method: "POST" });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || `Erro ao ${action}`);
       }
-
-      // Atualizar status
-      setBots(prev => prev.map(b => 
-        b.id === botId ? { ...b, status: "starting" } : b
-      ));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao iniciar bot");
+      const statusMap = { start: "starting", stop: "stopping", restart: "starting" };
+      setBots(prev => prev.map(b => b.id === botId ? { ...b, status: statusMap[action] } : b));
+      loadLogs();
+    } catch (e: any) {
+      setError(e.message);
     } finally {
-      setStatusUpdating(null);
+      setActionLoading(null);
     }
   }
 
-  // Parar bot
-  async function handleStop(botId: string) {
-    setStatusUpdating(botId);
-    setError(null);
-
+  async function handleRefresh(botId: string) {
+    setActionLoading(`${botId}-refresh`);
     try {
-      const response = await fetch(`/api/bots/${botId}/stop`, {
-        method: "POST"
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Erro ao parar bot");
+      const res = await fetch(`/api/bots/${botId}`);
+      if (res.ok) {
+        const d = await res.json();
+        setBots(prev => prev.map(b => b.id === botId ? { ...b, status: d.status?.status ?? b.status } : b));
       }
-
-      // Atualizar status
-      setBots(prev => prev.map(b => 
-        b.id === botId ? { ...b, status: "stopping" } : b
-      ));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao parar bot");
-    } finally {
-      setStatusUpdating(null);
-    }
+    } catch {}
+    setActionLoading(null);
   }
 
-  // Reiniciar bot
-  async function handleRestart(botId: string) {
-    setStatusUpdating(botId);
-    setError(null);
-
-    try {
-      const response = await fetch(`/api/bots/${botId}/restart`, {
-        method: "POST"
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Erro ao reiniciar bot");
-      }
-
-      // Atualizar status
-      setBots(prev => prev.map(b => 
-        b.id === botId ? { ...b, status: "starting" } : b
-      ));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao reiniciar bot");
-    } finally {
-      setStatusUpdating(null);
-    }
-  }
-
-  // Remover bot
-  async function handleRemove(botId: string) {
-    if (!confirm("Tem certeza que deseja remover este bot?")) return;
-
-    try {
-      const response = await fetch(`/api/bots/${botId}`, {
-        method: "DELETE"
-      });
-
-      if (!response.ok) throw new Error("Erro ao remover bot");
-
-      setBots(prev => prev.filter(b => b.id !== botId));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao remover bot");
-    }
-  }
-
-  // Formatar status
-  function formatStatus(status: string) {
-    const colors = {
-      online: "bg-green-500",
-      offline: "bg-red-500",
-      starting: "bg-yellow-500",
-      stopping: "bg-orange-500",
-      error: "bg-red-500"
-    };
-
-    const labels = {
-      online: "Online",
-      offline: "Offline",
-      starting: "Iniciando...",
-      stopping: "Parando...",
-      error: "Erro"
-    };
-
-    return (
-      <div className="flex items-center gap-2">
-        <span className={`w-2 h-2 rounded-full ${colors[status as keyof typeof colors]}`} />
-        <span className="text-sm text-silver">{labels[status as keyof typeof labels]}</span>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/30" />
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen px-4 py-8 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Bots Discloud</h2>
-          <p className="text-silver/60 text-sm mt-1">Gerencie seus bots hospedados na Discloud</p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <Bot className="w-8 h-8 text-purple-400" />
+          Meus Bots
+        </h1>
+        <p className="text-silver/50 mt-1 text-sm">Gerencie seus bots hospedados na Discloud</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 mb-6 p-1 rounded-lg w-fit"
+        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+        {(["bots", "logs"] as const).map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)}
+            className="px-4 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer capitalize"
+            style={{
+              background: activeTab === tab ? "rgba(255,255,255,0.1)" : "transparent",
+              color: activeTab === tab ? "#fff" : "rgba(255,255,255,0.4)"
+            }}>
+            {tab === "bots" ? "Bots" : "Logs"}
+          </button>
+        ))}
       </div>
 
       {/* Error */}
       {error && (
-        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500" />
-          <p className="text-red-500 text-sm">{error}</p>
+        <div className="mb-4 p-3 rounded-lg flex items-center gap-2 text-sm text-red-400"
+          style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
+          <AlertCircle className="w-4 h-4 shrink-0" /> {error}
         </div>
       )}
 
-      {/* Add Bot Form */}
-      <VoidCard className="p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          Adicionar Novo Bot
-        </h3>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="App ID da Discloud"
-            value={newBotAppId}
-            onChange={(e) => setNewBotAppId(e.target.value)}
-            className="flex-1 px-4 py-2 rounded-lg bg-black/50 border border-silver/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
-          />
-          <input
-            type="text"
-            placeholder="Nome do bot"
-            value={newBotName}
-            onChange={(e) => setNewBotName(e.target.value)}
-            className="flex-1 px-4 py-2 rounded-lg bg-black/50 border border-silver/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
-          />
-          <button
-            onClick={handleAddBot}
-            disabled={addingBot}
-            className="px-6 py-2 rounded-lg bg-white text-black font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
-          >
-            {addingBot ? "Adicionando..." : "Adicionar"}
-          </button>
-        </div>
-      </VoidCard>
-
-      {/* Bots List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {bots.map((bot) => (
-          <VoidCard key={bot.id} className="p-6 relative group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-500/10">
-                  <Bot className="w-6 h-6 text-purple-500" />
+      {/* Bots Tab */}
+      {activeTab === "bots" && (
+        <div className="space-y-4">
+          {bots.length === 0 ? (
+            <div className="text-center py-20 text-silver/30">
+              <Bot className="w-12 h-12 mx-auto mb-3 opacity-20" />
+              <p>Nenhum bot atribuído ainda</p>
+            </div>
+          ) : bots.map(bot => (
+            <div key={bot.id} className="rounded-2xl p-6"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <div className="flex items-start justify-between mb-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.2)" }}>
+                    <Bot className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">{bot.name}</h3>
+                    <p className="text-xs text-silver/40 font-mono mt-0.5">{bot.discloudAppId}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold">{bot.name}</h3>
-                  <p className="text-xs text-silver/50 font-mono">{bot.discloudAppId}</p>
-                </div>
+                <StatusBadge status={bot.status} />
               </div>
-              <button
-                onClick={() => handleRemove(bot.id)}
-                className="text-silver/40 hover:text-red-500 transition-colors"
-                title="Remover bot"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
 
-            <div className="mb-4">
-              {formatStatus(bot.status)}
-            </div>
+              {/* Stats row */}
+              <div className="flex items-center gap-4 mb-5 text-xs text-silver/40">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {bot.lastAction ? `Última ação: ${new Date(bot.lastAction).toLocaleString("pt-BR")}` : "Sem ações recentes"}
+                </span>
+              </div>
 
-            <div className="flex items-center gap-2">
-              {bot.status === "online" ? (
-                <button
-                  onClick={() => handleStop(bot.id)}
-                  disabled={statusUpdating === bot.id}
-                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border border-white/20 text-white text-sm hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  <Square className="w-4 h-4" /> Parar
+              {/* Actions */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {bot.status === "online" ? (
+                  <button onClick={() => handleAction(bot.id, "stop")}
+                    disabled={!!actionLoading}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer disabled:opacity-50"
+                    style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }}>
+                    <Square className="w-4 h-4" /> Parar
+                  </button>
+                ) : (
+                  <button onClick={() => handleAction(bot.id, "start")}
+                    disabled={!!actionLoading}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer disabled:opacity-50"
+                    style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.2)" }}>
+                    <Play className="w-4 h-4" /> Iniciar
+                  </button>
+                )}
+
+                <button onClick={() => handleAction(bot.id, "restart")}
+                  disabled={!!actionLoading}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer disabled:opacity-50"
+                  style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <RotateCw className={`w-4 h-4 ${actionLoading === `${bot.id}-restart` ? "animate-spin" : ""}`} />
+                  Reiniciar
                 </button>
-              ) : (
-                <button
-                  onClick={() => handleStart(bot.id)}
-                  disabled={statusUpdating === bot.id}
-                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  <Play className="w-4 h-4" /> Iniciar
+
+                <button onClick={() => handleRefresh(bot.id)}
+                  disabled={!!actionLoading}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer disabled:opacity-50 ml-auto"
+                  style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  title="Atualizar status">
+                  <RefreshCw className={`w-4 h-4 ${actionLoading === `${bot.id}-refresh` ? "animate-spin" : ""}`} />
                 </button>
-              )}
-
-              <button
-                onClick={() => handleRestart(bot.id)}
-                disabled={statusUpdating === bot.id}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border border-white/20 text-white text-sm hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              >
-                <RotateCw className="w-4 h-4" /> Reiniciar
-              </button>
-
-              <button
-                onClick={() => updateStatus(bot.id)}
-                disabled={statusUpdating === bot.id}
-                className="px-3 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                title="Atualizar status"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
+              </div>
             </div>
-          </VoidCard>
-        ))}
+          ))}
+        </div>
+      )}
 
-        {bots.length === 0 && (
-          <div className="col-span-full text-center py-12 text-silver/50">
-            <Bot className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p>Nenhum bot cadastrado</p>
-            <p className="text-sm">Adicione um bot acima para começar</p>
-          </div>
-        )}
-      </div>
+      {/* Logs Tab */}
+      {activeTab === "logs" && (
+        <div className="rounded-2xl overflow-hidden"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          {logs.length === 0 ? (
+            <div className="text-center py-16 text-silver/30">
+              <Activity className="w-10 h-10 mx-auto mb-3 opacity-20" />
+              <p>Nenhuma ação registrada</p>
+            </div>
+          ) : (
+            <div className="divide-y" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+              {logs.map(log => {
+                const actionColors: Record<string, string> = {
+                  bot_start: "#22c55e", bot_stop: "#ef4444", bot_restart: "#eab308"
+                };
+                const color = actionColors[log.action] ?? "#a1a1aa";
+                return (
+                  <div key={log.id} className="px-5 py-3.5 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                      <div>
+                        <p className="text-sm">{log.details || log.action}</p>
+                        <p className="text-xs text-silver/40 mt-0.5">por {log.staffName}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-silver/30 shrink-0">
+                      {new Date(log.createdAt).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -16,6 +16,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   try {
     await stopBot(bot.discloudAppId);
     await prisma.discloudBot.update({ where: { id }, data: { status: "stopping", lastAction: new Date() } });
+    await prisma.log.create({ data: {
+      userId: bot.userId,
+      action: "bot_stop",
+      details: `Bot ${bot.name} parado`,
+      staffName: (session.user as any)?.name || "Cliente"
+    }});
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "Erro ao parar" }, { status: 500 });
