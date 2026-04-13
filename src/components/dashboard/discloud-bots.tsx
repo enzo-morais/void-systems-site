@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Bot, Play, Square, RotateCw, Plus, Trash2, AlertCircle, RefreshCw } from "lucide-react";
 import { VoidCard } from "@/components/landing/void-card";
-import { VoidButton } from "@/components/landing/void-button";
 
 interface DiscloudBot {
   id: string;
@@ -275,9 +274,13 @@ export function DiscloudBots() {
             onChange={(e) => setNewBotName(e.target.value)}
             className="flex-1 px-4 py-2 rounded-lg bg-black/50 border border-silver/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
           />
-          <VoidButton onClick={handleAddBot} disabled={addingBot}>
+          <button
+            onClick={handleAddBot}
+            disabled={addingBot}
+            className="px-6 py-2 rounded-lg bg-white text-black font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+          >
             {addingBot ? "Adicionando..." : "Adicionar"}
-          </VoidButton>
+          </button>
         </div>
       </VoidCard>
 
@@ -310,44 +313,39 @@ export function DiscloudBots() {
 
             <div className="flex items-center gap-2">
               {bot.status === "online" ? (
-                <VoidButton 
-                  variant="secondary" 
+                <button
                   onClick={() => handleStop(bot.id)}
                   disabled={statusUpdating === bot.id}
-                  className="flex-1"
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border border-white/20 text-white text-sm hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  <Square className="w-4 h-4" />
-                  Parar
-                </VoidButton>
+                  <Square className="w-4 h-4" /> Parar
+                </button>
               ) : (
-                <VoidButton 
+                <button
                   onClick={() => handleStart(bot.id)}
                   disabled={statusUpdating === bot.id}
-                  className="flex-1"
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  <Play className="w-4 h-4" />
-                  Iniciar
-                </VoidButton>
+                  <Play className="w-4 h-4" /> Iniciar
+                </button>
               )}
 
-              <VoidButton 
-                variant="secondary"
+              <button
                 onClick={() => handleRestart(bot.id)}
                 disabled={statusUpdating === bot.id}
-                className="flex-1"
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg border border-white/20 text-white text-sm hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                <RotateCw className="w-4 h-4" />
-                Reiniciar
-              </VoidButton>
+                <RotateCw className="w-4 h-4" /> Reiniciar
+              </button>
 
-              <VoidButton 
-                variant="secondary"
+              <button
                 onClick={() => updateStatus(bot.id)}
                 disabled={statusUpdating === bot.id}
-                className="flex-1"
+                className="px-3 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                title="Atualizar status"
               >
                 <RefreshCw className="w-4 h-4" />
-              </VoidButton>
+              </button>
             </div>
           </VoidCard>
         ))}
