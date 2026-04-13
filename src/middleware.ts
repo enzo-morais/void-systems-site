@@ -1,29 +1,32 @@
-import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
-export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+/**
+ * Middleware para proteger rotas do dashboard
+ */
+export async function middleware(request: NextRequest) {
+  // Proteger apenas rotas do dashboard
+  if (request.nextUrl.pathname.startsWith("/discloud")) {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      // Redirecionar para login
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-  // Rotas que não precisam de login
-  const publicPaths = ["/login", "/api/auth", "/api/public", "/termos", "/privacidade"];
-  const isPublic = publicPaths.some((p) => req.nextUrl.pathname.startsWith(p));
-
-  // Assets e arquivos estáticos
-  const isAsset = req.nextUrl.pathname.startsWith("/_next") ||
-    req.nextUrl.pathname.startsWith("/uploads") ||
-    req.nextUrl.pathname.includes(".");
-
-  if (isPublic || isAsset) return NextResponse.next();
-
-  if (!token) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+    // Verificar se o usuário está autorizado (apenas ID específico)
+    const authorizedUserId = process.env.AUTHORIZED_USER_ID;
+    if (authorizedUserId && session.user.id !== authorizedUserId) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/discloud/:path*"]
 };

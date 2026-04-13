@@ -80,6 +80,7 @@ model Task {
 
 model Log {
   id        String   @id @default(cuid())
+  userId    String?
   action    String
   details   String?
   staffName String
@@ -123,4 +124,16 @@ model SiteUser {
   emailVerified Boolean  @default(false)
   verifyCode    String?
   createdAt     DateTime @default(now())
+}
+
+model DiscloudBot {
+  id            String   @id @default(cuid())
+  userId        String
+  discloudAppId String
+  name          String
+  status        String   @default("offline")
+  lastAction    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

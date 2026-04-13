@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!
+);
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -14,13 +18,19 @@ export async function POST(req: NextRequest) {
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-
   const ext = file.name.split(".").pop() || "png";
   const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(path.join(uploadDir, filename), buffer);
+  const { error } = await supabase.storage
+    .from("receipts")
+    .upload(filename, buffer, { contentType: file.type, upsert: false });
 
-  return NextResponse.json({ url: `/uploads/${filename}` });
+  if (error) {
+    console.error("Supabase upload error:", error);
+    return NextResponse.json({ error: "Erro ao enviar arquivo" }, { status: 500 });
+  }
+
+  const { data } = supabase.storage.from("receipts").getPublicUrl(filename);
+
+  return NextResponse.json({ url: data.publicUrl });
 }
