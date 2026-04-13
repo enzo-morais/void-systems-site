@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bot, Play, Stop, RotateCw, Plus, Trash2, AlertCircle, RefreshCw } from "lucide-react";
+import { Bot, Play, Square, RotateCw, Plus, Trash2, AlertCircle, RefreshCw } from "lucide-react";
 import { VoidCard } from "@/components/landing/void-card";
 import { VoidButton } from "@/components/landing/void-button";
 
@@ -316,7 +316,7 @@ export function DiscloudBots() {
                   disabled={statusUpdating === bot.id}
                   className="flex-1"
                 >
-                  <Stop className="w-4 h-4" />
+                  <Square className="w-4 h-4" />
                   Parar
                 </VoidButton>
               ) : (
