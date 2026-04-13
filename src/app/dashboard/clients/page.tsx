@@ -40,6 +40,9 @@ export default function ClientsPage() {
   const [botUserId, setBotUserId] = useState("");
   const [botAppId, setBotAppId] = useState("");
   const [botName, setBotName] = useState("");
+  const [botClientId, setBotClientId] = useState("");
+  const [botPreview, setBotPreview] = useState<{name: string; avatar: string | null} | null>(null);
+  const [botPreviewLoading, setBotPreviewLoading] = useState(false);
   const [botSaving, setBotSaving] = useState(false);
   const [botSuccess, setBotSuccess] = useState(false);
   const [botError, setBotError] = useState("");
@@ -104,17 +107,32 @@ export default function ClientsPage() {
     const res = await fetch("/api/staff/bots", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: botUserId, discloudAppId: botAppId, name: botName }),
+      body: JSON.stringify({ userId: botUserId, discloudAppId: botAppId, name: botName, botClientId: botClientId || undefined }),
     });
     const data = await res.json();
     setBotSaving(false);
     if (res.ok) {
-      setBotUserId(""); setBotAppId(""); setBotName("");
+      setBotUserId(""); setBotAppId(""); setBotName(""); setBotClientId(""); setBotPreview(null);
       setBotSuccess(true); fetchBots();
       setTimeout(() => setBotSuccess(false), 3000);
     } else {
       setBotError(data.error || "Erro ao atribuir bot");
     }
+  }
+
+  async function handleFetchBotInfo() {
+    if (!botClientId) return;
+    setBotPreviewLoading(true);
+    setBotPreview(null);
+    try {
+      const res = await fetch(`/api/staff/bot-info?clientId=${botClientId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setBotPreview({ name: data.name, avatar: data.avatar });
+        if (!botName) setBotName(data.name);
+      }
+    } catch {}
+    setBotPreviewLoading(false);
   }
 
   return (
@@ -248,7 +266,7 @@ export default function ClientsPage() {
       <form onSubmit={handleAssignBot} className="rounded-lg p-6" style={cardStyle}>
         <h2 className="text-sm font-semibold text-silver/60 uppercase tracking-wider mb-4 flex items-center gap-2"><Plus className="w-4 h-4" /> Atribuir Bot a Cliente</h2>
         <p className="text-xs text-silver/40 mb-4">Selecione o cliente que já fez login no site.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-xs text-silver/40 mb-1.5">Cliente *</label>
             <select value={botUserId} onChange={(e) => setBotUserId(e.target.value)} required
@@ -267,8 +285,33 @@ export default function ClientsPage() {
             <input type="text" value={botAppId} onChange={(e) => setBotAppId(e.target.value)} required placeholder="Ex: 1775616670965" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Nome do Bot *</label>
-            <input type="text" value={botName} onChange={(e) => setBotName(e.target.value)} required placeholder="Ex: VØID Ticket" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+            <label className="block text-xs text-silver/40 mb-1.5">Client ID do Bot (Discord)</label>
+            <div className="flex gap-2">
+              <input type="text" value={botClientId} onChange={(e) => setBotClientId(e.target.value)}
+                placeholder="Ex: 1234567890123456789"
+                className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+              <button type="button" onClick={handleFetchBotInfo} disabled={!botClientId || botPreviewLoading}
+                className="px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer disabled:opacity-50"
+                style={{ backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}>
+                {botPreviewLoading ? "..." : "Buscar"}
+              </button>
+            </div>
+            {botPreview && (
+              <div className="flex items-center gap-2 mt-2 p-2 rounded-lg" style={{ background: "rgba(255,255,255,0.04)" }}>
+                {botPreview.avatar
+                  ? <img src={botPreview.avatar} alt="" className="w-8 h-8 rounded-full" />
+                  : <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">🤖</div>
+                }
+                <span className="text-sm font-medium">{botPreview.name}</span>
+                <span className="text-xs text-green-400 ml-auto">✓ Encontrado</span>
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs text-silver/40 mb-1.5">Nome do Bot (opcional se usar Client ID)</label>
+            <input type="text" value={botName} onChange={(e) => setBotName(e.target.value)}
+              placeholder={botPreview?.name || "Ex: VØID Ticket"}
+              className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
         </div>
         {botError && <p className="text-red-400 text-sm mb-4">{botError}</p>}

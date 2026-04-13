@@ -9,6 +9,8 @@ interface DiscloudBot {
   discloudAppId: string;
   status: string;
   lastAction: string | null;
+  botAvatar?: string | null;
+  botClientId?: string | null;
 }
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
@@ -252,9 +254,12 @@ export function DiscloudBots() {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-5">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center"
                       style={{ background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.2)" }}>
-                      <Bot className="w-6 h-6 text-purple-400" />
+                      {bot.botAvatar
+                        ? <img src={bot.botAvatar} alt={bot.name} className="w-full h-full object-cover" />
+                        : <Bot className="w-6 h-6 text-purple-400" />
+                      }
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg">{bot.name}</h3>

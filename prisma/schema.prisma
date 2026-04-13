@@ -131,6 +131,8 @@ model DiscloudBot {
   userId        String
   discloudAppId String
   name          String
+  botClientId   String?
+  botAvatar     String?
   status        String    @default("offline")
   lastAction    DateTime?
   createdAt     DateTime  @default(now())

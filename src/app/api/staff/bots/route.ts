@@ -22,19 +22,35 @@ export async function POST(request: NextRequest) {
   if (!isStaffMember(session)) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
 
   try {
-    const { userId, discloudAppId, name } = await request.json();
+    const { userId, discloudAppId, name, botClientId } = await request.json();
 
-    if (!userId || !discloudAppId || !name) {
-      return NextResponse.json({ error: "Campos obrigatórios: userId, discloudAppId, name" }, { status: 400 });
+    if (!userId || !discloudAppId) {
+      return NextResponse.json({ error: "userId e discloudAppId são obrigatórios" }, { status: 400 });
     }
 
     // Verificar se o bot já existe
     const existing = await prisma.discloudBot.findFirst({ where: { discloudAppId } });
     if (existing) return NextResponse.json({ error: "Este App ID já está cadastrado" }, { status: 400 });
 
-    // Salva direto com o Discord ID como userId — sem precisar de User no banco
+    // Se tiver botClientId, buscar nome e avatar automaticamente
+    let botName = name || discloudAppId;
+    let botAvatar: string | null = null;
+
+    if (botClientId) {
+      try {
+        const res = await fetch(`https://discord.com/api/v10/applications/${botClientId}/rpc`);
+        if (res.ok) {
+          const data = await res.json();
+          botName = data.name || botName;
+          botAvatar = data.icon
+            ? `https://cdn.discordapp.com/app-icons/${botClientId}/${data.icon}.png`
+            : null;
+        }
+      } catch { /* usa o nome fornecido */ }
+    }
+
     const bot = await prisma.discloudBot.create({
-      data: { userId, discloudAppId, name, status: "offline" }
+      data: { userId, discloudAppId, name: botName, botClientId: botClientId || null, botAvatar, status: "offline" }
     });
 
     return NextResponse.json({ bot }, { status: 201 });
