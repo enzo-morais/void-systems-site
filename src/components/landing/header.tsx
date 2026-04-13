@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Bot } from "lucide-react";
 
 const DISCORD_LINK = "https://discord.gg/voidsystems";
 
@@ -17,6 +17,16 @@ export function Header() {
   const { data: session, status } = useSession();
   const isStaff = session?.user?.isStaff === true;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hasBots, setHasBots] = useState(false);
+
+  useEffect(() => {
+    if (session && !isStaff) {
+      fetch("/api/bots")
+        .then(r => r.ok ? r.json() : { bots: [] })
+        .then(data => setHasBots((data.bots?.length ?? 0) > 0))
+        .catch(() => {});
+    }
+  }, [session, isStaff]);
 
   return (
     <header
@@ -47,6 +57,11 @@ export function Header() {
               {isStaff && (
                 <Link href="/dashboard" className="text-sm px-4 py-2 rounded-lg font-medium text-black bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all duration-300">
                   Painel Staff
+                </Link>
+              )}
+              {!isStaff && hasBots && (
+                <Link href="/discloud" className="text-sm px-4 py-2 rounded-lg font-medium text-black bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all duration-300 flex items-center gap-1.5">
+                  <Bot className="w-4 h-4" /> Meus Bots
                 </Link>
               )}
               <Link href="/perfil" className="text-sm px-4 py-2 rounded-lg font-medium text-silver hover:text-white transition-colors"
@@ -91,6 +106,11 @@ export function Header() {
                 {isStaff && (
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block text-sm text-center py-2 rounded-lg bg-white text-black font-medium">
                     Painel Staff
+                  </Link>
+                )}
+                {!isStaff && hasBots && (
+                  <Link href="/discloud" onClick={() => setMobileOpen(false)} className="block text-sm text-center py-2 rounded-lg bg-white text-black font-medium flex items-center justify-center gap-1.5">
+                    <Bot className="w-4 h-4" /> Meus Bots
                   </Link>
                 )}
                 <Link href="/perfil" onClick={() => setMobileOpen(false)} className="block text-sm text-center py-2 rounded-lg text-silver"

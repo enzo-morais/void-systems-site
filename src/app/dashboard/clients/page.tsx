@@ -211,12 +211,15 @@ export default function ClientsPage() {
                 <th className="px-5 py-3 text-left text-xs text-silver/40 font-medium uppercase tracking-wider">App ID</th>
                 <th className="px-5 py-3 text-left text-xs text-silver/40 font-medium uppercase tracking-wider">Status</th>
                 <th className="px-5 py-3 text-left text-xs text-silver/40 font-medium uppercase tracking-wider">User ID</th>
+                <th className="px-5 py-3 w-12"></th>
               </tr>
             </thead>
             <tbody>
               {bots.map((b) => (
                 <tr key={b.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td className="px-5 py-3 font-medium flex items-center gap-2"><Bot className="w-4 h-4 text-purple-400" />{b.name}</td>
+                  <td className="px-5 py-3 font-medium">
+                    <div className="flex items-center gap-2"><Bot className="w-4 h-4 text-purple-400" />{b.name}</div>
+                  </td>
                   <td className="px-5 py-3 text-silver/50 font-mono text-xs">{b.discloudAppId}</td>
                   <td className="px-5 py-3">
                     <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: b.status === "online" ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", color: b.status === "online" ? "#22c55e" : "#ef4444" }}>
@@ -224,6 +227,21 @@ export default function ClientsPage() {
                     </span>
                   </td>
                   <td className="px-5 py-3 text-silver/40 font-mono text-xs">{b.userId}</td>
+                  <td className="px-5 py-3">
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Remover bot "${b.name}"?`)) return;
+                        await fetch(`/api/staff/bots/${b.id}`, { method: "DELETE" });
+                        fetchBots();
+                      }}
+                      className="p-1.5 rounded-md transition-colors cursor-pointer"
+                      style={{ color: "#666" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#ef4444"; (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(239,68,68,0.1)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#666"; (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
