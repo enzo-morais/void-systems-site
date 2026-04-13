@@ -30,7 +30,8 @@ export default function ClientsPage() {
 
   // Bot assignment state
   const [bots, setBots] = useState<DiscloudBot[]>([]);
-  const [botClientDiscordId, setBotClientDiscordId] = useState("");
+  const [users, setUsers] = useState<{id: string; name: string | null; email: string | null}[]>([]);
+  const [botUserId, setBotUserId] = useState("");
   const [botAppId, setBotAppId] = useState("");
   const [botName, setBotName] = useState("");
   const [botSaving, setBotSaving] = useState(false);
@@ -49,7 +50,12 @@ export default function ClientsPage() {
     if (res.ok) setBots(await res.json());
   }, []);
 
-  useEffect(() => { fetchClients(); fetchBots(); }, [fetchClients, fetchBots]);
+  const fetchUsers = useCallback(async () => {
+    const res = await fetch("/api/staff/users");
+    if (res.ok) setUsers(await res.json());
+  }, []);
+
+  useEffect(() => { fetchClients(); fetchBots(); fetchUsers(); }, [fetchClients, fetchBots, fetchUsers]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,12 +88,12 @@ export default function ClientsPage() {
     const res = await fetch("/api/staff/bots", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clientDiscordId: botClientDiscordId, discloudAppId: botAppId, name: botName }),
+      body: JSON.stringify({ userId: botUserId, discloudAppId: botAppId, name: botName }),
     });
     const data = await res.json();
     setBotSaving(false);
     if (res.ok) {
-      setBotClientDiscordId(""); setBotAppId(""); setBotName("");
+      setBotUserId(""); setBotAppId(""); setBotName("");
       setBotSuccess(true); fetchBots();
       setTimeout(() => setBotSuccess(false), 3000);
     } else {
@@ -179,11 +185,17 @@ export default function ClientsPage() {
 
       <form onSubmit={handleAssignBot} className="rounded-lg p-6" style={cardStyle}>
         <h2 className="text-sm font-semibold text-silver/60 uppercase tracking-wider mb-4 flex items-center gap-2"><Plus className="w-4 h-4" /> Atribuir Bot a Cliente</h2>
-        <p className="text-xs text-silver/40 mb-4">O cliente precisa ter feito login no site pelo menos uma vez com o Discord.</p>
+        <p className="text-xs text-silver/40 mb-4">Selecione o cliente que já fez login no site.</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Discord ID do Cliente *</label>
-            <input type="text" value={botClientDiscordId} onChange={(e) => setBotClientDiscordId(e.target.value)} required placeholder="ID do Discord do cliente" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+            <label className="block text-xs text-silver/40 mb-1.5">Cliente *</label>
+            <select value={botUserId} onChange={(e) => setBotUserId(e.target.value)} required
+              className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+              <option value="">Selecione um cliente...</option>
+              {users.map(u => (
+                <option key={u.id} value={u.id}>{u.name || u.email || u.id}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs text-silver/40 mb-1.5">App ID da Discloud *</label>

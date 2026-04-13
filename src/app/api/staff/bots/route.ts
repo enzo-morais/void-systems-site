@@ -24,35 +24,16 @@ export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
 
-  const { clientDiscordId, discloudAppId, name } = await request.json();
+  const { userId, discloudAppId, name } = await request.json();
 
-  if (!clientDiscordId || !discloudAppId || !name) {
-    return NextResponse.json({ error: "Campos obrigatórios: clientDiscordId, discloudAppId, name" }, { status: 400 });
+  if (!userId || !discloudAppId || !name) {
+    return NextResponse.json({ error: "Campos obrigatórios: userId, discloudAppId, name" }, { status: 400 });
   }
 
-  // Buscar o User pelo discordId — tenta na tabela Account primeiro
-  let userId: string | null = null;
-
-  const account = await prisma.account.findFirst({
-    where: { providerAccountId: clientDiscordId, provider: "discord" },
-    select: { userId: true }
-  });
-
-  if (account) {
-    userId = account.userId;
-  } else {
-    // Fallback: buscar direto na tabela User pelo id (caso seja login por credentials)
-    const user = await prisma.user.findUnique({
-      where: { id: clientDiscordId },
-      select: { id: true }
-    });
-    if (user) userId = user.id;
-  }
-
-  if (!userId) {
-    return NextResponse.json({ 
-      error: "Cliente não encontrado. Verifique se o Discord ID está correto e se o cliente já fez login no site." 
-    }, { status: 404 });
+  // Verificar se o usuário existe
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
   }
 
   // Verificar se o bot já existe
