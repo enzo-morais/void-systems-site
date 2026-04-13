@@ -2,29 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { PrismaClient } from "@prisma/client";
-import { protectAllBotRoutes, sanitizeInput } from "@/lib/discloud-middleware";
+import { sanitizeInput } from "@/lib/discloud-middleware";
 
 const prisma = new PrismaClient();
-type SessionUser = { id?: string };
+
+function getUserId(session: any): string | null {
+  return session?.user?.id ?? session?.user?.discordId ?? null;
+}
 
 export async function GET(request: NextRequest) {
-  const authError = await protectAllBotRoutes(request);
-  if (authError) return authError;
-
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as SessionUser)?.id;
+  const userId = getUserId(session);
 
   if (!userId) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
   try {
-    // Buscar bots do usuário
     const bots = await prisma.discloudBot.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" }
     });
-
     return NextResponse.json({ bots });
   } catch (error) {
     console.error("Erro ao listar bots:", error);
@@ -33,11 +31,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const authError = await protectAllBotRoutes(request);
-  if (authError) return authError;
-
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as SessionUser)?.id;
+  const userId = getUserId(session);
 
   if (!userId) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
@@ -47,16 +42,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { discloudAppId, name } = body;
 
-    // Sanitizar entradas
-    const sanitizedAppId = sanitizeInput(discloudAppId);
-    const sanitizedName = sanitizeInput(name);
+    const sanitizedAppId = sanitizeInput(String(discloudAppId ?? ""));
+    const sanitizedName = sanitizeInput(String(name ?? ""));
 
-    // Validar dados
     if (!sanitizedAppId || !sanitizedName) {
       return NextResponse.json({ error: "App ID e nome são obrigatórios" }, { status: 400 });
     }
 
-    // Verificar se o bot já existe
     const existingBot = await prisma.discloudBot.findFirst({
       where: {
         OR: [
@@ -70,14 +62,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Bot já cadastrado" }, { status: 400 });
     }
 
-    // Criar bot no banco
     const bot = await prisma.discloudBot.create({
-      data: {
-        userId,
-        discloudAppId: sanitizedAppId,
-        name: sanitizedName,
-        status: "offline"
-      }
+      data: { userId, discloudAppId: sanitizedAppId, name: sanitizedName, status: "offline" }
     });
 
     return NextResponse.json({ bot }, { status: 201 });
