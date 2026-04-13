@@ -5,12 +5,19 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prisma =
-  global.prisma ??
-  new PrismaClient({
+function createPrismaClient() {
+  return new PrismaClient({
     log: ["error"],
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
   });
-
-if (process.env.NODE_ENV !== "production") {
-  global.prisma = prisma;
 }
+
+// Em produção (Vercel serverless), cada invocação pode ser um processo novo
+// Usamos o global para reutilizar quando possível
+export const prisma = global.prisma ?? createPrismaClient();
+
+global.prisma = prisma;
