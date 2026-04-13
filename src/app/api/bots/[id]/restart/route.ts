@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { restartBot } from "@/lib/discloud-api";
 import { userOwnsBot } from "@/lib/bot-auth";
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
