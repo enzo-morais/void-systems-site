@@ -7,8 +7,13 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-  const clients = await prisma.client.findMany({ orderBy: { createdAt: "desc" } });
-  return NextResponse.json(clients);
+  try {
+    const clients = await prisma.client.findMany({ orderBy: { createdAt: "desc" } });
+    return NextResponse.json(clients);
+  } catch (e: any) {
+    console.error("[/api/clients GET]", e?.message, e?.code);
+    return NextResponse.json({ error: e?.message ?? "Erro interno" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
