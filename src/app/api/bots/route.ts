@@ -5,17 +5,14 @@ import { PrismaClient } from "@prisma/client";
 import { protectAllBotRoutes, sanitizeInput } from "@/lib/discloud-middleware";
 
 const prisma = new PrismaClient();
+type SessionUser = { id?: string };
 
-/**
- * GET /api/bots - Listar todos os bots do usuário
- */
 export async function GET(request: NextRequest) {
-  // Proteção de rotas
   const authError = await protectAllBotRoutes(request);
   if (authError) return authError;
 
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = (session?.user as SessionUser)?.id;
 
   if (!userId) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
@@ -35,16 +32,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/**
- * POST /api/bots - Adicionar novo bot
- */
 export async function POST(request: NextRequest) {
-  // Proteção de rotas
   const authError = await protectAllBotRoutes(request);
   if (authError) return authError;
 
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = (session?.user as SessionUser)?.id;
 
   if (!userId) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });

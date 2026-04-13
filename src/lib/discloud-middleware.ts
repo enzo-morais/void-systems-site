@@ -74,7 +74,7 @@ export async function protectAllBotRoutes(request: NextRequest) {
 
   // Verificar se o usuário está autorizado (apenas ID específico)
   const authorizedUserId = process.env.AUTHORIZED_USER_ID;
-  if (authorizedUserId && session.user.id !== authorizedUserId) {
+  if (authorizedUserId && (session?.user as { id?: string })?.id !== authorizedUserId) {
     return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
   }
 

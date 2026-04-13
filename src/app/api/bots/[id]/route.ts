@@ -8,11 +8,12 @@ import { getBotStatus, startBot, stopBot, restartBot } from "@/lib/discloud-api"
 const prisma = new PrismaClient();
 
 type Params = { params: Promise<{ id: string }> };
+type SessionUser = { id?: string; name?: string };
 
 export async function GET(request: NextRequest, { params }: Params) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = (session?.user as SessionUser)?.id;
 
   if (!userId) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 export async function POST(request: NextRequest, { params }: Params) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = (session?.user as SessionUser)?.id;
 
   if (!userId) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 export async function DELETE(request: NextRequest, { params }: Params) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = (session?.user as SessionUser)?.id;
 
   if (!userId) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 

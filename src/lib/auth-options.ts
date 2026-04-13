@@ -105,6 +105,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as Record<string, unknown>).username = token.username;
         (session.user as Record<string, unknown>).isStaff = token.isStaff;
         (session.user as Record<string, unknown>).provider = token.provider;
+        (session.user as Record<string, unknown>).id = token.sub;
         if (token.image) session.user.image = token.image as string;
       }
       return session;
