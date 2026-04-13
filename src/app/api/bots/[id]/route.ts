@@ -7,13 +7,10 @@ import { getBotStatus, startBot, stopBot, restartBot } from "@/lib/discloud-api"
 
 const prisma = new PrismaClient();
 
-/**
- * GET /api/bots/:id - Obter status do bot
- */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Params = { params: Promise<{ id: string }> };
+
+export async function GET(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
@@ -22,179 +19,78 @@ export async function GET(
   }
 
   try {
-    const bot = await prisma.discloudBot.findUnique({
-      where: { id: params.id, userId }
-    });
+    const bot = await prisma.discloudBot.findUnique({ where: { id, userId } });
+    if (!bot) return NextResponse.json({ error: "Bot não encontrado" }, { status: 404 });
 
-    if (!bot) {
-      return NextResponse.json({ error: "Bot não encontrado" }, { status: 404 });
-    }
-
-    // Obter status real da Discloud
     const status = await getBotStatus(bot.discloudAppId);
-
-    // Atualizar status no banco
-    await prisma.discloudBot.update({
-      where: { id: params.id },
-      data: { status: status.status, lastAction: new Date() }
-    });
+    await prisma.discloudBot.update({ where: { id }, data: { status: status.status, lastAction: new Date() } });
 
     return NextResponse.json({ bot, status });
-  } catch (error) {
-    console.error("Erro ao obter status do bot:", error);
+  } catch {
     return NextResponse.json({ error: "Erro ao obter status" }, { status: 500 });
   }
 }
 
-/**
- * POST /api/bots/:id/start - Iniciar bot
- */
-export async function POST_START(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
-  if (!userId) {
-    return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-  }
+  if (!userId) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
-  // Verificar proteção
-  const result = await protectBotRoute(request, params.id);
-  if (!result.success) {
-    return NextResponse.json({ error: result.message }, { status: 403 });
-  }
+  const url = new URL(request.url);
+  const action = url.pathname.split("/").pop(); // start | stop | restart
+
+  const result = await protectBotRoute(request, id);
+  if (!result.success) return NextResponse.json({ error: result.message }, { status: 403 });
 
   try {
-    // Iniciar bot na Discloud
-    const response = await startBot(result.bot.discloudAppId);
+    let response;
+    let newStatus: string;
+    let logAction: string;
 
-    if (response.success) {
-      // Atualizar status no banco
-      await prisma.discloudBot.update({
-        where: { id: params.id },
-        data: { status: "starting", lastAction: new Date() }
-      });
-
-      // Criar log
-      await createLog(
-        userId,
-        "bot_start",
-        `Bot ${result.bot.name} (${result.bot.discloudAppId}) iniciado`,
-        session.user.name || "Usuário"
-      );
-
-      return NextResponse.json({ success: true, message: "Bot iniciado com sucesso" });
+    if (action === "start") {
+      response = await startBot(result.bot.discloudAppId);
+      newStatus = "starting";
+      logAction = "bot_start";
+    } else if (action === "stop") {
+      response = await stopBot(result.bot.discloudAppId);
+      newStatus = "stopping";
+      logAction = "bot_stop";
+    } else if (action === "restart") {
+      response = await restartBot(result.bot.discloudAppId);
+      newStatus = "starting";
+      logAction = "bot_restart";
+    } else {
+      return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
     }
 
-    return NextResponse.json({ error: "Erro ao iniciar bot" }, { status: 500 });
-  } catch (error) {
-    console.error("Erro ao iniciar bot:", error);
-    return NextResponse.json({ error: "Erro ao iniciar bot" }, { status: 500 });
+    if (response.success) {
+      await prisma.discloudBot.update({ where: { id }, data: { status: newStatus, lastAction: new Date() } });
+      await createLog(userId, logAction, `Bot ${result.bot.name} (${result.bot.discloudAppId}) - ${action}`, session?.user?.name || "Usuário");
+      return NextResponse.json({ success: true });
+    }
+
+    return NextResponse.json({ error: "Erro na ação" }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }
 
-/**
- * POST /api/bots/:id/stop - Parar bot
- */
-export async function POST_STOP(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
-  if (!userId) {
-    return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-  }
-
-  // Verificar proteção
-  const result = await protectBotRoute(request, params.id);
-  if (!result.success) {
-    return NextResponse.json({ error: result.message }, { status: 403 });
-  }
+  if (!userId) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   try {
-    // Parar bot na Discloud
-    const response = await stopBot(result.bot.discloudAppId);
+    const bot = await prisma.discloudBot.findUnique({ where: { id, userId } });
+    if (!bot) return NextResponse.json({ error: "Bot não encontrado" }, { status: 404 });
 
-    if (response.success) {
-      // Atualizar status no banco
-      await prisma.discloudBot.update({
-        where: { id: params.id },
-        data: { status: "stopping", lastAction: new Date() }
-      });
-
-      // Criar log
-      await createLog(
-        userId,
-        "bot_stop",
-        `Bot ${result.bot.name} (${result.bot.discloudAppId}) parado`,
-        session.user.name || "Usuário"
-      );
-
-      return NextResponse.json({ success: true, message: "Bot parado com sucesso" });
-    }
-
-    return NextResponse.json({ error: "Erro ao parar bot" }, { status: 500 });
-  } catch (error) {
-    console.error("Erro ao parar bot:", error);
-    return NextResponse.json({ error: "Erro ao parar bot" }, { status: 500 });
+    await prisma.discloudBot.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Erro ao remover bot" }, { status: 500 });
   }
 }
-
-/**
- * POST /api/bots/:id/restart - Reiniciar bot
- */
-export async function POST_RESTART(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-  }
-
-  // Verificar proteção
-  const result = await protectBotRoute(request, params.id);
-  if (!result.success) {
-    return NextResponse.json({ error: result.message }, { status: 403 });
-  }
-
-  try {
-    // Reiniciar bot na Discloud
-    const response = await restartBot(result.bot.discloudAppId);
-
-    if (response.success) {
-      // Atualizar status no banco
-      await prisma.discloudBot.update({
-        where: { id: params.id },
-        data: { status: "starting", lastAction: new Date() }
-      });
-
-      // Criar log
-      await createLog(
-        userId,
-        "bot_restart",
-        `Bot ${result.bot.name} (${result.bot.discloudAppId}) reiniciado`,
-        session.user.name || "Usuário"
-      );
-
-      return NextResponse.json({ success: true, message: "Bot reiniciado com sucesso" });
-    }
-
-    return NextResponse.json({ error: "Erro ao reiniciar bot" }, { status: 500 });
-  } catch (error) {
-    console.error("Erro ao reiniciar bot:", error);
-    return NextResponse.json({ error: "Erro ao reiniciar bot" }, { status: 500 });
-  }
-}
-
-// Rotas dinâmicas
-export { POST_START as POST };
-export { POST_START as start };
-export { POST_STOP as stop };
-export { POST_RESTART as restart };
