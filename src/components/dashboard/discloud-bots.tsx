@@ -223,7 +223,7 @@ export function DiscloudBots() {
     return (
       <div className="flex items-center gap-2">
         <span className={`w-2 h-2 rounded-full ${colors[status as keyof typeof colors]}`} />
-        <span className="text-sm text-silver">{labels[status as keyof typeof typeof labels]}</span>
+        <span className="text-sm text-silver">{labels[status as keyof typeof labels]}</span>
       </div>
     );
   }
