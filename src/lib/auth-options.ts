@@ -75,6 +75,16 @@ export const authOptions: NextAuthOptions = {
 
         await sendLoginWebhook(username, discordId, "discord", avatarUrl);
 
+        // Sincronizar bots: se existir bot com o Discord ID como userId, atualizar para o userId real do banco
+        try {
+          if (token.sub) {
+            await prisma.discloudBot.updateMany({
+              where: { userId: discordId },
+              data: { userId: token.sub }
+            });
+          }
+        } catch { /* silent */ }
+
         try {
           const res = await fetch(
             `https://discord.com/api/v10/users/@me/guilds/${DISCORD_GUILD_ID}/member`,

@@ -30,10 +30,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Campos obrigatórios: userId, discloudAppId, name" }, { status: 400 });
   }
 
-  // Verificar se o usuário existe
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
+  // Tenta achar o User no banco pelo id interno OU pelo discordId (providerAccountId)
+  let resolvedUserId = userId;
+
+  const userById = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!userById) {
+    // Tenta achar pela conta Discord
+    const account = await prisma.account.findFirst({
+      where: { providerAccountId: userId, provider: "discord" },
+      select: { userId: true }
+    });
+
+    if (account) {
+      resolvedUserId = account.userId;
+    } else {
+      // Cria um User "placeholder" para o cliente Discord que ainda não fez login
+      const newUser = await prisma.user.create({
+        data: {
+          id: userId, // usa o Discord ID como id
+          name: name,
+        }
+      });
+      resolvedUserId = newUser.id;
+    }
   }
 
   // Verificar se o bot já existe
@@ -41,7 +61,7 @@ export async function POST(request: NextRequest) {
   if (existing) return NextResponse.json({ error: "Este App ID já está cadastrado" }, { status: 400 });
 
   const bot = await prisma.discloudBot.create({
-    data: { userId, discloudAppId, name, status: "offline" }
+    data: { userId: resolvedUserId, discloudAppId, name, status: "offline" }
   });
 
   return NextResponse.json({ bot }, { status: 201 });
