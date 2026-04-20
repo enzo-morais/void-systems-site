@@ -18,7 +18,9 @@ interface CustomSelectProps {
 
 export function CustomSelect({ value, onChange, options, placeholder = "Selecione...", required }: CustomSelectProps) {
   const [open, setOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
 
   const selected = options.find((o) => o.value === value);
 
@@ -30,9 +32,16 @@ export function CustomSelect({ value, onChange, options, placeholder = "Selecion
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Detectar se deve abrir para cima
+  useEffect(() => {
+    if (!open || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    setDropUp(spaceBelow < 260);
+  }, [open]);
+
   return (
     <div ref={ref} className="relative">
-      {/* Hidden input for form validation */}
       {required && <input type="text" value={value} required className="sr-only" tabIndex={-1} onChange={() => {}} />}
 
       <button
@@ -54,12 +63,14 @@ export function CustomSelect({ value, onChange, options, placeholder = "Selecion
 
       {open && (
         <div
-          className="absolute z-50 w-full mt-1 rounded-lg overflow-hidden backdrop-blur-xl shadow-2xl"
+          ref={dropRef}
+          className="absolute z-[9999] w-full rounded-lg overflow-hidden backdrop-blur-xl shadow-2xl"
           style={{
-            background: "rgba(15,15,15,0.95)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(15,15,15,0.98)",
+            border: "1px solid rgba(255,255,255,0.12)",
             maxHeight: "240px",
             overflowY: "auto",
+            ...(dropUp ? { bottom: "calc(100% + 4px)" } : { top: "calc(100% + 4px)" }),
           }}
         >
           {options.map((option) => (
