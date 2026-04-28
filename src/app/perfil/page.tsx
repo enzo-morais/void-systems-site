@@ -1,10 +1,11 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { VoidBackground } from "@/components/landing/void-background";
 import { Header } from "@/components/landing/header";
-import { User, Lock, Loader2, CheckCircle, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Loader2, CheckCircle, Pencil, KeyRound, Eye, EyeOff, Bot, Wrench } from "lucide-react";
 import Image from "next/image";
 
 const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
@@ -13,6 +14,17 @@ const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm foc
 export default function PerfilPage() {
   const { data: session, update } = useSession();
   const isDiscord = (session?.user as Record<string, unknown>)?.provider === "discord";
+  const isStaff = (session?.user as any)?.isStaff === true;
+  const [hasBots, setHasBots] = useState(false);
+
+  useEffect(() => {
+    if (session) {
+      fetch("/api/bots")
+        .then(r => r.ok ? r.json() : { bots: [] })
+        .then(data => setHasBots((data.bots?.length ?? 0) > 0))
+        .catch(() => {});
+    }
+  }, [session]);
 
   // Edit profile
   const [editing, setEditing] = useState(false);
@@ -182,6 +194,26 @@ export default function PerfilPage() {
             </div>
           )}
           {editMsg && <p className="text-green-400 text-xs mt-3 flex items-center gap-1"><CheckCircle className="w-3 h-3" />{editMsg}</p>}
+
+          {/* Atalhos */}
+          {(hasBots || isStaff) && (
+            <div className="flex flex-wrap gap-2 mt-5 pt-5" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+              {hasBots && (
+                <Link href="/discloud"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                  style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(192,192,192,0.8)" }}>
+                  <Bot className="w-4 h-4" /> Meus Bots
+                </Link>
+              )}
+              {isStaff && (
+                <Link href="/panel-builder"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                  style={{ backgroundColor: "rgba(88,101,242,0.1)", border: "1px solid rgba(88,101,242,0.3)", color: "#7c8cf8" }}>
+                  <Wrench className="w-4 h-4" /> Panel Builder
+                </Link>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Password section - only for email accounts */}
