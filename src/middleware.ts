@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Rotas que não precisam de login
 const PUBLIC_PATHS = [
   "/login",
   "/termos",

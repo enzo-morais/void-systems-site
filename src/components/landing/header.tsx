@@ -18,6 +18,7 @@ export function Header() {
   const isStaff = session?.user?.isStaff === true;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hasBots, setHasBots] = useState(false);
+  const [hasPanelBuilder, setHasPanelBuilder] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -25,8 +26,10 @@ export function Header() {
         .then(r => r.ok ? r.json() : { bots: [] })
         .then(data => setHasBots((data.bots?.length ?? 0) > 0))
         .catch(() => {});
+      // Staff sempre tem acesso ao panel builder
+      if (isStaff) setHasPanelBuilder(true);
     }
-  }, [session]);
+  }, [session, isStaff]);
 
   return (
     <header
@@ -57,6 +60,12 @@ export function Header() {
               {isStaff && (
                 <Link href="/dashboard" className="text-sm px-4 py-2 rounded-lg font-medium text-black bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all duration-300">
                   Painel Staff
+                </Link>
+              )}
+              {hasPanelBuilder && (
+                <Link href="/panel-builder" className="text-sm px-4 py-2 rounded-lg font-medium text-silver hover:text-white transition-all duration-300 flex items-center gap-1.5"
+                  style={{ backgroundColor: "rgba(88,101,242,0.1)", border: "1px solid rgba(88,101,242,0.3)", color: "#7c8cf8" }}>
+                  Panel Builder
                 </Link>
               )}
               {hasBots && (
@@ -107,6 +116,12 @@ export function Header() {
                 {isStaff && (
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block text-sm text-center py-2 rounded-lg bg-white text-black font-medium">
                     Painel Staff
+                  </Link>
+                )}
+                {hasPanelBuilder && (
+                  <Link href="/panel-builder" onClick={() => setMobileOpen(false)} className="block text-sm text-center py-2 rounded-lg font-medium"
+                    style={{ backgroundColor: "rgba(88,101,242,0.1)", border: "1px solid rgba(88,101,242,0.3)", color: "#7c8cf8" }}>
+                    Panel Builder
                   </Link>
                 )}
                 {hasBots && (
