@@ -11,10 +11,7 @@ export default async function PanelBuilderPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
-  if (PANEL_BUILDER_ROLE_ID) {
-    const isStaff = (session.user as any)?.isStaff;
-    if (!isStaff) redirect("/");
-  }
+  // Qualquer usuário logado pode acessar o panel builder
 
   return (
     <>

@@ -205,7 +205,7 @@ export default function PerfilPage() {
                   <Bot className="w-4 h-4" /> Meus Bots
                 </Link>
               )}
-              {isStaff && (
+              {(isStaff || hasBots) && (
                 <Link href="/panel-builder"
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
                   style={{ backgroundColor: "rgba(88,101,242,0.1)", border: "1px solid rgba(88,101,242,0.3)", color: "#7c8cf8" }}>
