@@ -6,6 +6,7 @@ import { prisma } from "./prisma";
 
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID!;
 const STAFF_ROLE_ID = "1462664924936274144";
+const CLIENT_ROLE_ID = "1462664263096205457";
 const LOGIN_WEBHOOK = process.env.DISCORD_LOGIN_WEBHOOK;
 
 async function sendLoginWebhook(username: string, id: string, provider: string, avatar?: string) {
@@ -92,9 +93,12 @@ export const authOptions: NextAuthOptions = {
           );
           if (res.ok) {
             const member = await res.json();
-            token.isStaff = (member.roles as string[]).includes(STAFF_ROLE_ID);
+            const roles = member.roles as string[];
+            token.isStaff = roles.includes(STAFF_ROLE_ID);
+            token.isClient = roles.includes(CLIENT_ROLE_ID);
           } else {
             token.isStaff = false;
+            token.isClient = false;
           }
         } catch {
           token.isStaff = false;
@@ -104,6 +108,7 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === "credentials") {
         token.provider = "credentials";
         token.isStaff = false;
+        token.isClient = false;
         await sendLoginWebhook(token.name || "Usuário", token.email || "email", "credentials");
       }
 
@@ -114,6 +119,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as Record<string, unknown>).discordId = token.discordId;
         (session.user as Record<string, unknown>).username = token.username;
         (session.user as Record<string, unknown>).isStaff = token.isStaff;
+        (session.user as Record<string, unknown>).isClient = token.isClient;
         (session.user as Record<string, unknown>).provider = token.provider;
         (session.user as Record<string, unknown>).id = token.sub ?? token.discordId;
         if (token.image) session.user.image = token.image as string;

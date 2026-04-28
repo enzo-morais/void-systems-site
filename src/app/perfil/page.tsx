@@ -15,16 +15,17 @@ export default function PerfilPage() {
   const { data: session, update } = useSession();
   const isDiscord = (session?.user as Record<string, unknown>)?.provider === "discord";
   const isStaff = (session?.user as any)?.isStaff === true;
+  const isClient = (session?.user as any)?.isClient === true;
   const [hasBots, setHasBots] = useState(false);
 
   useEffect(() => {
-    if (session) {
+    if (session && isClient) {
       fetch("/api/bots")
         .then(r => r.ok ? r.json() : { bots: [] })
         .then(data => setHasBots((data.bots?.length ?? 0) > 0))
         .catch(() => {});
     }
-  }, [session]);
+  }, [session, isClient]);
 
   // Edit profile
   const [editing, setEditing] = useState(false);
@@ -196,16 +197,16 @@ export default function PerfilPage() {
           {editMsg && <p className="text-green-400 text-xs mt-3 flex items-center gap-1"><CheckCircle className="w-3 h-3" />{editMsg}</p>}
 
           {/* Atalhos */}
-          {(hasBots || isStaff) && (
+          {(isClient || isStaff) && (
             <div className="flex flex-wrap gap-2 mt-5 pt-5" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-              {hasBots && (
+              {isClient && hasBots && (
                 <Link href="/discloud"
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
                   style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(192,192,192,0.8)" }}>
                   <Bot className="w-4 h-4" /> Meus Bots
                 </Link>
               )}
-              {(isStaff || hasBots) && (
+              {(isClient || isStaff) && (
                 <Link href="/panel-builder"
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
                   style={{ backgroundColor: "rgba(88,101,242,0.1)", border: "1px solid rgba(88,101,242,0.3)", color: "#7c8cf8" }}>
