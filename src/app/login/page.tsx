@@ -62,7 +62,9 @@ function LoginContent() {
     const result = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
 
-    if (result?.error) {
+    if (result?.error === "RATE_LIMITED") {
+      setError("Muitas tentativas. Aguarde alguns minutos e tente de novo.");
+    } else if (result?.error) {
       setError("Email ou senha incorretos");
     } else {
       router.push(callbackUrl);

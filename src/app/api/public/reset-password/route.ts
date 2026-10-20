@@ -1,24 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 import { Resend } from "resend";
+import { prisma } from "@/lib/prisma";
 import { resetPasswordEmail } from "@/lib/email-templates";
-import { rateLimit } from "@/lib/rate-limit";
+import { issueCode } from "@/lib/codes";
+import { RULES, checkIpAndEmail, getClientIp, tooManyRequests } from "@/lib/ratelimit";
+import { emailSchema, parseBody } from "@/lib/validation";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const bodySchema = z.object({ email: emailSchema }).strict();
+
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
-  if (!rateLimit(ip, 3, 60000)) {
-    return NextResponse.json({ error: "Muitas tentativas. Aguarde 1 minuto." }, { status: 429 });
-  }
-  const { email } = await req.json();
-  if (!email) return NextResponse.json({ error: "Email obrigatório" }, { status: 400 });
+  const parsed = await parseBody(req, bodySchema);
+  if (!parsed.ok) return parsed.response;
+  const { email } = parsed.data;
+
+  const limit = await checkIpAndEmail(RULES.resetRequestIp, RULES.resetRequestEmail, getClientIp(req.headers), email);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSec);
 
   const user = await prisma.siteUser.findUnique({ where: { email } });
-  if (!user) return NextResponse.json({ success: true }); // Don't reveal if email exists
+  if (!user) return NextResponse.json({ success: true }); // não revela se o email existe
 
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-  await prisma.siteUser.update({ where: { email }, data: { verifyCode: code } });
+  const code = await issueCode("reset", email);
 
   try {
     await resend.emails.send({
@@ -27,7 +31,8 @@ export async function POST(req: NextRequest) {
       subject: "Recuperacao de senha - VOID Systems",
       html: resetPasswordEmail(code),
     });
-  } catch {
+  } catch (err) {
+    console.error("[EMAIL] Erro ao enviar:", err instanceof Error ? err.message : "desconhecido");
     return NextResponse.json({ error: "Erro ao enviar email" }, { status: 500 });
   }
 

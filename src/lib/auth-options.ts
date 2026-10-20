@@ -3,6 +3,7 @@ import DiscordProvider from "next-auth/providers/discord";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
+import { RULES, checkRate, emailKey, getClientIp } from "./ratelimit";
 
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID!;
 const STAFF_ROLE_ID = "1462664924936274144";
@@ -47,8 +48,14 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Senha", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+      async authorize(credentials, req) {
+        if (typeof credentials?.email !== "string" || typeof credentials?.password !== "string") return null;
+        if (!credentials.email || !credentials.password) return null;
+
+        // limite de tentativas por IP e por email (Upstash): barra força bruta no login
+        const byIp = await checkRate(RULES.loginIp, getClientIp((req?.headers ?? {}) as Record<string, string | string[] | undefined>));
+        const byEmail = byIp.ok ? await checkRate(RULES.loginEmail, emailKey(credentials.email)) : byIp;
+        if (!byEmail.ok) throw new Error("RATE_LIMITED");
 
         const user = await prisma.siteUser.findUnique({ where: { email: credentials.email } });
         if (!user) return null;
