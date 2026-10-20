@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Bell,
   ClipboardList,
@@ -179,8 +179,16 @@ const VARIANTS: Variant[] = [
   },
 ];
 
-/** Duração do ciclo de animação do mockup (precisa bater com o `14s` do CSS). */
-const CYCLE_MS = 14_000;
+/** Sorteia a ordem das cenas; nunca repete a que acabou de passar. */
+function shuffledQueue(current: number): number[] {
+  const q = VARIANTS.map((_, i) => i);
+  for (let i = q.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [q[i], q[j]] = [q[j], q[i]];
+  }
+  if (q[0] === current) [q[0], q[q.length - 1]] = [q[q.length - 1], q[0]];
+  return q;
+}
 
 function Cursor() {
   return (
@@ -225,14 +233,17 @@ function MockBtn({ button }: { button: MockButton }) {
 }
 
 export function DiscordMockup() {
+  // a primeira cena é sempre a de tickets (igual no servidor e no cliente); as seguintes saem sorteadas
   const [index, setIndex] = useState(0);
+  const queue = useRef<number[]>([]);
 
-  // troca de cena a cada ciclo; com movimento reduzido fica parado na primeira
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % VARIANTS.length), CYCLE_MS);
-    return () => window.clearInterval(id);
-  }, []);
+  // o próprio ciclo de animação (dm-life) é o relógio: ao terminar, entra a próxima cena.
+  // Com movimento reduzido não há animação, então fica parado na primeira.
+  function nextScene(e: React.AnimationEvent<HTMLDivElement>) {
+    if (e.target !== e.currentTarget || e.animationName !== "dm-life") return;
+    if (queue.current.length === 0) queue.current = shuffledQueue(index);
+    setIndex(queue.current.shift()!);
+  }
 
   const v = VARIANTS[index];
   const PanelChIcon = v.panelChannel.icon;
@@ -254,7 +265,7 @@ export function DiscordMockup() {
         </div>
 
         {/* key: reinicia a animação CSS do começo a cada troca de cena */}
-        <div className="dm-body dm-body--in" key={v.id}>
+        <div className="dm-body dm-body--in" key={v.id} onAnimationEnd={nextScene}>
           <div className="dm-rail">
             <div className="dm-server dm-server--active">V</div>
             <div className="dm-sep" />
