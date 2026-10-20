@@ -52,6 +52,8 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      // o Discord devolve `iss` na volta do OAuth (RFC 9207); sem declarar o issuer o NextAuth falha com OAuthCallback
+      issuer: "https://discord.com",
       authorization: { params: { scope: "identify guilds guilds.members.read" } },
     }),
     CredentialsProvider({
