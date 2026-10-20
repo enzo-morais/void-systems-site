@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_PATHS = [
+  "/produtos",
   "/login",
   "/termos",
   "/privacidade",
@@ -13,6 +14,11 @@ const PUBLIC_PATHS = [
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Home pública (match exato, "/" sozinho liberaria tudo)
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
 
   // Liberar rotas públicas
   if (PUBLIC_PATHS.some(p => pathname.startsWith(p))) {
