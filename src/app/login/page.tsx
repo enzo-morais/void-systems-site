@@ -103,6 +103,10 @@ function LoginContent() {
   const [clientIdx, setClientIdx] = useState(0);
   const succeeded = useRef(false);
 
+  // erro devolvido pelo NextAuth na URL (?error=...), ex.: falha ao voltar do Discord
+  const urlError = searchParams.get("error");
+  const authError = urlError && urlError !== "CredentialsSignin" ? urlError : null;
+
   const busy = loading || discordLoading;
   const errFor = (f: Field) => (err?.field === f ? err.msg : undefined);
 
@@ -350,6 +354,7 @@ function LoginContent() {
                 )}
                 {discordLoading ? "Conectando ao Discord..." : "Entrar com Discord"}
               </button>
+              <FieldError id="lg-auth-err" msg={authError ? `Não foi possível entrar com o Discord. Tente de novo. (código: ${authError})` : undefined} />
 
               <div className="lg-or">
                 <span />

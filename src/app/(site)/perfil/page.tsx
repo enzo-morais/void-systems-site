@@ -1,8 +1,8 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import { User, Lock, Loader2, CheckCircle, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Loader2, CheckCircle, LogOut, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { ProfileBots } from "@/components/home/ProfileBots";
 import "@/components/dashboard/panel-theme.css";
@@ -140,12 +140,18 @@ export default function PerfilPage() {
                 <p className="text-[10px] text-silver/75 mt-1">{isDiscord ? "Conectado via Discord" : "Conta por email"}</p>
               </div>
             </div>
-            {!isDiscord && !editing && (
-              <button onClick={startEdit} className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-white transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
+            <div className="flex items-center gap-2">
+              {!isDiscord && !editing && (
+                <button onClick={startEdit} className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-white transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
+                  style={{ backgroundColor: "#15151c" }}>
+                  <Pencil className="w-3 h-3" /> Editar
+                </button>
+              )}
+              <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-red-400 transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
                 style={{ backgroundColor: "#15151c" }}>
-                <Pencil className="w-3 h-3" /> Editar
+                <LogOut className="w-3 h-3" /> Sair
               </button>
-            )}
+            </div>
           </div>
 
           {editing ? (
