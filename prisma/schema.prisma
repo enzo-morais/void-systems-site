@@ -122,7 +122,14 @@ model SiteUser {
   password      String
   image         String?
   emailVerified Boolean  @default(false)
-  verifyCode    String?
+  verifyCode    String? // legado (texto puro): não é mais usado
+  // códigos de verificação e de redefinição de senha: só o hash, com validade e tentativas
+  verifyCodeHash    String?
+  verifyCodeExpires DateTime?
+  verifyAttempts    Int       @default(0)
+  resetCodeHash     String?
+  resetCodeExpires  DateTime?
+  resetAttempts     Int       @default(0)
   createdAt     DateTime @default(now())
 }
 
@@ -137,4 +144,13 @@ model DiscloudBot {
   lastAction    DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+// Contadores do rate limit (janela fixa). Linhas expiradas são apagadas automaticamente por src/lib/ratelimit.ts.
+model RateLimit {
+  key       String   @id
+  count     Int
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }

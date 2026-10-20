@@ -173,7 +173,9 @@ function LoginContent() {
     const result = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
 
-    if (result?.error) {
+    if (result?.error === "RATE_LIMITED") {
+      fail("password", "Muitas tentativas. Aguarde alguns minutos e tente de novo.");
+    } else if (result?.error) {
       fail("password", "Email ou senha incorretos. Confira os dados e tente de novo.");
     }
     // sucesso: o efeito da sessão dispara a animação e o redirecionamento

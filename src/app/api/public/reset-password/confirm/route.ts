@@ -1,22 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+import { checkCode } from "@/lib/codes";
+import { RULES, checkIpAndEmail, getClientIp, tooManyRequests } from "@/lib/ratelimit";
+import { codeSchema, emailSchema, parseBody, passwordSchema } from "@/lib/validation";
+
+const bodySchema = z.object({ email: emailSchema, code: codeSchema, newPassword: passwordSchema }).strict();
 
 export async function POST(req: NextRequest) {
-  const { email, code, newPassword } = await req.json();
-  if (!email || !code || !newPassword) return NextResponse.json({ error: "Campos obrigatórios" }, { status: 400 });
-  if (newPassword.length < 6) return NextResponse.json({ error: "Senha deve ter no mínimo 6 caracteres" }, { status: 400 });
+  const parsed = await parseBody(req, bodySchema);
+  if (!parsed.ok) return parsed.response;
+  const { email, code, newPassword } = parsed.data;
 
-  const user = await prisma.siteUser.findUnique({ where: { email } });
-  if (!user || user.verifyCode !== code) {
-    return NextResponse.json({ error: "Código incorreto" }, { status: 400 });
+  const limit = await checkIpAndEmail(RULES.resetConfirmIp, RULES.resetConfirmEmail, getClientIp(req.headers), email);
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSec);
+
+  if (!(await checkCode("reset", email, code))) {
+    return NextResponse.json({ error: "Código incorreto ou expirado" }, { status: 400 });
   }
 
   const hashed = await bcrypt.hash(newPassword, 12);
-  await prisma.siteUser.update({
-    where: { email },
-    data: { password: hashed, verifyCode: null },
-  });
+  await prisma.siteUser.update({ where: { email }, data: { password: hashed } });
 
   return NextResponse.json({ success: true });
 }
