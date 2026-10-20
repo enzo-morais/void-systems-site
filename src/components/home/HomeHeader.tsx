@@ -20,6 +20,7 @@ export function HomeHeader() {
 
   const accountHref = session ? "/perfil" : "/login";
   const accountLabel = session ? "Perfil" : "Entrar";
+  const isStaff = (session?.user as { isStaff?: boolean } | undefined)?.isStaff === true;
 
   return (
     <header
@@ -45,6 +46,11 @@ export function HomeHeader() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
+          {isStaff && (
+            <Link href="/dashboard" className="text-sm text-white/90 hover:text-white transition-colors">
+              Painel
+            </Link>
+          )}
           <Link href={accountHref} className="text-sm text-silver/75 hover:text-white transition-colors">
             {accountLabel}
           </Link>
@@ -81,6 +87,11 @@ export function HomeHeader() {
               {link.label}
             </Link>
           ))}
+          {isStaff && (
+            <Link href="/dashboard" onClick={() => setOpen(false)} className="block text-sm py-2.5 text-white">
+              Painel administrativo
+            </Link>
+          )}
           <div className="pt-3 flex items-center gap-3">
             <Link
               href={accountHref}

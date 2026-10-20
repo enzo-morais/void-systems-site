@@ -61,7 +61,7 @@ export function ProfileBots() {
         <h2 className="font-display text-lg font-semibold flex items-center gap-2">
           <Bot className="w-5 h-5 text-[var(--void-accent)]" /> Meus bots
         </h2>
-        <Link href="/discloud" className="text-xs text-silver/80 hover:text-white transition-colors">Gerenciar →</Link>
+        <Link href="/meus-bots" className="text-xs text-silver/80 hover:text-white transition-colors">Gerenciar →</Link>
       </div>
 
       {bots === null && <div className="panel p-6 text-sm text-silver/80">Carregando...</div>}

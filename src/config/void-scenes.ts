@@ -81,6 +81,7 @@ export const routeScenes: RouteScene[] = [
   // painel: só estrelas, calmo
   { path: "/dashboard", scenes: "calm", transition: "dissolve" },
   { path: "/discloud", scenes: "calm", transition: "dissolve" },
+  { path: "/meus-bots", scenes: "calm", transition: "dissolve" },
   { path: "/perfil", scenes: "calm", transition: "dissolve" },
   // home e páginas do site com cenas controladas pelo scroll
   { path: "/", exact: true, scenes: "page", transition: "explode" },

@@ -2,8 +2,9 @@
 
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import { User, Lock, Loader2, CheckCircle, LogOut, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Loader2, CheckCircle, LayoutDashboard, LogOut, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { ProfileBots } from "@/components/home/ProfileBots";
 import "@/components/dashboard/panel-theme.css";
 
@@ -146,6 +147,12 @@ export default function PerfilPage() {
                   style={{ backgroundColor: "#15151c" }}>
                   <Pencil className="w-3 h-3" /> Editar
                 </button>
+              )}
+              {(session?.user as { isStaff?: boolean } | undefined)?.isStaff === true && (
+                <Link href="/dashboard" className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-white transition-colors px-3 py-1.5 rounded-lg"
+                  style={{ backgroundColor: "#15151c" }}>
+                  <LayoutDashboard className="w-3 h-3" /> Painel
+                </Link>
               )}
               <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-red-400 transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
                 style={{ backgroundColor: "#15151c" }}>
