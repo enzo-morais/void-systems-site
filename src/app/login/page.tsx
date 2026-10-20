@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
 import { AlertCircle, ChevronDown, Eye, EyeOff, Loader2, Mail } from "lucide-react";
-import { clients, DISCORD_LINK } from "@/config/home";
+import { clients } from "@/config/home";
+import { DISCORD_STORE_URL } from "@/config/store";
 import "@/components/home/home.css";
 import "./login.css";
 
@@ -434,7 +435,7 @@ function LoginContent() {
             <div>
               <Link href="/termos">Termos</Link>
               <Link href="/privacidade">Privacidade</Link>
-              <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer">Discord</a>
+              <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer">Discord</a>
             </div>
           </div>
         </div>

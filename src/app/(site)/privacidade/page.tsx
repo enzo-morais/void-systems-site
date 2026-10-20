@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DISCORD_STORE_URL } from "@/config/store";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade — VØID Systems",
@@ -56,7 +57,7 @@ export default function PrivacidadePage() {
 
           <section>
             <h2 className="text-white font-semibold mb-2">9. Contato</h2>
-            <p>Para dúvidas sobre privacidade, entre em contato pelo nosso Discord: <a href="https://discord.gg/voidsystems" target="_blank" rel="noopener noreferrer" className="text-white hover:underline">discord.gg/voidsystems</a></p>
+            <p>Para dúvidas sobre privacidade, entre em contato pelo nosso Discord: <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-white hover:underline">discord.gg/voidsystems</a></p>
           </section>
         </div>
         </div>

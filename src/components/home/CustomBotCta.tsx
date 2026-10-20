@@ -1,4 +1,4 @@
-import { DISCORD_LINK } from "@/config/home";
+import { DISCORD_STORE_URL } from "@/config/store";
 import { KineticTitle } from "./KineticTitle";
 import { Reveal } from "./Reveal";
 import "./hero.css";
@@ -22,7 +22,7 @@ export function CustomBotCta({ scene = 2 }: { scene?: number }) {
             Contamos o que o seu servidor precisa e montamos um bot sob medida. Peça um orçamento, sem compromisso.
           </p>
           <a
-            href={DISCORD_LINK}
+            href={DISCORD_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="hero-cta hero-cta--primary mt-8"

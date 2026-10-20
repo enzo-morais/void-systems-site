@@ -1,4 +1,5 @@
 // Conteúdo editável da home. Altere aqui, sem mexer nos componentes.
+import { PAYMENT_NOTE } from "./store";
 
 /** Clientes exibidos na faixa em carrossel (ordem = ordem de exibição). */
 export const clients: string[] = ["Rust Brasil", "Junin", "IdosoZ", "RubyHub", "Berdo"];
@@ -24,9 +25,6 @@ export const stats: Stat[] = [
   { label: "Estabilidade pós-entrega", value: 100, suffix: "%" },
 ];
 
-/** Discord da loja (orçamentos, tickets e suporte). */
-export const DISCORD_LINK = "https://discord.gg/voidsystems";
-
 /** Passos da seção "Como funciona". */
 export const steps = [
   { title: "Escolha o bot", desc: "Veja o catálogo, compare e adicione ao carrinho o que o seu servidor precisa." },
@@ -44,7 +42,7 @@ export const reasons = [
 
 /** Perguntas do FAQ. */
 export const faqs = [
-  { q: "Como funciona o pagamento?", a: "Aceitamos apenas Pix. O pagamento é mensal e você pode cancelar a qualquer momento pelo Discord." },
+  { q: "Como funciona o pagamento?", a: PAYMENT_NOTE },
   { q: "Quanto tempo leva pra configurar?", a: "A maioria dos bots fica pronto no mesmo dia. Configurações mais complexas podem levar 48 horas ou mais." },
   { q: "O bot fica hospedado onde?", a: "Os bots ficam hospedados em servidores nossos. Você não precisa se preocupar com hospedagem nem com manutenção." },
   { q: "E se eu precisar de algo personalizado?", a: "Fazemos bots sob medida. Entre no Discord, abra um ticket e descreva o que precisa. Enviamos um orçamento sem compromisso." },
@@ -52,7 +50,7 @@ export const faqs = [
 ];
 
 /** Itens de confiança abaixo dos botões do hero. */
-export const trust = ["Pagamento via Pix", "Cancele quando quiser", "Suporte direto no Discord"];
+export const trust = ["Pix pelo Discord", "Cancele quando quiser", "Suporte direto no Discord"];
 
 /** Cards "Explore" da home, que levam às páginas do site. */
 export const explore = [

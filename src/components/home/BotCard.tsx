@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import type { PointerEvent } from "react";
-import { Check, Plus, Activity, ClipboardList, Clock, Megaphone, ShieldCheck, Sparkles, Swords, Ticket, UserPlus, type LucideIcon } from "lucide-react";
+import { Calculator, Check, Activity, ClipboardList, Clock, Megaphone, ShieldCheck, Sparkles, Swords, Ticket, UserPlus, type LucideIcon } from "lucide-react";
 import { formatPrice, type Badge, type BotIcon, type BotItem } from "@/config/bots";
 import { BotDemo } from "./BotDemo";
+import { HireButton } from "./HireButton";
 import "./bot-card.css";
 
 const icons: Record<BotIcon, LucideIcon> = {
@@ -70,16 +71,25 @@ export function BotCard({ bot, inCart = false, onToggle }: { bot: BotItem; inCar
         {/* demonstração: parada com convite; roda ao passar o mouse */}
         <BotDemo bot={bot} />
 
-        <div className="mt-auto pt-5 flex items-end justify-between gap-3">
+        <div className="mt-auto pt-5 flex flex-wrap items-end justify-between gap-3">
           <p className="text-white">
             <span className={`font-mono ${price.suffix ? "text-xl font-semibold" : "text-base font-medium"}`}>{price.main}</span>
             {price.suffix && <span className="font-mono text-sm text-silver/80">{price.suffix}</span>}
           </p>
-{onToggle ? (
-            <button type="button" onClick={onToggle} aria-pressed={inCart} className={`bc-buy ${inCart ? "bc-buy--on" : ""}`}>
-              {inCart ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              {inCart ? "Adicionado" : "Adicionar"}
-            </button>
+          {onToggle ? (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onToggle}
+                aria-pressed={inCart}
+                aria-label={inCart ? "Remover da calculadora de desconto" : "Adicionar à calculadora de desconto"}
+                title={inCart ? "Remover da calculadora de desconto" : "Adicionar à calculadora de desconto"}
+                className={`bc-calc ${inCart ? "bc-calc--on" : ""}`}
+              >
+                {inCart ? <Check className="w-4 h-4" /> : <Calculator className="w-4 h-4" />}
+              </button>
+              <HireButton items={[{ name: bot.name, price: bot.price }]} className="bc-buy" />
+            </div>
           ) : (
             <Link href={`/bots/${bot.id}`} className="bc-buy">
               Ver detalhes

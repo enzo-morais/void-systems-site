@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { Percent, ShoppingCart, X } from "lucide-react";
 import { bots, brl, discountTiers, getDiscountPct } from "@/config/bots";
-import { DISCORD_LINK } from "@/config/home";
 import { BotCard } from "./BotCard";
+import { HireButton } from "./HireButton";
 import { Reveal } from "./Reveal";
 import "./hero.css";
 import "./calculator.css";
@@ -145,9 +145,9 @@ export function CatalogSection() {
           )}
           {hasQuote && <p className="calc-hint">O bot personalizado é orçado à parte e não entra no total.</p>}
 
-          <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--primary calc-cta">
-            Contratar pelo Discord
-          </a>
+{items.length > 0 ? (
+            <HireButton items={items.map((b) => ({ name: b.name, price: b.price }))} className="hero-cta hero-cta--primary calc-cta" />
+          ) : null}
           <button type="button" onClick={() => setCart([])} className="calc-clear">
             Limpar carrinho
           </button>

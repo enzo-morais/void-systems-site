@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { bots, formatPrice } from "@/config/bots";
-import { DISCORD_LINK } from "@/config/home";
 import { KineticTitle } from "@/components/home/KineticTitle";
 import { Reveal } from "@/components/home/Reveal";
+import { HireButton } from "@/components/home/HireButton";
 import { BotDemo } from "@/components/home/BotDemo";
 import "@/components/home/bot-card.css";
 import "@/components/home/hero.css";
@@ -69,9 +69,7 @@ export default async function BotDetailPage({ params }: Props) {
                 <span className={`font-mono ${price.suffix ? "text-3xl font-semibold" : "text-xl font-medium"}`}>{price.main}</span>
                 {price.suffix && <span className="font-mono text-sm text-silver/80">{price.suffix}</span>}
               </p>
-              <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--primary">
-                Contratar
-              </a>
+              <HireButton items={[{ name: bot.name, price: bot.price }]} />
             </div>
             <Link href="/bots" className="mt-5 block text-center text-sm text-silver/85 hover:text-white transition-colors underline underline-offset-4 decoration-white/30">
               Calcular desconto com outros bots →

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DISCORD_LINK } from "@/config/home";
+import { DISCORD_STORE_URL } from "@/config/store";
 import { KineticTitle } from "./KineticTitle";
 import { Reveal } from "./Reveal";
 import "./hero.css";
@@ -20,7 +20,7 @@ export function FinalCta() {
           <Link href="/bots" className="hero-cta hero-cta--primary">
             Ver bots
           </Link>
-          <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--ghost">
+          <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--ghost">
             Entrar no Discord
           </a>
         </Reveal>

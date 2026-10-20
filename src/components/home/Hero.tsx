@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check, ChevronDown } from "lucide-react";
-import { clients, DISCORD_LINK, trust } from "@/config/home";
+import { clients, trust } from "@/config/home";
+import { DISCORD_STORE_URL } from "@/config/store";
 import { DiscordMockup } from "./DiscordMockup";
 import { KineticTitle } from "./KineticTitle";
 import "./hero.css";
@@ -26,7 +27,7 @@ export function Hero() {
             <Link href="/bots" className="hero-cta hero-cta--primary">
               Ver bots
             </Link>
-            <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--ghost">
+            <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--ghost">
               Bot personalizado
             </a>
           </div>

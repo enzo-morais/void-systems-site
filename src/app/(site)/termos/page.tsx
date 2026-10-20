@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DISCORD_STORE_URL } from "@/config/store";
 
 export const metadata: Metadata = {
   title: "Termos de Uso — VØID Systems",
@@ -26,7 +27,7 @@ export default function TermosPage() {
 
           <section>
             <h2 className="text-white font-semibold mb-2">3. Pagamento</h2>
-            <p>Os pagamentos são realizados exclusivamente via Pix. Planos mensais são cobrados a cada 30 dias. O não pagamento pode resultar na suspensão do serviço. Não realizamos reembolsos após a entrega e configuração do produto.</p>
+            <p>O pagamento é feito via Pix pelo nosso Discord, com atendimento direto da equipe. Planos mensais são cobrados a cada 30 dias. O não pagamento pode resultar na suspensão do serviço. Não realizamos reembolsos após a entrega e configuração do produto.</p>
           </section>
 
           <section>
@@ -56,7 +57,7 @@ export default function TermosPage() {
 
           <section>
             <h2 className="text-white font-semibold mb-2">9. Contato</h2>
-            <p>Para dúvidas sobre estes termos, entre em contato pelo nosso Discord: <a href="https://discord.gg/voidsystems" target="_blank" rel="noopener noreferrer" className="text-white hover:underline">discord.gg/voidsystems</a></p>
+            <p>Para dúvidas sobre estes termos, entre em contato pelo nosso Discord: <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-white hover:underline">discord.gg/voidsystems</a></p>
           </section>
         </div>
         </div>

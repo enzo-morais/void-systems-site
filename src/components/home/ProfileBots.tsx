@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, Bot, CalendarClock, LifeBuoy, QrCode, Server } from "lucide-react";
-import { DISCORD_LINK } from "@/config/home";
+import { AlertTriangle, Bot, CalendarClock, LifeBuoy, RefreshCw, Server } from "lucide-react";
+import { DISCORD_STORE_URL, PAYMENT_NOTE } from "@/config/store";
 import "@/components/dashboard/panel-theme.css";
 
 interface ClientBot {
@@ -120,14 +120,14 @@ export function ProfileBots() {
               )}
 
               <div className="flex flex-wrap gap-2 mt-5">
-                <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="pt-btn pt-btn--primary">
-                  <QrCode className="w-4 h-4" /> Renovar via Pix
+                <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="pt-btn pt-btn--primary">
+                  <RefreshCw className="w-4 h-4" /> Renovar pelo Discord
                 </a>
-                <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="pt-btn pt-btn--ghost">
+                <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="pt-btn pt-btn--ghost">
                   <LifeBuoy className="w-4 h-4" /> Abrir suporte
                 </a>
               </div>
-              <p className="text-[11px] text-silver/70 mt-3">O Pix é gerado pela nossa equipe no Discord da loja.</p>
+              <p className="text-[11px] text-silver/70 mt-3">{PAYMENT_NOTE}</p>
             </div>
           );
         })}

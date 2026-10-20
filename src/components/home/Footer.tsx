@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DISCORD_LINK } from "@/config/home";
+import { DISCORD_STORE_URL } from "@/config/store";
 
 export function Footer() {
   return (
@@ -13,7 +13,7 @@ export function Footer() {
         </div>
 
         <nav className="flex items-center gap-6 text-sm text-silver/75">
-          <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+          <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
             Discord
           </a>
           <Link href="/termos" className="hover:text-white transition-colors">Termos</Link>
