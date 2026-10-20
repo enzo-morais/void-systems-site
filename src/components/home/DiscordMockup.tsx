@@ -1,5 +1,186 @@
-import { Bell, Hash, Headphones, Lock, Mic, Pin, Search, Settings, Ticket, Users, Volume2 } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  Bell,
+  ClipboardList,
+  Gift,
+  Hash,
+  Headphones,
+  Lock,
+  Mic,
+  Pin,
+  Search,
+  Settings,
+  ShieldCheck,
+  ShoppingCart,
+  Ticket,
+  Users,
+  Volume2,
+  type LucideIcon,
+} from "lucide-react";
 import "./discord-mockup.css";
+
+interface MockButton {
+  label: string;
+  icon?: LucideIcon;
+  tone?: "blurple" | "danger";
+}
+
+interface Variant {
+  id: string;
+  /** Nome do servidor e da categoria onde ficam os canais da demonstração. */
+  server: string;
+  category: string;
+  panelChannel: { name: string; icon: LucideIcon };
+  resultChannel: { name: string; icon: LucideIcon };
+  user: { name: string; tone: string };
+  roleLabel: string;
+  /** Mensagem do bot com o botão que o membro clica (cena A). */
+  panel: { title: string; desc: string; foot: string; icon: LucideIcon; button: MockButton & { icon: LucideIcon } };
+  /** Cena B: mensagem do membro, resposta do bot e cargo entregue. */
+  userMessage: string;
+  reply: { title: string; desc: string; fields: [string, string][]; foot: string; buttons: MockButton[] };
+  roleName: string;
+  /** Texto para leitores de tela. */
+  alt: string;
+}
+
+const VARIANTS: Variant[] = [
+  {
+    id: "tickets",
+    server: "VØID Community",
+    category: "Atendimento",
+    panelChannel: { name: "painel-tickets", icon: Ticket },
+    resultChannel: { name: "ticket-lucas", icon: Lock },
+    user: { name: "Lucas", tone: "linear-gradient(135deg,#f59e0b,#ef4444)" },
+    roleLabel: "Cliente",
+    panel: {
+      title: "Central de Atendimento",
+      desc: "Precisa de ajuda? Clique no botão abaixo para abrir um ticket com a nossa equipe.",
+      foot: "VØID Systems · Atendimento",
+      icon: Ticket,
+      button: { label: "Abrir ticket", icon: Ticket },
+    },
+    userMessage: "Oi! Preciso de ajuda com o meu pedido.",
+    reply: {
+      title: "Ticket #0042 aberto",
+      desc: "Olá, Lucas! Nossa equipe já foi avisada e responde em instantes.",
+      fields: [["Categoria", "Suporte"], ["Prioridade", "Normal"], ["Status", "Aguardando"]],
+      foot: "VØID Systems · Ticket",
+      buttons: [{ label: "Fechar ticket", icon: Lock, tone: "danger" }, { label: "Assumir" }],
+    },
+    roleName: "@Cliente",
+    alt: "um bot de tickets abrindo um ticket, respondendo ao membro e entregando um cargo",
+  },
+  {
+    id: "verificacao",
+    server: "Comunidade Nova",
+    category: "Entrada",
+    panelChannel: { name: "verificacao", icon: ShieldCheck },
+    resultChannel: { name: "boas-vindas", icon: Hash },
+    user: { name: "Marina", tone: "linear-gradient(135deg,#10b981,#0ea5e9)" },
+    roleLabel: "Membro",
+    panel: {
+      title: "Verificação de membros",
+      desc: "Clique em Verificar para liberar o acesso a todos os canais do servidor.",
+      foot: "VØID Systems · Segurança",
+      icon: ShieldCheck,
+      button: { label: "Verificar", icon: ShieldCheck },
+    },
+    userMessage: "Oi pessoal, cheguei agora!",
+    reply: {
+      title: "Bem-vinda, Marina!",
+      desc: "Verificação concluída. Leia as regras e se apresente no chat.",
+      fields: [["Status", "Verificada"], ["Membro nº", "#1.204"], ["Acesso", "Liberado"]],
+      foot: "VØID Systems · Boas-vindas",
+      buttons: [{ label: "Ver regras", tone: "blurple" }, { label: "Apresentar-se" }],
+    },
+    roleName: "@Membro",
+    alt: "um bot de verificação liberando o acesso de um novo membro e entregando o cargo",
+  },
+  {
+    id: "loja",
+    server: "Loja Gamer",
+    category: "Loja",
+    panelChannel: { name: "vitrine", icon: ShoppingCart },
+    resultChannel: { name: "pedido-davi", icon: Lock },
+    user: { name: "Davi", tone: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
+    roleLabel: "Cliente",
+    panel: {
+      title: "Vitrine de produtos",
+      desc: "Escolha o seu plano e finalize o pagamento por Pix em poucos cliques.",
+      foot: "VØID Systems · Vendas",
+      icon: ShoppingCart,
+      button: { label: "Comprar", icon: ShoppingCart },
+    },
+    userMessage: "Quero o plano mensal, por favor.",
+    reply: {
+      title: "Pedido #118 criado",
+      desc: "Davi, seu pedido está reservado. Pague para liberar o acesso na hora.",
+      fields: [["Produto", "Plano Mensal"], ["Valor", "R$ 29,90"], ["Pagamento", "Pix"]],
+      foot: "VØID Systems · Pedido",
+      buttons: [{ label: "Pagar com Pix", tone: "blurple" }, { label: "Cancelar", tone: "danger" }],
+    },
+    roleName: "@Cliente",
+    alt: "um bot de loja criando um pedido com pagamento por Pix e entregando o cargo de cliente",
+  },
+  {
+    id: "sorteio",
+    server: "Comunidade Games",
+    category: "Eventos",
+    panelChannel: { name: "sorteios", icon: Gift },
+    resultChannel: { name: "participantes", icon: Hash },
+    user: { name: "Rafa", tone: "linear-gradient(135deg,#a855f7,#ec4899)" },
+    roleLabel: "Participante",
+    panel: {
+      title: "Sorteio: Nitro de 1 mês",
+      desc: "Clique em Participar para entrar no sorteio. O resultado sai em 24 horas.",
+      foot: "VØID Systems · Eventos",
+      icon: Gift,
+      button: { label: "Participar", icon: Gift },
+    },
+    userMessage: "Participando! Boa sorte pra todo mundo.",
+    reply: {
+      title: "Você está no sorteio!",
+      desc: "Rafa, a sua participação foi registrada com sucesso.",
+      fields: [["Prêmio", "Nitro 1 mês"], ["Participantes", "128"], ["Termina em", "23h 41min"]],
+      foot: "VØID Systems · Sorteio",
+      buttons: [{ label: "Sair do sorteio", tone: "danger" }, { label: "Ver regras" }],
+    },
+    roleName: "@Participante",
+    alt: "um bot de sorteios registrando a participação de um membro e entregando o cargo de participante",
+  },
+  {
+    id: "registro",
+    server: "Cidade RP",
+    category: "Cidadania",
+    panelChannel: { name: "registro", icon: ClipboardList },
+    resultChannel: { name: "registro-bruno", icon: Lock },
+    user: { name: "Bruno", tone: "linear-gradient(135deg,#14b8a6,#22c55e)" },
+    roleLabel: "Cidadão",
+    panel: {
+      title: "Registro de cidadão",
+      desc: "Clique em Iniciar registro e preencha os seus dados para entrar na cidade.",
+      foot: "VØID Systems · Registro",
+      icon: ClipboardList,
+      button: { label: "Iniciar registro", icon: ClipboardList },
+    },
+    userMessage: "Preenchi o formulário com os meus dados.",
+    reply: {
+      title: "Registro enviado",
+      desc: "Bruno, a equipe vai analisar os seus dados em instantes.",
+      fields: [["Nome", "Bruno Santos"], ["Idade", "24 anos"], ["Status", "Em análise"]],
+      foot: "VØID Systems · Registro",
+      buttons: [{ label: "Aprovar", tone: "blurple" }, { label: "Recusar", tone: "danger" }],
+    },
+    roleName: "@Cidadão",
+    alt: "um bot de registro recebendo um formulário de cidadão e entregando o cargo após a análise",
+  },
+];
+
+/** Duração do ciclo de animação do mockup (precisa bater com o `14s` do CSS). */
+const CYCLE_MS = 14_000;
 
 function Cursor() {
   return (
@@ -34,13 +215,33 @@ function Member({ name, color, tone, bot }: { name: string; color?: string; tone
   );
 }
 
-export function DiscordMockup() {
+function MockBtn({ button }: { button: MockButton }) {
+  const Icon = button.icon;
   return (
-    <div
-      className="dm-wrap"
-      role="img"
-      aria-label="Demonstração de um bot de tickets no Discord abrindo um ticket, respondendo ao membro e entregando um cargo"
-    >
+    <span className={`dm-btn${button.tone ? ` dm-btn--${button.tone}` : ""}`}>
+      {Icon && <Icon />} {button.label}
+    </span>
+  );
+}
+
+export function DiscordMockup() {
+  const [index, setIndex] = useState(0);
+
+  // troca de cena a cada ciclo; com movimento reduzido fica parado na primeira
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setInterval(() => setIndex((i) => (i + 1) % VARIANTS.length), CYCLE_MS);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const v = VARIANTS[index];
+  const PanelChIcon = v.panelChannel.icon;
+  const ResultChIcon = v.resultChannel.icon;
+  const PanelIcon = v.panel.icon;
+  const userInitial = v.user.name[0];
+
+  return (
+    <div className="dm-wrap" role="img" aria-label={`Demonstração de ${v.alt}`}>
       <div className="dm-glow" />
       <div className="dm-window" aria-hidden="true">
         <div className="dm-titlebar">
@@ -52,7 +253,8 @@ export function DiscordMockup() {
           </span>
         </div>
 
-        <div className="dm-body">
+        {/* key: reinicia a animação CSS do começo a cada troca de cena */}
+        <div className="dm-body dm-body--in" key={v.id}>
           <div className="dm-rail">
             <div className="dm-server dm-server--active">V</div>
             <div className="dm-sep" />
@@ -62,7 +264,7 @@ export function DiscordMockup() {
           </div>
 
           <div className="dm-side">
-            <div className="dm-side-title">VØID Community</div>
+            <div className="dm-side-title">{v.server}</div>
             <div className="dm-channels">
               <div className="dm-cat">Informações</div>
               <div className="dm-ch">
@@ -71,12 +273,12 @@ export function DiscordMockup() {
               <div className="dm-ch">
                 <Hash /> avisos
               </div>
-              <div className="dm-cat">Atendimento</div>
+              <div className="dm-cat">{v.category}</div>
               <div className="dm-ch dm-ch--painel">
-                <Ticket /> painel-tickets
+                <PanelChIcon /> {v.panelChannel.name}
               </div>
               <div className="dm-ch dm-ch--ticket">
-                <Lock /> ticket-lucas
+                <ResultChIcon /> {v.resultChannel.name}
               </div>
               <div className="dm-cat">Voz</div>
               <div className="dm-ch">
@@ -85,10 +287,11 @@ export function DiscordMockup() {
             </div>
             <div className="dm-user">
               <span className="dm-mav dm-mav--user">
-                L<i className="dm-status" />
+                {userInitial}
+                <i className="dm-status" />
               </span>
               <span className="dm-user-text">
-                <b>Lucas</b>
+                <b>{v.user.name}</b>
                 <small>Online</small>
               </span>
               <span className="dm-user-icons">
@@ -102,10 +305,10 @@ export function DiscordMockup() {
           <div className="dm-main">
             <div className="dm-head">
               <span className="dm-head-a">
-                <Ticket /> painel-tickets
+                <PanelChIcon /> {v.panelChannel.name}
               </span>
               <span className="dm-head-b">
-                <Lock /> ticket-lucas
+                <ResultChIcon /> {v.resultChannel.name}
               </span>
               <span className="dm-head-icons">
                 <Bell />
@@ -117,7 +320,7 @@ export function DiscordMockup() {
 
             <div className="dm-area">
               <div className="dm-feed">
-                {/* Cena A: painel com o botão "Abrir ticket" */}
+                {/* Cena A: painel com o botão que o membro clica */}
                 <div className="dm-screen dm-screen-a">
                   <div className="dm-msg">
                     <div className="dm-avatar dm-avatar--bot">V</div>
@@ -126,20 +329,18 @@ export function DiscordMockup() {
                       <div className="dm-embed">
                         <div className="dm-embed-row">
                           <div>
-                            <div className="dm-embed-title">Central de Atendimento</div>
-                            <div className="dm-embed-desc">
-                              Precisa de ajuda? Clique no botão abaixo para abrir um ticket com a nossa equipe.
-                            </div>
+                            <div className="dm-embed-title">{v.panel.title}</div>
+                            <div className="dm-embed-desc">{v.panel.desc}</div>
                           </div>
                           <span className="dm-thumb">
-                            <Ticket />
+                            <PanelIcon />
                           </span>
                         </div>
-                        <div className="dm-embed-foot">VØID Systems · Atendimento</div>
+                        <div className="dm-embed-foot">{v.panel.foot}</div>
                       </div>
                       <div className="dm-btnwrap">
                         <span className="dm-btn dm-btn--blurple">
-                          <Ticket /> Abrir ticket
+                          <v.panel.button.icon /> {v.panel.button.label}
                         </span>
                         <Cursor />
                       </div>
@@ -147,17 +348,17 @@ export function DiscordMockup() {
                   </div>
                 </div>
 
-                {/* Cena B: canal do ticket */}
+                {/* Cena B: resultado (canal do ticket, pedido, boas-vindas...) */}
                 <div className="dm-screen dm-screen-b">
                   <div className="dm-msg">
-                    <div className="dm-avatar dm-avatar--user">L</div>
+                    <div className="dm-avatar dm-avatar--user">{userInitial}</div>
                     <div className="dm-content">
                       <div className="dm-author">
-                        <span className="dm-name dm-user-name">Lucas</span>
-                        <span className="dm-role-pill">Cliente</span>
+                        <span className="dm-name dm-user-name">{v.user.name}</span>
+                        <span className="dm-role-pill">{v.roleLabel}</span>
                         <span className="dm-time">Hoje às 14:32</span>
                       </div>
-                      <div>Oi! Preciso de ajuda com o meu pedido.</div>
+                      <div>{v.userMessage}</div>
                     </div>
                   </div>
 
@@ -166,29 +367,22 @@ export function DiscordMockup() {
                     <div className="dm-content">
                       <BotAuthor time="Hoje às 14:32" />
                       <div className="dm-embed">
-                        <div className="dm-embed-title">Ticket #0042 aberto</div>
-                        <div className="dm-embed-desc">Olá, Lucas! Nossa equipe já foi avisada e responde em instantes.</div>
+                        <div className="dm-embed-title">{v.reply.title}</div>
+                        <div className="dm-embed-desc">{v.reply.desc}</div>
                         <div className="dm-fields">
-                          <div>
-                            <div className="dm-field-name">Categoria</div>
-                            <div className="dm-field-value">Suporte</div>
-                          </div>
-                          <div>
-                            <div className="dm-field-name">Prioridade</div>
-                            <div className="dm-field-value">Normal</div>
-                          </div>
-                          <div>
-                            <div className="dm-field-name">Status</div>
-                            <div className="dm-field-value">Aguardando</div>
-                          </div>
+                          {v.reply.fields.map(([name, value]) => (
+                            <div key={name}>
+                              <div className="dm-field-name">{name}</div>
+                              <div className="dm-field-value">{value}</div>
+                            </div>
+                          ))}
                         </div>
-                        <div className="dm-embed-foot">VØID Systems · Ticket</div>
+                        <div className="dm-embed-foot">{v.reply.foot}</div>
                       </div>
                       <div className="dm-buttons">
-                        <span className="dm-btn dm-btn--danger">
-                          <Lock /> Fechar ticket
-                        </span>
-                        <span className="dm-btn">Assumir</span>
+                        {v.reply.buttons.map((b) => (
+                          <MockBtn key={b.label} button={b} />
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -198,7 +392,7 @@ export function DiscordMockup() {
                     <div className="dm-content">
                       <BotAuthor time="Hoje às 14:33" />
                       <div className="dm-role-line">
-                        Lucas recebeu o cargo <b>@Cliente</b>
+                        {v.user.name} recebeu o cargo <b>{v.roleName}</b>
                       </div>
                     </div>
                   </div>
@@ -219,8 +413,8 @@ export function DiscordMockup() {
               <div className="dm-input">
                 <span className="dm-plus">+</span>
                 <span className="dm-input-text">
-                  <span className="dm-input-a">Conversar em #painel-tickets</span>
-                  <span className="dm-input-b">Conversar em #ticket-lucas</span>
+                  <span className="dm-input-a">Conversar em #{v.panelChannel.name}</span>
+                  <span className="dm-input-b">Conversar em #{v.resultChannel.name}</span>
                 </span>
               </div>
             </div>
@@ -232,10 +426,11 @@ export function DiscordMockup() {
             <Member name="VØID Bot" color="#5865f2" tone="#111" bot />
             <div className="dm-cat">Membros — 3</div>
             <div className="dm-member dm-member--lucas">
-              <span className="dm-mav" style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)" }}>
-                L<i className="dm-status" />
+              <span className="dm-mav" style={{ background: v.user.tone }}>
+                {userInitial}
+                <i className="dm-status" />
               </span>
-              <span className="dm-mname dm-user-name">Lucas</span>
+              <span className="dm-mname dm-user-name">{v.user.name}</span>
             </div>
             <Member name="Davi" tone="#0ea5e9" />
             <Member name="Marina" tone="#10b981" />
