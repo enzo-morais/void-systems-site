@@ -5,20 +5,23 @@ export const clients: string[] = ["Rust Brasil", "Junin", "IdosoZ", "RubyHub", "
 
 export interface Stat {
   label: string;
-  /** Número final do contador. Deixe null enquanto não tiver o valor real: aparece "—". */
-  value: number | null;
+  /** Número final do contador. */
+  value: number;
   prefix?: string;
+  /** Símbolo que fica no final, depois do número (ex.: "+", "/5", "%"). */
   suffix?: string;
   /** Casas decimais (ex.: 1 para 99,9). */
   decimals?: number;
+  /** true = sem contagem: o valor aparece direto, só com fade (ex.: um ano). Também não usa separador de milhar. */
+  still?: boolean;
 }
 
-/** Números da seção de contadores. Todos são placeholders: preencha com os valores reais. */
+/** Números da seção de contadores da home e da página de clientes. */
 export const stats: Stat[] = [
-  { label: "Servidores atendidos", value: null, suffix: "+" },
-  { label: "Bots entregues", value: null, suffix: "+" },
-  { label: "Clientes ativos", value: null, suffix: "+" },
-  { label: "Uptime", value: null, suffix: "%", decimals: 1 },
+  { label: "Projetos entregues", value: 10, suffix: "+" },
+  { label: "Avaliação média", value: 5, suffix: "/5" },
+  { label: "No mercado desde", value: 2025, still: true },
+  { label: "Estabilidade pós-entrega", value: 100, suffix: "%" },
 ];
 
 /** Discord da loja (orçamentos, tickets e suporte). */
@@ -47,3 +50,17 @@ export const faqs = [
   { q: "E se eu precisar de algo personalizado?", a: "Fazemos bots sob medida. Entre no Discord, abra um ticket e descreva o que precisa. Enviamos um orçamento sem compromisso." },
   { q: "Posso trocar de plano depois?", a: "Sim, você pode fazer upgrade ou downgrade a qualquer momento. A diferença é ajustada no próximo pagamento." },
 ];
+
+/** Itens de confiança abaixo dos botões do hero. */
+export const trust = ["Pagamento via Pix", "Cancele quando quiser", "Suporte direto no Discord"];
+
+/** Cards "Explore" da home, que levam às páginas do site. */
+export const explore = [
+  { href: "/bots", title: "Bots", desc: "Ticket, registro, verificação e mais. Veja o catálogo completo." },
+  { href: "/como-funciona", title: "Como funciona", desc: "Do pedido ao bot rodando, e por que escolher a VØID." },
+  { href: "/clientes", title: "Clientes", desc: "Os servidores que já rodam bots da VØID." },
+  { href: "/faq", title: "FAQ", desc: "Pagamento, prazos, hospedagem e outras dúvidas." },
+];
+
+/** Ids (de src/config/bots.ts) dos bots mostrados em "Bots em destaque" na home. */
+export const featuredBotIds = ["ticket", "registro-cla", "verificacao"];

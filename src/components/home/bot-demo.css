@@ -1,0 +1,247 @@
+.bd {
+  position: relative;
+  margin-top: 16px;
+  height: 236px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #1e1f22;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #dbdee1;
+}
+
+.bd-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #2b2d31;
+  border-bottom: 1px solid #1a1b1e;
+}
+.bd-head svg { color: #949ba4; }
+
+.bd-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+/* convite: visível só com a demonstração parada */
+.bd-idle {
+  position: absolute;
+  inset: 28px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  background: linear-gradient(180deg, rgba(30, 31, 34, 0.6), #1e1f22 70%);
+  transition: opacity 0.25s;
+}
+.bd-play {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(143, 125, 255, 0.35);
+  border: 1px solid rgba(143, 125, 255, 0.7);
+  box-shadow: 0 0 24px rgba(143, 125, 255, 0.35);
+}
+
+/* linhas da conversa */
+.bd-row {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  opacity: 0;
+}
+.bd-row--sys {
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-style: italic;
+  color: #949ba4;
+}
+.bd-row--sys::before,
+.bd-row--sys::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.bd-av {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+.bd-av--user { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.bd-av--bot { background: #000; border: 1px solid rgba(255, 255, 255, 0.3); }
+.bd-col { position: relative; display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.bd-name { font-size: 11px; color: #fff; }
+.bd-tag {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-size: 8px;
+  font-weight: 700;
+  font-style: normal;
+  text-transform: uppercase;
+  background: #5865f2;
+}
+.bd-text { color: #dbdee1; }
+
+/* embed */
+.bd-embed {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 3px;
+  padding: 7px 9px;
+  border-left: 3px solid #8f7dff;
+  border-radius: 3px;
+  background: #2b2d31;
+}
+.bd-embed-title { color: #fff; }
+.bd-embed-text { color: #dbdee1; }
+.bd-fields { display: flex; gap: 16px; margin-top: 3px; }
+.bd-fields small { display: block; font-size: 9px; font-weight: 700; color: #fff; }
+.bd-fields em { font-style: normal; color: #dbdee1; }
+.bd-buttons { display: flex; gap: 6px; margin-top: 5px; }
+.bd-btn {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-weight: 500;
+  color: #fff;
+  background: #4e5058;
+}
+.bd-btn--blurple { background: #5865f2; }
+.bd-btn--danger { background: #da373c; }
+
+/* clique no botão + cursor */
+.bd-clickwrap { position: relative; display: inline-block; margin-top: 3px; align-self: flex-start; }
+.bd-cursor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: 2px 0 0 4px;
+  opacity: 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+/* "digitando..." antes da resposta do bot */
+.bd-dots {
+  position: absolute;
+  left: 0;
+  top: 16px;
+  display: inline-flex;
+  gap: 3px;
+  opacity: 0;
+}
+.bd-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #dbdee1;
+  animation: bd-dot 0.9s infinite;
+}
+.bd-dots i:nth-child(2) { animation-delay: 0.15s; }
+.bd-dots i:nth-child(3) { animation-delay: 0.3s; }
+.bd-after { display: block; opacity: 1; }
+
+/* ---- animação (só ao passar o mouse, ou sempre com autoplay) ---- */
+.bc:hover .bd-idle,
+.bc:focus-within .bd-idle,
+.bd--auto .bd-idle { opacity: 0; pointer-events: none; }
+
+.bc:hover .bd-row,
+.bc:focus-within .bd-row,
+.bd--auto .bd-row {
+  animation: bd-row var(--cycle) infinite;
+  animation-delay: calc(var(--i) * var(--step));
+}
+.bc:hover .bd-dots,
+.bc:focus-within .bd-dots,
+.bd--auto .bd-dots {
+  animation: bd-dots var(--cycle) infinite;
+  animation-delay: calc(var(--i) * var(--step));
+}
+.bc:hover .bd-after,
+.bc:focus-within .bd-after,
+.bd--auto .bd-after {
+  animation: bd-after var(--cycle) infinite;
+  animation-delay: calc(var(--i) * var(--step));
+}
+.bc:hover .bd-btn--press,
+.bc:focus-within .bd-btn--press,
+.bd--auto .bd-btn--press {
+  animation: bd-press var(--cycle) infinite;
+  animation-delay: calc(var(--i) * var(--step));
+}
+.bc:hover .bd-cursor,
+.bc:focus-within .bd-cursor,
+.bd--auto .bd-cursor {
+  animation: bd-cursor var(--cycle) infinite;
+  animation-delay: calc(var(--i) * var(--step));
+}
+
+@keyframes bd-row {
+  0% { opacity: 0; transform: translateY(8px); }
+  5%, 86% { opacity: 1; transform: translateY(0); }
+  94%, 100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes bd-dots {
+  0% { opacity: 0; }
+  2%, 12% { opacity: 1; }
+  15%, 100% { opacity: 0; }
+}
+@keyframes bd-after {
+  0%, 14% { opacity: 0; }
+  18%, 100% { opacity: 1; }
+}
+@keyframes bd-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+}
+@keyframes bd-cursor {
+  0% { opacity: 0; transform: translate(40px, 24px); }
+  4% { opacity: 1; transform: translate(40px, 24px); }
+  10% { opacity: 1; transform: translate(0, 0); }
+  13% { opacity: 1; transform: translate(0, 0) scale(0.85); }
+  16% { opacity: 1; transform: translate(0, 0) scale(1); }
+  19%, 100% { opacity: 0; transform: translate(0, 0); }
+}
+@keyframes bd-press {
+  0%, 11% { transform: scale(1); background: #5865f2; }
+  13% { transform: scale(0.92); background: #4752c4; }
+  17%, 100% { transform: scale(1); background: #5865f2; }
+}
+
+/* movimento reduzido: sem convite nem animação, a conversa já aparece pronta */
+@media (prefers-reduced-motion: reduce) {
+  .bd-idle { display: none; }
+  .bd-row,
+  .bc:hover .bd-row,
+  .bd--auto .bd-row { opacity: 1; animation: none; transform: none; }
+  .bd-dots, .bd-cursor { display: none; }
+  .bc:hover .bd-after, .bd--auto .bd-after { animation: none; opacity: 1; }
+}

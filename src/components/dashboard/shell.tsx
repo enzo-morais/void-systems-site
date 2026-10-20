@@ -1,11 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LayoutDashboard, ShoppingCart, Users, ListTodo, ScrollText, LogOut, ChevronRight, Package, Users2, BookOpen, FileText, DollarSign } from "lucide-react";
-import { VoidBackground } from "@/components/landing/void-background";
+import {
+  BookOpen,
+  DollarSign,
+  FileText,
+  LayoutDashboard,
+  ListTodo,
+  LogOut,
+  Menu,
+  Package,
+  ScrollText,
+  Server,
+  ShoppingCart,
+  Users,
+  Users2,
+  X,
+} from "lucide-react";
+import "@/components/home/home.css";
+import "./panel-theme.css";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -18,6 +35,7 @@ const navItems = [
   { href: "/dashboard/tasks", label: "Tarefas", icon: ListTodo },
   { href: "/dashboard/applications", label: "Formulários", icon: FileText },
   { href: "/dashboard/logs", label: "Logs", icon: ScrollText },
+  { href: "/discloud", label: "Bots hospedados", icon: Server },
 ];
 
 interface ShellProps {
@@ -27,72 +45,92 @@ interface ShellProps {
 
 export function DashboardShell({ user, children }: ShellProps) {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  // fecha o menu do celular ao trocar de página
+  useEffect(() => setOpen(false), [pathname]);
+
+  const nav = (
+    <nav className="flex-1 p-3 space-y-1">
+      {navItems.map((item) => {
+        const active = pathname === item.href;
+        return (
+          <Link key={item.href} href={item.href} className={`pt-nav ${active ? "pt-nav--active" : ""}`} aria-current={active ? "page" : undefined}>
+            <item.icon className="w-4 h-4" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
+  const account = (
+    <div className="p-4 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+      <div className="flex items-center gap-3 mb-3">
+        {user.image ? (
+          <Image src={user.image} alt="" width={32} height={32} className="rounded-full" />
+        ) : (
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(143,125,255,0.25)" }}>
+            {(user.username || user.name || "?")[0].toUpperCase()}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-sm font-medium truncate">{user.username || user.name}</p>
+          <p className="font-mono text-[10px] uppercase tracking-wider text-silver/70">Staff</p>
+        </div>
+      </div>
+      <button onClick={() => signOut({ callbackUrl: "/" })} className="pt-nav w-full cursor-pointer hover:!text-red-400">
+        <LogOut className="w-4 h-4" />
+        Sair
+      </button>
+    </div>
+  );
+
+  const brand = (
+    <Link href="/" className="block">
+      <span className="font-display text-lg font-bold tracking-tight">
+        VØID <span className="font-medium text-silver/80">Systems</span>
+      </span>
+      <span className="block font-mono text-[10px] uppercase tracking-wider text-silver/70 mt-0.5">Painel staff</span>
+    </Link>
+  );
 
   return (
-    <>
-      <VoidBackground />
-      <div className="relative z-10 flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <aside
-          className="w-60 flex flex-col shrink-0 border-r backdrop-blur-md overflow-y-auto"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)", borderColor: "rgba(255,255,255,0.06)" }}
-        >
-          <div className="p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-lg font-bold tracking-tight">
-                VØID <span className="font-light text-silver/60">Systems</span>
-              </span>
-            </Link>
-            <p className="text-[10px] text-silver/30 mt-0.5">Painel Staff</p>
-          </div>
+    <div className="site-root pt relative z-10 flex h-screen overflow-hidden">
+      {/* barra lateral (desktop) */}
+      <aside className="pt-side hidden md:flex w-64 flex-col shrink-0 overflow-y-auto">
+        <div className="p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>{brand}</div>
+        {nav}
+        {account}
+      </aside>
 
-          <nav className="flex-1 p-2 space-y-0.5 mt-2">
-            {navItems.map((item) => {
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                    active ? "text-white" : "text-silver/50 hover:text-white hover:bg-white/[0.04]"
-                  }`}
-                  style={active ? { backgroundColor: "rgba(255,255,255,0.08)" } : {}}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                  {active && <ChevronRight className="w-3 h-3 ml-auto opacity-30" />}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="p-3 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-            <div className="flex items-center gap-2.5 mb-2 px-2">
-              {user.image ? (
-                <Image src={user.image} alt="" width={28} height={28} className="rounded-full" />
-              ) : (
-                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold">
-                  {(user.username || user.name || "?")[0].toUpperCase()}
-                </div>
-              )}
-              <div className="min-w-0">
-                <p className="text-xs font-medium truncate">{user.username || user.name}</p>
-                <p className="text-[10px] text-silver/30">Staff</p>
-              </div>
-            </div>
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="flex items-center gap-2 w-full px-3 py-1.5 text-xs rounded-lg transition-colors cursor-pointer text-silver/40 hover:text-red-400 hover:bg-red-400/10"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              Sair
-            </button>
-          </div>
-        </aside>
-
-        {/* Content */}
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+      {/* barra superior (celular) */}
+      <div className="pt-top md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 h-14">
+        {brand}
+        <button onClick={() => setOpen(true)} aria-label="Abrir menu" className="p-2 text-silver hover:text-white cursor-pointer">
+          <Menu className="w-5 h-5" />
+        </button>
       </div>
-    </>
+
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50 flex" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setOpen(false)} />
+          <aside className="pt-side relative w-72 max-w-[85vw] flex flex-col overflow-y-auto">
+            <div className="p-5 border-b flex items-start justify-between" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+              {brand}
+              <button onClick={() => setOpen(false)} aria-label="Fechar menu" className="p-1 text-silver hover:text-white cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            {nav}
+            {account}
+          </aside>
+        </div>
+      )}
+
+      <main className="flex-1 min-w-0 overflow-y-auto px-4 md:px-8 pt-20 md:pt-8 pb-12">
+        <div className="max-w-6xl mx-auto">{children}</div>
+      </main>
+    </div>
   );
 }

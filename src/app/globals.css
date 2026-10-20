@@ -81,3 +81,44 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+/* ---- Transição entre páginas (View Transitions API) ---- */
+
+/* o conteúdo antigo sai com fade + leve blur; o novo entra logo depois */
+::view-transition-old(.page-out) {
+  animation: 260ms ease-in both vt-out;
+}
+::view-transition-new(.page-in) {
+  animation: 420ms ease-out 120ms both vt-in;
+}
+@keyframes vt-out {
+  to { opacity: 0; filter: blur(8px); }
+}
+@keyframes vt-in {
+  from { opacity: 0; filter: blur(8px); transform: translateY(10px); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+
+/* o fundo animado e o header não participam da animação */
+::view-transition-group(void-bg),
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(void-bg),
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(void-bg),
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* movimento reduzido: troca instantânea */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

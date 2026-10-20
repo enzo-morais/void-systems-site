@@ -49,14 +49,14 @@ export function CustomSelect({ value, onChange, options, placeholder = "Selecion
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between rounded-lg px-4 py-2.5 text-sm text-left transition-all duration-200 cursor-pointer backdrop-blur-sm"
         style={{
-          backgroundColor: "rgba(0,0,0,0.4)",
+          backgroundColor: "#101016",
           border: `1px solid rgba(255,255,255,${open ? 0.2 : 0.1})`,
           color: selected ? "#fff" : "rgba(192,192,192,0.3)",
         }}
       >
         <span className="truncate">{selected ? selected.label : placeholder}</span>
         <ChevronDown
-          className="w-4 h-4 text-silver/30 shrink-0 ml-2 transition-transform duration-200"
+          className="w-4 h-4 text-silver/70 shrink-0 ml-2 transition-transform duration-200"
           style={{ transform: open ? "rotate(180deg)" : "rotate(0)" }}
         />
       </button>
@@ -84,7 +84,7 @@ export function CustomSelect({ value, onChange, options, placeholder = "Selecion
                 color: option.value === value ? "#fff" : "rgba(192,192,192,0.7)",
               }}
               onMouseEnter={(e) => {
-                if (option.value !== value) (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255,255,255,0.05)";
+                if (option.value !== value) (e.currentTarget as HTMLElement).style.backgroundColor = "#15151c";
               }}
               onMouseLeave={(e) => {
                 if (option.value !== value) (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";

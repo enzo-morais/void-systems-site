@@ -2,7 +2,7 @@
 
 import { BookOpen, UserPlus, ShoppingCart, Target, ArrowRight, CheckCircle, Package, DollarSign, FileText } from "lucide-react";
 
-const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 const steps = [
   {
@@ -96,19 +96,19 @@ export default function GuidePage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2"><BookOpen className="w-6 h-6" /> Guia de Uso</h1>
-        <p className="text-xs text-silver/40 mt-1">Passo a passo de como usar o painel</p>
+        <p className="text-xs text-silver/70 mt-1">Passo a passo de como usar o painel</p>
       </div>
 
       <div className="space-y-6">
         {steps.map((step) => (
           <div key={step.title} className="rounded-lg p-6" style={cardStyle}>
             <div className="flex items-center gap-3 mb-5">
-              <div className="p-2.5 rounded-xl backdrop-blur-sm" style={{ backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div className="p-2.5 rounded-xl backdrop-blur-sm" style={{ backgroundColor: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}>
                 <step.icon className="w-5 h-5 text-white/70" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold">{step.title}</h2>
-                <p className="text-[10px] text-silver/30 uppercase tracking-wider">Aba: {step.where}</p>
+                <p className="text-[10px] text-silver/70 uppercase tracking-wider">Aba: {step.where}</p>
               </div>
             </div>
             <div className="space-y-3 ml-1">
@@ -117,7 +117,7 @@ export default function GuidePage() {
                   <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold mt-0.5" style={{ backgroundColor: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>
                     {i + 1}
                   </div>
-                  <p className="text-sm text-silver/60 leading-relaxed">{s}</p>
+                  <p className="text-sm text-silver/70 leading-relaxed">{s}</p>
                 </div>
               ))}
             </div>
@@ -126,14 +126,14 @@ export default function GuidePage() {
       </div>
 
       <div className="rounded-lg p-6" style={cardStyle}>
-        <h2 className="text-sm font-semibold text-silver/60 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-silver/70 uppercase tracking-wider mb-4 flex items-center gap-2">
           <ArrowRight className="w-4 h-4" /> Dicas
         </h2>
         <div className="space-y-2.5">
           {tips.map((tip) => (
             <div key={tip} className="flex items-center gap-2.5">
               <CheckCircle className="w-4 h-4 text-green-400/50 shrink-0" />
-              <p className="text-sm text-silver/50">{tip}</p>
+              <p className="text-sm text-silver/70">{tip}</p>
             </div>
           ))}
         </div>

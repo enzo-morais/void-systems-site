@@ -9,8 +9,8 @@ interface Client { id: string; name: string; }
 interface Product { id: string; name: string; price: number; }
 interface Staff { id: string; displayName: string; username: string; }
 
-const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
-const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/30 backdrop-blur-sm";
+const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/70 backdrop-blur-sm";
 
 // Regra de desconto automático por quantidade de bots
 function getAutoDiscount(botCount: number): number {
@@ -155,17 +155,17 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="rounded-lg p-6" style={cardStyle}>
-      <h2 className="text-sm font-semibold text-silver/60 uppercase tracking-wider mb-4 flex items-center gap-2">
+      <h2 className="text-sm font-semibold text-silver/70 uppercase tracking-wider mb-4 flex items-center gap-2">
         <Plus className="w-4 h-4" /> Nova Venda
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="block text-xs text-silver/40 mb-1.5">Vendedor *</label>
+          <label className="block text-xs text-silver/70 mb-1.5">Vendedor *</label>
           <CustomSelect value={staffId} onChange={setStaffId} options={staffOptions} placeholder="Selecione o vendedor" required />
         </div>
         <div>
-          <label className="block text-xs text-silver/40 mb-1.5">Cliente *</label>
+          <label className="block text-xs text-silver/70 mb-1.5">Cliente *</label>
           <CustomSelect value={clientId} onChange={setClientId} options={clientOptions} placeholder="Selecione um cliente" required />
         </div>
       </div>
@@ -173,9 +173,9 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
       {/* Produtos */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-silver/40">Bots / Produtos *</label>
+          <label className="text-xs text-silver/70">Bots / Produtos *</label>
           <button type="button" onClick={addProductLine}
-            className="text-xs text-silver/40 hover:text-white transition-colors flex items-center gap-1 cursor-pointer">
+            className="text-xs text-silver/70 hover:text-white transition-colors flex items-center gap-1 cursor-pointer">
             <Plus className="w-3 h-3" /> Adicionar bot
           </button>
         </div>
@@ -194,8 +194,8 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
               </div>
               {index > 0 && (
                 <button type="button" onClick={() => removeProductLine(index)}
-                  className="p-2 rounded-lg text-silver/40 hover:text-red-400 transition-colors cursor-pointer shrink-0"
-                  style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+                  className="p-2 rounded-lg text-silver/70 hover:text-red-400 transition-colors cursor-pointer shrink-0"
+                  style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
                   <Trash2 className="w-4 h-4" />
                 </button>
               )}
@@ -204,7 +204,7 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
         </div>
 
         {/* Regras de desconto */}
-        <div className="flex items-center gap-4 mt-3 text-xs text-silver/40">
+        <div className="flex items-center gap-4 mt-3 text-xs text-silver/70">
           <span>% descontos:</span>
           {[
             { count: 2, pct: 10 },
@@ -213,7 +213,7 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
           ].map(({ count, pct, plus }) => (
             <span key={count} className="flex items-center gap-1">
               <span>{count}{plus ? "+" : ""} bots →</span>
-              <span className={botCount >= count ? "text-green-400 font-semibold" : "text-silver/30"}>
+              <span className={botCount >= count ? "text-green-400 font-semibold" : "text-silver/70"}>
                 {pct}% OFF
               </span>
             </span>
@@ -224,8 +224,8 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
       {/* Resumo de valores */}
       {subtotal > 0 && (
         <div className="mb-4 p-4 rounded-lg space-y-1.5"
-          style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-          <div className="flex justify-between text-sm text-silver/60">
+          style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="flex justify-between text-sm text-silver/70">
             <span>Subtotal</span>
             <span>R${subtotal.toFixed(2).replace(".", ",")}</span>
           </div>
@@ -236,7 +236,7 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             </div>
           )}
           <div className="flex justify-between text-base font-semibold pt-1"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
             <span>Total</span>
             <span className="text-green-400">R${total.toFixed(2).replace(".", ",")}</span>
           </div>
@@ -245,19 +245,19 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="block text-xs text-silver/40 mb-1.5">Observações</label>
+          <label className="block text-xs text-silver/70 mb-1.5">Observações</label>
           <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
             placeholder="Opcional" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
         </div>
         <div>
-          <label className="block text-xs text-silver/40 mb-1.5">Comprovante</label>
+          <label className="block text-xs text-silver/70 mb-1.5">Comprovante</label>
           <input ref={fileRef} type="file" accept="image/*,.pdf" onChange={handleFileChange} className="hidden" />
           {receiptPreview ? (
             <div className="relative rounded-lg overflow-hidden w-fit" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
               {receiptFile?.type.startsWith("image/") ? (
                 <img src={receiptPreview} alt="Comprovante" className="h-[42px] object-cover" />
               ) : (
-                <div className="flex items-center gap-2 p-3 text-xs text-silver/60"><ImageIcon className="w-4 h-4" />{receiptFile?.name}</div>
+                <div className="flex items-center gap-2 p-3 text-xs text-silver/70"><ImageIcon className="w-4 h-4" />{receiptFile?.name}</div>
               )}
               <button type="button" onClick={removeFile} className="absolute top-1 right-1 p-1 rounded-full bg-black/70 text-white cursor-pointer hover:bg-red-500/80 transition-colors">
                 <X className="w-3 h-3" />
@@ -265,7 +265,7 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             </div>
           ) : (
             <button type="button" onClick={() => fileRef.current?.click()}
-              className="flex items-center gap-2 py-2.5 px-4 rounded-lg text-xs text-silver/40 transition-colors cursor-pointer hover:text-white"
+              className="flex items-center gap-2 py-2.5 px-4 rounded-lg text-xs text-silver/70 transition-colors cursor-pointer hover:text-white"
               style={{ border: "1px dashed rgba(255,255,255,0.15)", backgroundColor: "rgba(255,255,255,0.02)" }}>
               <Upload className="w-4 h-4" /> Anexar comprovante
             </button>
@@ -276,7 +276,7 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
       {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
 
       <button type="submit" disabled={loading || uploading}
-        className="bg-white text-black font-medium px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
+        className="bg-white text-black font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
         {loading || uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
         {uploading ? "Enviando..." : loading ? "Salvando..." : "Registrar"}
       </button>

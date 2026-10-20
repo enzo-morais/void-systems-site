@@ -1,0 +1,18 @@
+.kin-accent {
+  font-style: normal;
+  color: var(--void-accent);
+}
+
+.kin.kin-hit {
+  animation: kin 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes kin {
+  0% { transform: translateX(-10vw) skewX(-12deg); filter: blur(14px); opacity: 0.2; }
+  60% { filter: blur(0); }
+  100% { transform: none; filter: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kin.kin-hit { animation: none; }
+}

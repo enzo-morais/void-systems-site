@@ -57,7 +57,7 @@ export default function SalesPage() {
           <button
             onClick={exportCSV}
             className="flex items-center gap-2 text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer"
-            style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#a0a0a0" }}
+            style={{ backgroundColor: "#15151c", border: "1px solid rgba(255,255,255,0.1)", color: "#a0a0a0" }}
           >
             <Download className="w-3.5 h-3.5" />
             Exportar CSV
@@ -69,9 +69,9 @@ export default function SalesPage() {
       {sales.length > 0 && (
         <div
           className="rounded-lg p-5 backdrop-blur-md"
-          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+          style={{ background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)" }}
         >
-          <p className="text-xs text-silver/40 uppercase tracking-wider mb-4">Vendas — Últimos 14 dias</p>
+          <p className="text-xs text-silver/70 uppercase tracking-wider mb-4">Vendas — Últimos 14 dias</p>
           <div className="flex items-end gap-1.5 h-20">
             {chartData.map((d) => (
               <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
@@ -79,19 +79,19 @@ export default function SalesPage() {
                   className="w-full rounded-sm transition-all duration-300 min-h-[2px]"
                   style={{
                     height: `${(d.count / maxCount) * 100}%`,
-                    background: d.count > 0 ? "linear-gradient(to top, rgba(255,255,255,0.2), rgba(255,255,255,0.5))" : "rgba(255,255,255,0.05)",
+                    background: d.count > 0 ? "linear-gradient(to top, rgba(255,255,255,0.2), rgba(255,255,255,0.5))" : "#15151c",
                   }}
                 />
                 {/* Tooltip */}
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block text-[9px] px-2 py-1 rounded bg-white text-black font-medium whitespace-nowrap">
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block text-[9px] px-2 py-1 rounded bg-white text-black font-semibold whitespace-nowrap">
                   {d.count} venda{d.count !== 1 ? "s" : ""} — {new Date(d.date + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
                 </div>
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-2">
-            <span className="text-[9px] text-silver/20">{new Date(last14[0] + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}</span>
-            <span className="text-[9px] text-silver/20">Hoje</span>
+            <span className="text-[9px] text-silver/70">{new Date(last14[0] + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}</span>
+            <span className="text-[9px] text-silver/70">Hoje</span>
           </div>
         </div>
       )}

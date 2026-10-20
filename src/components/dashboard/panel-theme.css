@@ -1,0 +1,110 @@
+/* Tema dos painéis (staff, bots hospedados, perfil): mesmo visual da home, cards em vidro escuro. */
+
+.pt {
+  color: #fff;
+}
+
+.pt-side,
+.pt-top {
+  background: rgba(10, 10, 14, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+.pt-top {
+  border-right: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pt-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+  transition: background 0.2s, color 0.2s;
+}
+.pt-nav:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+.pt-nav--active {
+  color: #fff;
+  background: rgba(143, 125, 255, 0.18);
+  box-shadow: inset 2px 0 0 var(--void-accent);
+}
+
+/* cartão em vidro escuro (usa a classe .panel da home quando possível) */
+.pt-card {
+  background: rgba(13, 13, 18, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+
+/* títulos de página */
+.pt-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+.pt-sub { margin-top: 2px; font-size: 13px; color: rgba(255, 255, 255, 0.7); }
+
+/* inputs / selects dentro dos painéis */
+.pt input:not([type="checkbox"]):not([type="radio"]),
+.pt select,
+.pt textarea {
+  color: #fff;
+  caret-color: #fff;
+}
+.pt input:not([type="checkbox"]):not([type="radio"]):focus,
+.pt select:focus,
+.pt textarea:focus {
+  outline: none;
+  border-color: rgba(143, 125, 255, 0.75) !important;
+  box-shadow: 0 0 0 3px rgba(143, 125, 255, 0.18);
+}
+.pt input::placeholder,
+.pt textarea::placeholder { color: rgba(255, 255, 255, 0.4); }
+.pt input:-webkit-autofill,
+.pt textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #15151c inset !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff;
+}
+.pt option { background: #15151c; color: #fff; }
+
+/* botão principal e secundário dos painéis */
+.pt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s, background 0.2s, opacity 0.2s;
+}
+.pt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pt-btn--primary { color: #0a0a0d; background: #fff; }
+.pt-btn--primary:not(:disabled):hover { box-shadow: 0 8px 30px rgba(143, 125, 255, 0.45); transform: translateY(-1px); }
+.pt-btn--ghost { color: #fff; background: #15151c; border: 1px solid rgba(255, 255, 255, 0.14); }
+.pt-btn--ghost:not(:disabled):hover { background: #1c1c26; }
+
+/* selo "Em breve" para dados que o sistema ainda não tem */
+.pt-soon {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(143, 125, 255, 0.16);
+  border: 1px solid rgba(143, 125, 255, 0.35);
+}
+
+/* títulos de seção dentro dos painéis: texto normal (Clash fica só nos títulos de página e números) */
+.pt h2,
+.pt h3 {
+  font-family: var(--font-satoshi), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: normal;
+}

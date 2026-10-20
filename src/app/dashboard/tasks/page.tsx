@@ -10,11 +10,11 @@ interface Task {
   id: string; title: string; description: string | null; status: string; priority: string; assignedTo: string | null; createdAt: string;
 }
 
-const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
-const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/30 backdrop-blur-sm";
+const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/70 backdrop-blur-sm";
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pending: <Circle className="w-4 h-4 text-silver/40" />,
+  pending: <Circle className="w-4 h-4 text-silver/70" />,
   in_progress: <Clock className="w-4 h-4 text-amber-400" />,
   done: <CheckCircle2 className="w-4 h-4 text-green-400" />,
 };
@@ -79,22 +79,22 @@ export default function TasksPage() {
       <ConfirmModal {...modalProps} />
 
       <form onSubmit={handleSubmit} className="rounded-lg p-6" style={cardStyle}>
-        <h2 className="text-sm font-semibold text-silver/60 uppercase tracking-wider mb-4 flex items-center gap-2"><Plus className="w-4 h-4" /> Nova Tarefa</h2>
+        <h2 className="text-sm font-semibold text-silver/70 uppercase tracking-wider mb-4 flex items-center gap-2"><Plus className="w-4 h-4" /> Nova Tarefa</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Título *</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Título *</label>
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Título da tarefa" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Responsável</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Responsável</label>
             <input type="text" value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} placeholder="Nome do responsável" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Descrição</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Descrição</label>
             <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Opcional" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Prioridade</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Prioridade</label>
             <CustomSelect value={priority} onChange={setPriority} options={[
               { value: "low", label: "Baixa" },
               { value: "medium", label: "Média" },
@@ -103,16 +103,16 @@ export default function TasksPage() {
           </div>
         </div>
         {success && <p className="text-green-400 text-sm mb-4 flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Tarefa criada</p>}
-        <button type="submit" disabled={saving} className="bg-white text-black font-medium px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
+        <button type="submit" disabled={saving} className="bg-white text-black font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           {saving ? "Salvando..." : "Criar"}
         </button>
       </form>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12 text-silver/40"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando...</div>
+        <div className="flex items-center justify-center py-12 text-silver/70"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando...</div>
       ) : tasks.length === 0 ? (
-        <div className="text-center py-12 text-silver/30 text-sm">Nenhuma tarefa criada.</div>
+        <div className="text-center py-12 text-silver/70 text-sm">Nenhuma tarefa criada.</div>
       ) : (
         <div className="space-y-2">
           {tasks.map((task) => (
@@ -124,14 +124,14 @@ export default function TasksPage() {
                 {statusIcons[task.status]}
               </button>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${task.status === "done" ? "line-through text-silver/40" : ""}`}>{task.title}</p>
-                {task.description && <p className="text-xs text-silver/40 mt-0.5">{task.description}</p>}
+                <p className={`text-sm font-medium ${task.status === "done" ? "line-through text-silver/70" : ""}`}>{task.title}</p>
+                {task.description && <p className="text-xs text-silver/70 mt-0.5">{task.description}</p>}
               </div>
               <span className="text-xs px-2 py-0.5 rounded-full shrink-0" style={{ backgroundColor: `${priorityColors[task.priority]}15`, color: priorityColors[task.priority] }}>
                 {priorityLabels[task.priority]}
               </span>
-              <span className="text-xs text-silver/30 shrink-0">{statusLabels[task.status]}</span>
-              {task.assignedTo && <span className="text-xs text-silver/40 shrink-0">@{task.assignedTo}</span>}
+              <span className="text-xs text-silver/70 shrink-0">{statusLabels[task.status]}</span>
+              {task.assignedTo && <span className="text-xs text-silver/70 shrink-0">@{task.assignedTo}</span>}
               <button onClick={() => handleDelete(task.id)} className="p-1.5 rounded-md transition-colors cursor-pointer shrink-0" style={{ color: "#666" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#ef4444"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#666"; }}

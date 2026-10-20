@@ -34,6 +34,18 @@ async function sendLoginWebhook(username: string, id: string, provider: string, 
   } catch { /* silent */ }
 }
 
+/**
+ * Usuário staff de TESTE: só existe em desenvolvimento (NODE_ENV !== "production") e só se
+ * DEV_STAFF_EMAIL e DEV_STAFF_PASSWORD estiverem no .env.local. Em produção nunca é aceito.
+ */
+const DEV_STAFF_ID = "dev-staff";
+function matchesDevStaff(email: string, password: string): boolean {
+  if (process.env.NODE_ENV === "production") return false;
+  const devEmail = process.env.DEV_STAFF_EMAIL;
+  const devPassword = process.env.DEV_STAFF_PASSWORD;
+  return Boolean(devEmail && devPassword && email === devEmail && password === devPassword);
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     DiscordProvider({
@@ -50,6 +62,10 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        if (matchesDevStaff(credentials.email, credentials.password)) {
+          return { id: DEV_STAFF_ID, name: "Staff de Teste", email: credentials.email, image: null };
+        }
+
         const user = await prisma.siteUser.findUnique({ where: { email: credentials.email } });
         if (!user) return null;
         if (!user.emailVerified) return null;
@@ -62,7 +78,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, user }) {
       if (account?.provider === "discord" && profile) {
         const discordId = (profile as { id: string }).id;
         const username = (profile as { username: string }).username;
@@ -107,9 +123,10 @@ export const authOptions: NextAuthOptions = {
 
       if (account?.provider === "credentials") {
         token.provider = "credentials";
-        token.isStaff = false;
+        // staff de teste (só em desenvolvimento, ver matchesDevStaff)
+        token.isStaff = process.env.NODE_ENV !== "production" && user?.id === DEV_STAFF_ID;
         token.isClient = false;
-        await sendLoginWebhook(token.name || "Usuário", token.email || "email", "credentials");
+        if (user?.id !== DEV_STAFF_ID) await sendLoginWebhook(token.name || "Usuário", token.email || "email", "credentials"); // o staff de teste não avisa o Discord
       }
 
       return token;

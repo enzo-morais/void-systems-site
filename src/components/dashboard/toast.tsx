@@ -42,7 +42,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none">
+      <div suppressHydrationWarning className="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none">
         {toasts.map((t) => {
           const Icon = icons[t.type];
           return (
@@ -57,7 +57,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             >
               <Icon className="w-4 h-4 shrink-0" style={{ color: colors[t.type] }} />
               <p className="text-sm flex-1">{t.message}</p>
-              <button onClick={() => remove(t.id)} className="p-1 cursor-pointer text-silver/30 hover:text-white transition-colors">
+              <button onClick={() => remove(t.id)} className="p-1 cursor-pointer text-silver/70 hover:text-white transition-colors">
                 <X className="w-3 h-3" />
               </button>
             </div>

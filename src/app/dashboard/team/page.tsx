@@ -13,7 +13,7 @@ interface Sale {
 }
 
 const MONTHLY_GOAL = 5;
-const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 export default function TeamPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
@@ -40,7 +40,7 @@ export default function TeamPage() {
   for (const s of monthSales) { if (s.staffName) counts[s.staffName] = (counts[s.staffName] || 0) + 1; }
   const monthName = now.toLocaleString("pt-BR", { month: "long", year: "numeric" });
 
-  if (loading) return <div className="flex items-center justify-center py-20 text-silver/40"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando equipe do Discord...</div>;
+  if (loading) return <div className="flex items-center justify-center py-20 text-silver/70"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando equipe do Discord...</div>;
 
   return (
     <div className="space-y-8">
@@ -48,22 +48,22 @@ export default function TeamPage() {
         <h1 className="text-2xl font-bold flex items-center gap-2"><Users2 className="w-6 h-6" /> Equipe</h1>
         <button onClick={handleRefresh} disabled={refreshing}
           className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg transition-colors cursor-pointer"
-          style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#a0a0a0" }}
+          style={{ backgroundColor: "#15151c", border: "1px solid rgba(255,255,255,0.1)", color: "#a0a0a0" }}
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} /> Atualizar
         </button>
       </div>
 
       <div className="rounded-lg p-5 flex items-center gap-4" style={cardStyle}>
-        <Target className="w-5 h-5 text-silver/40" />
+        <Target className="w-5 h-5 text-silver/70" />
         <div>
           <p className="text-sm font-medium">Meta Mensal — {monthName}</p>
-          <p className="text-xs text-silver/40">{MONTHLY_GOAL} vendas por membro · {staff.length} membros no Discord</p>
+          <p className="text-xs text-silver/70">{MONTHLY_GOAL} vendas por membro · {staff.length} membros no Discord</p>
         </div>
       </div>
 
       {staff.length === 0 ? (
-        <div className="text-center py-12 text-silver/30 text-sm">Nenhum membro com o cargo encontrado no Discord.</div>
+        <div className="text-center py-12 text-silver/70 text-sm">Nenhum membro com o cargo encontrado no Discord.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {staff
@@ -98,12 +98,12 @@ export default function TeamPage() {
                         {member.displayName}
                         {completed && <Trophy className="w-3.5 h-3.5 text-green-400 shrink-0" />}
                       </p>
-                      <p className="text-xs text-silver/30">@{member.username}</p>
+                      <p className="text-xs text-silver/70">@{member.username}</p>
                     </div>
                   </div>
                   <div className="flex items-end gap-2 mb-2">
                     <span className="text-3xl font-bold">{member.salesCount}</span>
-                    <span className="text-silver/40 text-sm mb-0.5">/ {MONTHLY_GOAL}</span>
+                    <span className="text-silver/70 text-sm mb-0.5">/ {MONTHLY_GOAL}</span>
                   </div>
                   <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
                     <div className="h-full rounded-full transition-all duration-700 ease-out" style={{
@@ -151,11 +151,11 @@ export default function TeamPage() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           <div
             className="relative rounded-lg w-full max-w-2xl max-h-[80vh] overflow-hidden mx-4 flex flex-col"
-            style={{ background: "rgba(10,10,10,0.95)", border: "1px solid rgba(255,255,255,0.1)", animation: "fadeIn 0.15s ease-out" }}
+            style={{ background: "rgba(13,13,18,0.97)", border: "1px solid rgba(255,255,255,0.1)", animation: "fadeIn 0.15s ease-out" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
               <div className="flex items-center gap-3">
                 {selectedMember.avatar ? (
                   <Image src={selectedMember.avatar} alt="" width={40} height={40} className="rounded-full" />
@@ -166,16 +166,16 @@ export default function TeamPage() {
                 )}
                 <div>
                   <p className="font-semibold">{selectedMember.displayName}</p>
-                  <p className="text-xs text-silver/40">@{selectedMember.username}</p>
+                  <p className="text-xs text-silver/70">@{selectedMember.username}</p>
                 </div>
               </div>
-              <button onClick={() => { setSelectedMember(null); setModalTab("vendas"); }} className="p-2 rounded-lg cursor-pointer text-silver/40 hover:text-white transition-colors">
+              <button onClick={() => { setSelectedMember(null); setModalTab("vendas"); }} className="p-2 rounded-lg cursor-pointer text-silver/70 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+            <div className="flex border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
               {(["vendas", "faturas"] as const).map((tab) => (
                 <button key={tab} onClick={() => setModalTab(tab)}
                   className="flex-1 py-3 text-xs uppercase tracking-wider font-medium transition-colors cursor-pointer"
@@ -191,10 +191,10 @@ export default function TeamPage() {
             <div className="overflow-y-auto p-5 space-y-3 flex-1">
               {modalTab === "vendas" ? (
                 memberAllSales.length === 0 ? (
-                  <p className="text-center text-silver/30 text-sm py-8">Nenhuma venda registrada.</p>
+                  <p className="text-center text-silver/70 text-sm py-8">Nenhuma venda registrada.</p>
                 ) : (
                   memberAllSales.map((sale) => (
-                    <div key={sale.id} className="rounded-lg p-4 flex gap-4" style={{ backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div key={sale.id} className="rounded-lg p-4 flex gap-4" style={{ backgroundColor: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
                       {sale.receipt ? (
                         <a href={sale.receipt} target="_blank" rel="noopener noreferrer" className="shrink-0 group relative">
                           <img src={sale.receipt} alt="Comprovante" className="w-16 h-16 rounded-lg object-cover" />
@@ -203,8 +203,8 @@ export default function TeamPage() {
                           </div>
                         </a>
                       ) : (
-                        <div className="w-16 h-16 rounded-lg shrink-0 flex items-center justify-center" style={{ backgroundColor: "rgba(255,255,255,0.04)" }}>
-                          <ImageIcon className="w-5 h-5 text-silver/20" />
+                        <div className="w-16 h-16 rounded-lg shrink-0 flex items-center justify-center" style={{ backgroundColor: "#15151c" }}>
+                          <ImageIcon className="w-5 h-5 text-silver/70" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
@@ -212,27 +212,27 @@ export default function TeamPage() {
                           <p className="text-sm font-medium">{sale.product}</p>
                           <p className="text-sm font-bold text-green-400">R${sale.value.toFixed(2).replace(".", ",")}</p>
                         </div>
-                        <p className="text-xs text-silver/40 mt-0.5">Cliente: {sale.client}</p>
-                        {sale.notes && <p className="text-xs text-silver/30 mt-0.5">{sale.notes}</p>}
-                        <p className="text-[10px] text-silver/20 mt-1">{new Date(sale.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                        <p className="text-xs text-silver/70 mt-0.5">Cliente: {sale.client}</p>
+                        {sale.notes && <p className="text-xs text-silver/70 mt-0.5">{sale.notes}</p>}
+                        <p className="text-[10px] text-silver/70 mt-1">{new Date(sale.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
                       </div>
                     </div>
                   ))
                 )
               ) : (
                 invoices.length === 0 ? (
-                  <p className="text-center text-silver/30 text-sm py-8">Nenhuma fatura.</p>
+                  <p className="text-center text-silver/70 text-sm py-8">Nenhuma fatura.</p>
                 ) : (
                   invoices.map((inv) => (
-                    <div key={inv.month} className="rounded-lg p-4" style={{ backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div key={inv.month} className="rounded-lg p-4" style={{ backgroundColor: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <p className="text-sm font-medium capitalize">{inv.label}</p>
-                          <p className="text-[10px] text-silver/30">{inv.sales} venda{inv.sales !== 1 ? "s" : ""} · R${inv.total.toFixed(2).replace(".", ",")} em vendas</p>
+                          <p className="text-[10px] text-silver/70">{inv.sales} venda{inv.sales !== 1 ? "s" : ""} · R${inv.total.toFixed(2).replace(".", ",")} em vendas</p>
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-green-400">R${inv.commission.toFixed(2).replace(".", ",")}</p>
-                          <p className="text-[10px] text-silver/30">{inv.metGoal ? "Meta batida" : "Meta não batida"}</p>
+                          <p className="text-[10px] text-silver/70">{inv.metGoal ? "Meta batida" : "Meta não batida"}</p>
                         </div>
                       </div>
                       <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>

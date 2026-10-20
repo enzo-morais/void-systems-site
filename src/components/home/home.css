@@ -1,0 +1,38 @@
+/* fontes do site: Satoshi no texto, Clash Display nos títulos, Geist Mono nos detalhes */
+.site-root {
+  font-family: var(--font-satoshi), var(--font-inter), system-ui, sans-serif;
+}
+.site-root h1,
+.site-root h2,
+.site-root h3,
+.site-root .font-display {
+  font-family: var(--font-clash), var(--font-satoshi), system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+.site-root .font-mono,
+.site-root .eyebrow {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* legibilidade do conteúdo sobre o fundo animado */
+.home-main h1,
+.home-main h2,
+.home-main h3,
+.home-main p,
+.home-main li {
+  text-shadow: 0 0 22px rgba(10, 10, 13, 0.95), 0 1px 3px rgba(10, 10, 13, 0.9);
+}
+
+/* painel sólido para blocos de conteúdo (cards, listas) */
+.panel {
+  background: rgba(13, 13, 18, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+}
+
+/* dentro de cards o fundo já é sólido: sem sombra no texto */
+.panel h1, .panel h2, .panel h3, .panel p, .panel li,
+.bc h3, .bc p, .bc li,
+.faq-item p, .faq-item span {
+  text-shadow: none;
+}

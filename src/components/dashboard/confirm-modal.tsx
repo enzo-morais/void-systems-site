@@ -46,20 +46,20 @@ export function ConfirmModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3 mb-4">
-          <div className="p-2 rounded-lg shrink-0" style={{ backgroundColor: danger ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.05)" }}>
+          <div className="p-2 rounded-lg shrink-0" style={{ backgroundColor: danger ? "rgba(239,68,68,0.1)" : "#15151c" }}>
             <AlertTriangle className="w-5 h-5" style={{ color: danger ? "#ef4444" : "#fff" }} />
           </div>
           <div>
             <h3 className="font-semibold text-sm">{title}</h3>
-            <p className="text-xs text-silver/50 mt-1">{message}</p>
+            <p className="text-xs text-silver/70 mt-1">{message}</p>
           </div>
         </div>
 
         <div className="flex justify-end gap-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-xs rounded-lg font-medium transition-colors cursor-pointer text-silver/60 hover:text-white"
-            style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+            className="px-4 py-2 text-xs rounded-lg font-medium transition-colors cursor-pointer text-silver/70 hover:text-white"
+            style={{ backgroundColor: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}
           >
             {cancelText}
           </button>

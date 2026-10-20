@@ -2,12 +2,20 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { VoidBackground } from "@/components/landing/void-background";
-import { LoginCarousel } from "@/components/login-carousel";
+import { useCallback, useEffect, useRef, useState, Suspense } from "react";
+import Link from "next/link";
+import { AlertCircle, ChevronDown, Eye, EyeOff, Loader2, Mail } from "lucide-react";
+import { clients, DISCORD_LINK } from "@/config/home";
+import "@/components/home/home.css";
+import "./login.css";
 
-const inputClass = "w-full bg-white/[0.04] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/30 backdrop-blur-sm";
+type Mode = "login" | "register" | "verify" | "forgot" | "reset";
+type Field = "name" | "email" | "password" | "code" | "form";
+
+/** Avisa o fundo animado (VoidBackground) sobre o estado do login. */
+function bg(detail: { state: "hover" | "hover-end" | "loading" | "idle" | "error" | "success"; x?: number; y?: number }) {
+  window.dispatchEvent(new CustomEvent("void-bg", { detail }));
+}
 
 export default function LoginPage() {
   return (
@@ -17,29 +25,129 @@ export default function LoginPage() {
   );
 }
 
+const DISCORD_ICON =
+  "M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.947 2.418-2.157 2.418z";
+
+/** Campo de código de 6 dígitos (verificação e redefinição de senha). */
+function Otp({ idPrefix, value, onChange }: { idPrefix: string; value: string; onChange: (v: string) => void }) {
+  const focus = (i: number) => setTimeout(() => document.getElementById(`${idPrefix}-${i}`)?.focus(), 0);
+  return (
+    <div className="flex gap-2 justify-center">
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <input
+          key={i}
+          id={`${idPrefix}-${i}`}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          autoComplete="one-time-code"
+          aria-label={`Dígito ${i + 1}`}
+          value={value[i] || ""}
+          onPaste={(e) => {
+            e.preventDefault();
+            const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+            onChange(text);
+            focus(Math.min(text.length, 5));
+          }}
+          onChange={(e) => {
+            const val = e.target.value.replace(/\D/g, "");
+            if (val.length > 1) {
+              onChange(val.slice(0, 6));
+              focus(Math.min(val.length, 5));
+              return;
+            }
+            const arr = value.split("");
+            arr[i] = val;
+            onChange(arr.join("").slice(0, 6));
+            if (val && i < 5) focus(i + 1);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Backspace" && !value[i] && i > 0) focus(i - 1);
+          }}
+          className="lg-otp"
+        />
+      ))}
+    </div>
+  );
+}
+
+function FieldError({ id, msg }: { id: string; msg?: string }) {
+  if (!msg) return null;
+  return (
+    <p id={id} role="alert" className="lg-error">
+      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+      {msg}
+    </p>
+  );
+}
+
 function LoginContent() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  const [mode, setMode] = useState<"login" | "register" | "verify" | "forgot" | "reset">("login");
+  const [mode, setMode] = useState<Mode>("login");
+  const [emailOpen, setEmailOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyCode, setVerifyCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [discordLoading, setDiscordLoading] = useState(false);
+  const [err, setErr] = useState<{ field: Field; msg: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [shaking, setShaking] = useState(false);
+  const [clientIdx, setClientIdx] = useState(0);
+  const succeeded = useRef(false);
+
+  const busy = loading || discordLoading;
+  const errFor = (f: Field) => (err?.field === f ? err.msg : undefined);
+
+  // o fundo pulsa devagar enquanto o login carrega
+  useEffect(() => {
+    bg({ state: busy ? "loading" : "idle" });
+  }, [busy]);
+
+  // nomes dos clientes alternando em fade
+  useEffect(() => {
+    const id = window.setInterval(() => setClientIdx((i) => (i + 1) % clients.length), 2600);
+    return () => window.clearInterval(id);
+  }, []);
+
+  // sucesso: partículas sugadas, flash, e só então redireciona (com a transição de página)
+  const success = useCallback(() => {
+    if (succeeded.current) return;
+    succeeded.current = true;
+    bg({ state: "success" });
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.setTimeout(() => router.push(callbackUrl), reduce ? 0 : 950);
+  }, [router, callbackUrl]);
 
   useEffect(() => {
-    if (session) router.push(callbackUrl);
-  }, [session, router, callbackUrl]);
+    if (session) success();
+  }, [session, success]);
+
+  function fail(field: Field, msg: string) {
+    setErr({ field, msg });
+    setShaking(true);
+    window.setTimeout(() => setShaking(false), 520);
+    bg({ state: "error" });
+  }
+
+  function fieldOf(message: string): Field {
+    const m = message.toLowerCase();
+    if (m.includes("email") && !m.includes("senha")) return "email";
+    if (m.includes("senha")) return "password";
+    if (m.includes("nome")) return "name";
+    return "form";
+  }
 
   async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setError("");
+    setLoading(true);
+    setErr(null);
 
     if (mode === "register") {
       const res = await fetch("/api/public/register", {
@@ -47,13 +155,15 @@ function LoginContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
-      const data = await res.json();
-      setLoading(false);
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Erro ao cadastrar");
+        setLoading(false);
+        const msg = data.error || "Não foi possível criar a conta. Tente de novo.";
+        fail(fieldOf(msg), msg);
         return;
       }
       if (data.needsVerification) {
+        setLoading(false);
         setMode("verify");
         return;
       }
@@ -63,40 +173,41 @@ function LoginContent() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Email ou senha incorretos");
-    } else {
-      router.push(callbackUrl);
+      fail("password", "Email ou senha incorretos. Confira os dados e tente de novo.");
     }
+    // sucesso: o efeito da sessão dispara a animação e o redirecionamento
   }
 
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setError("");
+    setLoading(true);
+    setErr(null);
 
     const res = await fetch("/api/public/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, code: verifyCode }),
     });
-    setLoading(false);
 
     if (!res.ok) {
-      const data = await res.json();
-      setError(data.error || "Código incorreto");
+      setLoading(false);
+      const data = await res.json().catch(() => ({}));
+      fail("code", data.error || "Código incorreto. Confira o email e tente de novo.");
       return;
     }
 
     const result = await signIn("credentials", { email, password, redirect: false });
+    setLoading(false);
     if (result?.error) {
       setMode("login");
-    } else {
-      router.push(callbackUrl);
+      setEmailOpen(true);
     }
   }
 
   async function handleForgot(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setError("");
+    setLoading(true);
+    setErr(null);
     const res = await fetch("/api/public/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,14 +218,15 @@ function LoginContent() {
       setMode("reset");
       setVerifyCode("");
     } else {
-      const data = await res.json();
-      setError(data.error || "Erro ao enviar email");
+      const data = await res.json().catch(() => ({}));
+      fail("email", data.error || "Não foi possível enviar o email. Tente de novo.");
     }
   }
 
   async function handleReset(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setError("");
+    setLoading(true);
+    setErr(null);
     const res = await fetch("/api/public/reset-password/confirm", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -123,219 +235,220 @@ function LoginContent() {
     setLoading(false);
     if (res.ok) {
       setMode("login");
-      setVerifyCode(""); setNewPassword("");
-      setError("");
+      setEmailOpen(true);
+      setVerifyCode("");
+      setNewPassword("");
+      setErr(null);
     } else {
-      const data = await res.json();
-      setError(data.error || "Código incorreto");
+      const data = await res.json().catch(() => ({}));
+      fail("code", data.error || "Código incorreto. Confira o email e tente de novo.");
     }
   }
 
+  function go(next: Mode) {
+    setMode(next);
+    setErr(null);
+    if (next === "register") setEmailOpen(true);
+  }
+
+  function onDiscordEnter(e: React.MouseEvent<HTMLButtonElement>) {
+    const r = e.currentTarget.getBoundingClientRect();
+    bg({ state: "hover", x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  }
+
+  function discordLogin() {
+    setDiscordLoading(true);
+    signIn("discord", { callbackUrl });
+  }
+
+  const subtitle =
+    mode === "login" ? "Entre para continuar" : mode === "register" ? "Crie a sua conta" : mode === "forgot" ? "Recuperar senha" : mode === "reset" ? "Defina uma nova senha" : "Verifique o seu email";
+
+  const registering = mode === "register";
+  const showMain = mode === "login" || mode === "register";
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black">
-      {/* Starfield - covers everything */}
-      <div className="fixed inset-0 z-0">
-        <VoidBackground />
-      </div>
+    <div className="site-root lg-page">
+      <div className="lg-panel">
+        <div className={`lg-inner ${shaking ? "lg-shake" : ""}`}>
+          <h1 className="lg-brand font-display">
+            VØID <span>Systems</span>
+          </h1>
+          <p className="lg-sub">{subtitle}</p>
 
-      {/* Content */}
-      <div className="relative z-10 flex min-h-screen">
-        {/* Left - Glass login panel */}
-        <div
-          className="w-full lg:w-[440px] shrink-0 flex flex-col justify-center px-8 sm:px-12 py-12"
-          style={{
-            backgroundColor: "rgba(0,0,0,0.75)",
-            borderRight: "1px solid rgba(255,255,255,0.1)",
-            boxShadow: "4px 0 30px rgba(0,0,0,0.5)",
-          }}
-        >
-          <div className="max-w-sm mx-auto w-full">
-            <h1
-              className="text-4xl font-bold tracking-tighter mb-1"
-              style={{
-                background: "linear-gradient(to right, #ffffff, #c0c0c0, #ffffff)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              VØID <span className="text-2xl font-light">Systems</span>
-            </h1>
-            <p className="text-silver/40 text-sm mb-10">
-              {mode === "login" ? "Faça login para continuar" : mode === "register" ? "Crie sua conta" : mode === "forgot" ? "Recuperar senha" : mode === "reset" ? "Nova senha" : "Verifique seu email"}
-            </p>
-
-            {mode === "forgot" ? (
-              <form onSubmit={handleForgot} className="space-y-3">
-                <p className="text-xs text-silver/40 mb-4">Digite seu email para receber o código de recuperação.</p>
-                <div>
-                  <label className="block text-xs text-silver/40 mb-1.5">Email</label>
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="seu@email.com" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.08)" }} />
-                </div>
-                {error && <p className="text-red-400 text-xs">{error}</p>}
-                <button type="submit" disabled={loading}
-                  className="w-full bg-white text-black font-medium py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
-                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Enviar código
-                </button>
-                <button type="button" onClick={() => { setMode("login"); setError(""); }} className="w-full text-xs text-silver/30 hover:text-white transition-colors cursor-pointer py-2">Voltar ao login</button>
-              </form>
-            ) : mode === "reset" ? (
-              <form onSubmit={handleReset} className="space-y-4">
-                <p className="text-xs text-silver/40 mb-4">Enviamos um código para <span className="text-white">{email}</span></p>
-                <div className="flex gap-2 justify-center">
-                  {[0,1,2,3,4,5].map((i) => (
-                    <input key={i} id={`rst-${i}`} type="text" inputMode="numeric" maxLength={1} value={verifyCode[i] || ""}
-                      onPaste={(e) => { e.preventDefault(); const t = e.clipboardData.getData("text").replace(/\D/g, "").slice(0,6); setVerifyCode(t); setTimeout(() => document.getElementById(`rst-${Math.min(t.length,5)}`)?.focus(), 0); }}
-                      onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); if (v.length > 1) { setVerifyCode(v.slice(0,6)); setTimeout(() => document.getElementById(`rst-${Math.min(v.length,5)}`)?.focus(), 0); return; } const a = verifyCode.split(""); a[i] = v; setVerifyCode(a.join("").slice(0,6)); if (v && i < 5) document.getElementById(`rst-${i+1}`)?.focus(); }}
-                      onKeyDown={(e) => { if (e.key === "Backspace" && !verifyCode[i] && i > 0) document.getElementById(`rst-${i-1}`)?.focus(); }}
-                      className="w-12 h-14 text-center text-xl font-bold rounded-lg border text-white"
-                      style={{ backgroundColor: "rgba(255,255,255,0.1)", borderColor: verifyCode[i] ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.15)" }}
-                    />
-                  ))}
-                </div>
-                <div>
-                  <label className="block text-xs text-silver/40 mb-1.5">Nova senha</label>
-                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required placeholder="••••••" minLength={6} className={inputClass} style={{ borderColor: "rgba(255,255,255,0.08)" }} />
-                </div>
-                {error && <p className="text-red-400 text-xs text-center">{error}</p>}
-                <button type="submit" disabled={loading || verifyCode.length < 6}
-                  className="w-full bg-white text-black font-medium py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
-                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Redefinir senha
-                </button>
-                <button type="button" onClick={() => { setMode("forgot"); setError(""); setVerifyCode(""); }} className="w-full text-xs text-silver/30 hover:text-white transition-colors cursor-pointer py-2">Reenviar código</button>
-              </form>
-            ) : mode === "verify" ? (
-              <form onSubmit={handleVerify} className="space-y-4">
-                <p className="text-xs text-silver/40 mb-4">Enviamos um código de 6 dígitos para <span className="text-white">{email}</span></p>
-                <div className="flex gap-2 justify-center">
-                  {[0,1,2,3,4,5].map((i) => (
-                    <input
-                      key={i}
-                      id={`otp-${i}`}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={verifyCode[i] || ""}
-                      onPaste={(e) => {
-                        e.preventDefault();
-                        const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-                        setVerifyCode(text);
-                        const focusIdx = Math.min(text.length, 5);
-                        setTimeout(() => document.getElementById(`otp-${focusIdx}`)?.focus(), 0);
-                      }}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, "");
-                        if (val.length > 1) {
-                          setVerifyCode(val.slice(0, 6));
-                          const focusIdx = Math.min(val.length, 5);
-                          setTimeout(() => document.getElementById(`otp-${focusIdx}`)?.focus(), 0);
-                          return;
-                        }
-                        const arr = verifyCode.split("");
-                        arr[i] = val;
-                        setVerifyCode(arr.join("").slice(0, 6));
-                        if (val && i < 5) document.getElementById(`otp-${i+1}`)?.focus();
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Backspace" && !verifyCode[i] && i > 0) document.getElementById(`otp-${i-1}`)?.focus();
-                      }}
-                      className="w-12 h-14 text-center text-xl font-bold rounded-lg border text-white"
-                      style={{ backgroundColor: "rgba(255,255,255,0.1)", borderColor: verifyCode[i] ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.15)" }}
-                    />
-                  ))}
-                </div>
-                {error && <p className="text-red-400 text-xs text-center">{error}</p>}
-                <button type="submit" disabled={loading || verifyCode.length < 6}
-                  className="w-full bg-white text-black font-medium py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Verificar
-                </button>
-                <button type="button" onClick={() => { setMode("register"); setError(""); }} className="w-full text-xs text-silver/30 hover:text-white transition-colors cursor-pointer py-2">Reenviar código</button>
-              </form>
-            ) : (
-            <>
-
-            {/* Discord */}
-            <button
-              onClick={() => signIn("discord", { callbackUrl })}
-              className="w-full flex items-center justify-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(88,101,242,0.3)] cursor-pointer mb-6"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.947 2.418-2.157 2.418z" />
-              </svg>
-              Entrar com Discord
-            </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }} />
-              <span className="text-[10px] text-silver/30 uppercase tracking-wider">ou</span>
-              <div className="flex-1 h-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }} />
-            </div>
-
-            {/* Email/Password form */}
-            <form onSubmit={handleCredentials} className="space-y-3">
-              {mode === "register" && (
-                <div>
-                  <label className="block text-xs text-silver/40 mb-1.5">Nome</label>
-                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Seu nome" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.08)" }} />
-                </div>
-              )}
+          {mode === "forgot" && (
+            <form onSubmit={handleForgot} className="space-y-4" noValidate={false}>
+              <p className="lg-note">Digite o seu email para receber o código de recuperação.</p>
               <div>
-                <label className="block text-xs text-silver/40 mb-1.5">Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="seu@email.com" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.08)" }} />
+                <label htmlFor="lg-email" className="lg-label">Email</label>
+                <input id="lg-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="seu@email.com" className="lg-input" aria-invalid={!!errFor("email")} aria-describedby={errFor("email") ? "lg-email-err" : undefined} />
+                <FieldError id="lg-email-err" msg={errFor("email")} />
               </div>
-              <div>
-                <label className="block text-xs text-silver/40 mb-1.5">Senha</label>
-                <div className="relative">
-                  <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••" minLength={6} className={inputClass + " pr-10"} style={{ borderColor: "rgba(255,255,255,0.08)" }} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-silver/30 hover:text-white transition-colors cursor-pointer">
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {error && <p className="text-red-400 text-xs">{error}</p>}
-
-              <button type="submit" disabled={loading}
-                className="w-full bg-white text-black font-medium py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
-              >
+              <button type="submit" disabled={loading} className="lg-btn lg-btn--light">
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {mode === "login" ? "Entrar" : "Criar conta"}
+                Enviar código
               </button>
+              <button type="button" onClick={() => go("login")} className="lg-link">Voltar ao login</button>
             </form>
+          )}
 
-            <p className="text-xs text-silver/30 mt-6 text-center">
-              {mode === "login" ? (
-                <>
-                  Não tem conta? <button onClick={() => { setMode("register"); setError(""); }} className="text-white hover:underline cursor-pointer">Criar conta</button>
-                  <br />
-                  <button onClick={() => { setMode("forgot"); setError(""); }} className="text-silver/40 hover:text-white hover:underline cursor-pointer mt-2 inline-block">Esqueci minha senha</button>
-                </>
-              ) : (
-                <>Já tem conta? <button onClick={() => { setMode("login"); setError(""); }} className="text-white hover:underline cursor-pointer">Fazer login</button></>
-              )}
-            </p>
-            </>
-            )}
-
-            <div className="mt-10 pt-6 text-center" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-              <p className="text-[10px] text-silver/20 mb-1">&copy; 2026 VØID Systems</p>
-              <div className="flex items-center justify-center gap-3">
-                <a href="/termos" className="text-[10px] text-silver/30 hover:text-white transition-colors">Termos</a>
-                <a href="/privacidade" className="text-[10px] text-silver/30 hover:text-white transition-colors">Privacidade</a>
-                <a href="https://discord.gg/voidsystems" target="_blank" rel="noopener noreferrer" className="text-[10px] text-silver/30 hover:text-white transition-colors">Discord</a>
+          {mode === "reset" && (
+            <form onSubmit={handleReset} className="space-y-4">
+              <p className="lg-note">
+                Enviamos um código para <b className="text-white">{email}</b>
+              </p>
+              <Otp idPrefix="rst" value={verifyCode} onChange={setVerifyCode} />
+              <FieldError id="lg-code-err" msg={errFor("code")} />
+              <div>
+                <label htmlFor="lg-newpw" className="lg-label">Nova senha</label>
+                <input id="lg-newpw" type="password" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required placeholder="••••••" minLength={6} className="lg-input" />
               </div>
+              <button type="submit" disabled={loading || verifyCode.length < 6} className="lg-btn lg-btn--light">
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                Redefinir senha
+              </button>
+              <button type="button" onClick={() => { go("forgot"); setVerifyCode(""); }} className="lg-link">Reenviar código</button>
+            </form>
+          )}
+
+          {mode === "verify" && (
+            <form onSubmit={handleVerify} className="space-y-4">
+              <p className="lg-note">
+                Enviamos um código de 6 dígitos para <b className="text-white">{email}</b>
+              </p>
+              <Otp idPrefix="otp" value={verifyCode} onChange={setVerifyCode} />
+              <FieldError id="lg-code-err" msg={errFor("code")} />
+              <button type="submit" disabled={loading || verifyCode.length < 6} className="lg-btn lg-btn--light">
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                Verificar
+              </button>
+              <button type="button" onClick={() => go("register")} className="lg-link">Reenviar código</button>
+            </form>
+          )}
+
+          {showMain && (
+            <>
+              <button
+                type="button"
+                onClick={discordLogin}
+                onMouseEnter={onDiscordEnter}
+                onMouseLeave={() => bg({ state: "hover-end" })}
+                onFocus={(e) => onDiscordEnter(e as unknown as React.MouseEvent<HTMLButtonElement>)}
+                onBlur={() => bg({ state: "hover-end" })}
+                disabled={busy}
+                className="lg-btn lg-btn--discord"
+              >
+                {discordLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d={DISCORD_ICON} />
+                  </svg>
+                )}
+                {discordLoading ? "Conectando ao Discord..." : "Entrar com Discord"}
+              </button>
+
+              <div className="lg-or">
+                <span />
+                ou
+                <span />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setEmailOpen((o) => !o)}
+                aria-expanded={emailOpen || registering}
+                aria-controls="lg-email-area"
+                className="lg-btn lg-btn--ghost"
+              >
+                <Mail className="w-4 h-4" />
+                {registering ? "Criar conta com email" : "Entrar com email"}
+                <ChevronDown className={`lg-chev ${emailOpen || registering ? "lg-chev--open" : ""}`} />
+              </button>
+
+              <div id="lg-email-area" className={`lg-collapse ${emailOpen || registering ? "lg-collapse--open" : ""}`} inert={!(emailOpen || registering)}>
+                <div className="lg-collapse-inner">
+                  <form onSubmit={handleCredentials} className="lg-form">
+                    {registering && (
+                      <div>
+                        <label htmlFor="lg-name" className="lg-label">Nome</label>
+                        <input id="lg-name" type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Seu nome" className="lg-input" aria-invalid={!!errFor("name")} />
+                        <FieldError id="lg-name-err" msg={errFor("name")} />
+                      </div>
+                    )}
+                    <div>
+                      <label htmlFor="lg-email" className="lg-label">Email</label>
+                      <input id="lg-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="seu@email.com" className="lg-input" aria-invalid={!!errFor("email")} aria-describedby={errFor("email") ? "lg-email-err" : undefined} />
+                      <FieldError id="lg-email-err" msg={errFor("email")} />
+                    </div>
+                    <div>
+                      <label htmlFor="lg-password" className="lg-label">Senha</label>
+                      <div className="relative">
+                        <input
+                          id="lg-password"
+                          type={showPassword ? "text" : "password"}
+                          autoComplete={registering ? "new-password" : "current-password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          placeholder="••••••"
+                          minLength={6}
+                          className="lg-input pr-11"
+                          aria-invalid={!!errFor("password")}
+                          aria-describedby={errFor("password") ? "lg-password-err" : undefined}
+                        />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} className="lg-eye">
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <FieldError id="lg-password-err" msg={errFor("password")} />
+                    </div>
+                    <FieldError id="lg-form-err" msg={errFor("form")} />
+
+                    <button type="submit" disabled={busy} className="lg-btn lg-btn--light">
+                      {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                      {registering ? "Criar conta" : "Entrar"}
+                    </button>
+                  </form>
+
+                  <p className="lg-switch">
+                    {registering ? (
+                      <>
+                        Já tem conta? <button type="button" onClick={() => go("login")}>Fazer login</button>
+                      </>
+                    ) : (
+                      <>
+                        Não tem conta? <button type="button" onClick={() => go("register")}>Criar conta</button>
+                        <br />
+                        <button type="button" className="lg-muted" onClick={() => go("forgot")}>Esqueci minha senha</button>
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="lg-foot">
+            <p>&copy; 2026 VØID Systems</p>
+            <div>
+              <Link href="/termos">Termos</Link>
+              <Link href="/privacidade">Privacidade</Link>
+              <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer">Discord</a>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Right - carousel */}
-        <div className="hidden lg:flex flex-1 items-center justify-center">
-          <LoginCarousel />
-        </div>
+      {/* lado direito: o logo de partículas é desenhado pelo fundo; aqui ficam só a frase e os clientes */}
+      <div className="lg-side" aria-hidden="false">
+        <p className="lg-phrase font-display">Seu servidor rodando sozinho, 24 horas.</p>
+        <p className="lg-used">
+          <span className="lg-used-static">Usado por {clients.join(", ")}</span>
+          <span className="lg-used-rot">
+            Usado por <b key={clientIdx}>{clients[clientIdx]}</b>
+          </span>
+        </p>
       </div>
     </div>
   );

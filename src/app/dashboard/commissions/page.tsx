@@ -15,7 +15,7 @@ const MONTHLY_GOAL = 5;
 const COMMISSION_BEFORE_GOAL = 0.10; // 10%
 const COMMISSION_AFTER_GOAL = 1.00; // 100%
 
-const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 export default function CommissionsPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
@@ -74,7 +74,7 @@ export default function CommissionsPage() {
 
   const totalCommissions = commissions.reduce((sum, c) => sum + c.commission, 0);
 
-  if (loading) return <div className="flex items-center justify-center py-20 text-silver/40"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando...</div>;
+  if (loading) return <div className="flex items-center justify-center py-20 text-silver/70"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando...</div>;
 
   return (
     <div className="space-y-6">
@@ -82,32 +82,32 @@ export default function CommissionsPage() {
 
       {/* Info */}
       <div className="rounded-lg p-5 flex items-center gap-4" style={cardStyle}>
-        <TrendingUp className="w-5 h-5 text-silver/40" />
+        <TrendingUp className="w-5 h-5 text-silver/70" />
         <div>
           <p className="text-sm font-medium">Comissões — {monthName}</p>
-          <p className="text-xs text-silver/40">10% por venda antes da meta ({MONTHLY_GOAL} vendas) · 100% por venda após bater a meta</p>
+          <p className="text-xs text-silver/70">10% por venda antes da meta ({MONTHLY_GOAL} vendas) · 100% por venda após bater a meta</p>
         </div>
       </div>
 
       {/* Total */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-lg p-5" style={cardStyle}>
-          <p className="text-xs text-silver/40 uppercase tracking-wider mb-1">Total a pagar</p>
+          <p className="text-xs text-silver/70 uppercase tracking-wider mb-1">Total a pagar</p>
           <p className="text-2xl font-bold text-green-400">R${totalCommissions.toFixed(2).replace(".", ",")}</p>
         </div>
         <div className="rounded-lg p-5" style={cardStyle}>
-          <p className="text-xs text-silver/40 uppercase tracking-wider mb-1">Vendedores ativos</p>
+          <p className="text-xs text-silver/70 uppercase tracking-wider mb-1">Vendedores ativos</p>
           <p className="text-2xl font-bold">{commissions.filter((c) => c.totalSales > 0).length}</p>
         </div>
         <div className="rounded-lg p-5" style={cardStyle}>
-          <p className="text-xs text-silver/40 uppercase tracking-wider mb-1">Metas batidas</p>
+          <p className="text-xs text-silver/70 uppercase tracking-wider mb-1">Metas batidas</p>
           <p className="text-2xl font-bold">{commissions.filter((c) => c.metGoal).length}/{staff.length}</p>
         </div>
       </div>
 
       {/* Staff cards */}
       {commissions.length === 0 ? (
-        <div className="text-center py-12 text-silver/30 text-sm">Nenhum membro encontrado.</div>
+        <div className="text-center py-12 text-silver/70 text-sm">Nenhum membro encontrado.</div>
       ) : (
         <div className="space-y-3">
           {commissions.map((member) => (
@@ -126,21 +126,21 @@ export default function CommissionsPage() {
                       {member.displayName}
                       {member.metGoal && <Trophy className="w-3.5 h-3.5 text-green-400 shrink-0" />}
                     </p>
-                    <p className="text-[10px] text-silver/30">{member.totalSales} venda{member.totalSales !== 1 ? "s" : ""} · R${member.totalRevenue.toFixed(2).replace(".", ",")} em vendas</p>
+                    <p className="text-[10px] text-silver/70">{member.totalSales} venda{member.totalSales !== 1 ? "s" : ""} · R${member.totalRevenue.toFixed(2).replace(".", ",")} em vendas</p>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-lg font-bold text-green-400">R${member.commission.toFixed(2).replace(".", ",")}</p>
-                  <p className="text-[10px] text-silver/30">{member.metGoal ? "Meta batida — 100%" : "10% por venda"}</p>
+                  <p className="text-[10px] text-silver/70">{member.metGoal ? "Meta batida — 100%" : "10% por venda"}</p>
                 </div>
               </summary>
 
               {/* Breakdown */}
               {member.breakdown.length > 0 && (
-                <div className="px-4 pb-4" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                <div className="px-4 pb-4" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                   <table className="w-full text-xs mt-3">
                     <thead>
-                      <tr className="text-silver/30">
+                      <tr className="text-silver/70">
                         <th className="text-left py-1 font-medium">#</th>
                         <th className="text-left py-1 font-medium">Valor da venda</th>
                         <th className="text-left py-1 font-medium">Taxa</th>
@@ -150,11 +150,11 @@ export default function CommissionsPage() {
                     <tbody>
                       {member.breakdown.map((b) => (
                         <tr key={b.saleNum} style={{ borderTop: "1px solid rgba(255,255,255,0.03)" }}>
-                          <td className="py-1.5 text-silver/40">{b.saleNum}</td>
+                          <td className="py-1.5 text-silver/70">{b.saleNum}</td>
                           <td className="py-1.5">R${b.value.toFixed(2).replace(".", ",")}</td>
                           <td className="py-1.5">
                             <span className="px-1.5 py-0.5 rounded text-[10px]" style={{
-                              backgroundColor: b.rate === 1 ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.05)",
+                              backgroundColor: b.rate === 1 ? "rgba(34,197,94,0.1)" : "#15151c",
                               color: b.rate === 1 ? "#22c55e" : "#999",
                             }}>
                               {b.rate === 1 ? "100%" : "10%"}

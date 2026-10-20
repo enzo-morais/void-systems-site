@@ -10,8 +10,8 @@ interface Product {
   id: string; name: string; price: number; description: string | null; category: string | null; badge: string | null; billing: string; tags: string | null; active: boolean; createdAt: string;
 }
 
-const cardStyle = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" };
-const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/30 backdrop-blur-sm";
+const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/70 backdrop-blur-sm";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -95,22 +95,22 @@ export default function ProductsPage() {
       <ConfirmModal {...modalProps} />
 
       <form onSubmit={handleSubmit} className="rounded-lg p-6" style={cardStyle}>
-        <h2 className="text-sm font-semibold text-silver/60 uppercase tracking-wider mb-4 flex items-center gap-2"><Plus className="w-4 h-4" /> Novo Produto</h2>
+        <h2 className="text-sm font-semibold text-silver/70 uppercase tracking-wider mb-4 flex items-center gap-2"><Plus className="w-4 h-4" /> Novo Produto</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Nome *</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Nome *</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Nome do produto" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Preço (R$) *</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Preço (R$) *</label>
             <input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0,00" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Categoria</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Categoria</label>
             <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Ex: Bot, Serviço..." className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Badge</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Badge</label>
             <CustomSelect value={badge} onChange={setBadge} options={[
               { value: "", label: "Nenhum" },
               { value: "Popular", label: "Popular" },
@@ -119,32 +119,32 @@ export default function ProductsPage() {
             ]} placeholder="Selecione" />
           </div>
           <div>
-            <label className="block text-xs text-silver/40 mb-1.5">Pagamento</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Pagamento</label>
             <CustomSelect value={billing} onChange={setBilling} options={[
               { value: "monthly", label: "Mensal" },
               { value: "once", label: "Pagamento único" },
             ]} placeholder="Selecione" />
           </div>
           <div className="sm:col-span-2 lg:col-span-4">
-            <label className="block text-xs text-silver/40 mb-1.5">Descrição (visível na loja)</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Descrição (visível na loja)</label>
             <textarea value={description} onChange={(e) => { setDescription(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }} placeholder="Descrição do produto" rows={1} className={inputClass + " resize-none overflow-hidden"} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
           <div className="sm:col-span-2 lg:col-span-4">
-            <label className="block text-xs text-silver/40 mb-1.5">Tags (separadas por vírgula)</label>
+            <label className="block text-xs text-silver/70 mb-1.5">Tags (separadas por vírgula)</label>
             <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Ex: DayZ, Discord, Jogo, Automação" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
           </div>
         </div>
         {success && <p className="text-green-400 text-sm mb-4 flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Produto cadastrado</p>}
-        <button type="submit" disabled={saving} className="bg-white text-black font-medium px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
+        <button type="submit" disabled={saving} className="bg-white text-black font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           {saving ? "Salvando..." : "Cadastrar"}
         </button>
       </form>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12 text-silver/40"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando...</div>
+        <div className="flex items-center justify-center py-12 text-silver/70"><Loader2 className="w-5 h-5 animate-spin mr-2" />Carregando...</div>
       ) : products.length === 0 ? (
-        <div className="text-center py-12 text-silver/30 text-sm">Nenhum produto cadastrado.</div>
+        <div className="text-center py-12 text-silver/70 text-sm">Nenhum produto cadastrado.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {products.map((p) => (
@@ -155,7 +155,7 @@ export default function ProductsPage() {
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <p className="font-medium">{p.name}</p>
-                  {p.category && <p className="text-xs text-silver/40 mt-0.5">{p.category}</p>}
+                  {p.category && <p className="text-xs text-silver/70 mt-0.5">{p.category}</p>}
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => startEdit(p)}
@@ -174,7 +174,7 @@ export default function ProductsPage() {
               {p.tags && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {p.tags.split(",").map((t: string) => t.trim()).filter(Boolean).map((t: string) => (
-                    <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>{t}</span>
+                    <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "#15151c", color: "rgba(255,255,255,0.4)" }}>{t}</span>
                   ))}
                 </div>
               )}
@@ -188,48 +188,48 @@ export default function ProductsPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={() => setEditingProduct(null)}>
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           <div className="relative rounded-xl w-full max-w-lg mx-4 p-6" onClick={(e) => e.stopPropagation()}
-            style={{ background: "rgba(10,10,10,0.95)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            style={{ background: "rgba(13,13,18,0.97)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <h2 className="text-lg font-semibold mb-4">Editar Produto</h2>
             <form onSubmit={handleSaveEdit} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-silver/40 mb-1">Nome</label>
+                  <label className="block text-xs text-silver/70 mb-1">Nome</label>
                   <input type="text" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} required className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
                 <div>
-                  <label className="block text-xs text-silver/40 mb-1">Preço (R$)</label>
+                  <label className="block text-xs text-silver/70 mb-1">Preço (R$)</label>
                   <input type="number" step="0.01" value={editData.price} onChange={(e) => setEditData({ ...editData, price: e.target.value })} required className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
                 <div>
-                  <label className="block text-xs text-silver/40 mb-1">Categoria</label>
+                  <label className="block text-xs text-silver/70 mb-1">Categoria</label>
                   <input type="text" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })} className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
                 <div>
-                  <label className="block text-xs text-silver/40 mb-1">Badge</label>
+                  <label className="block text-xs text-silver/70 mb-1">Badge</label>
                   <CustomSelect value={editData.badge} onChange={(v) => setEditData({ ...editData, badge: v })} options={[
                     { value: "", label: "Nenhum" }, { value: "Popular", label: "Popular" }, { value: "Novo", label: "Novo" }, { value: "Destaque", label: "Destaque" },
                   ]} placeholder="Selecione" />
                 </div>
                 <div>
-                  <label className="block text-xs text-silver/40 mb-1">Pagamento</label>
+                  <label className="block text-xs text-silver/70 mb-1">Pagamento</label>
                   <CustomSelect value={editData.billing} onChange={(v) => setEditData({ ...editData, billing: v })} options={[
                     { value: "monthly", label: "Mensal" }, { value: "once", label: "Pagamento único" },
                   ]} placeholder="Selecione" />
                 </div>
                 <div>
-                  <label className="block text-xs text-silver/40 mb-1">Tags</label>
+                  <label className="block text-xs text-silver/70 mb-1">Tags</label>
                   <input type="text" value={editData.tags} onChange={(e) => setEditData({ ...editData, tags: e.target.value })} placeholder="DayZ, Discord..." className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-silver/40 mb-1">Descrição</label>
+                <label className="block text-xs text-silver/70 mb-1">Descrição</label>
                 <textarea value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} rows={3} className={inputClass + " resize-none"} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="submit" disabled={editLoading} className="bg-white text-black font-medium px-6 py-2.5 rounded-lg text-sm transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
+                <button type="submit" disabled={editLoading} className="bg-white text-black font-semibold px-6 py-2.5 rounded-lg text-sm transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer">
                   {editLoading && <Loader2 className="w-4 h-4 animate-spin" />} Salvar
                 </button>
-                <button type="button" onClick={() => setEditingProduct(null)} className="text-sm text-silver/40 hover:text-white cursor-pointer px-4">Cancelar</button>
+                <button type="button" onClick={() => setEditingProduct(null)} className="text-sm text-silver/70 hover:text-white cursor-pointer px-4">Cancelar</button>
               </div>
             </form>
           </div>

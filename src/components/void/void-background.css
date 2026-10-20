@@ -1,0 +1,69 @@
+/* Cor de destaque do fundo: troque aqui (ou sobrescreva em outro lugar) para mudar tudo de uma vez. */
+:root {
+  --void-accent: #8f7dff;
+}
+
+/* Camada fixa atrás de todo o conteúdo (main usa z-10, header z-50). */
+.vb-root {
+  --vb-bg: #0a0a0d;
+  --vb-ink: #ecebf2;
+  --vb-muted: #8d8b99;
+  --vb-line: rgba(236, 235, 242, 0.14);
+  --vb-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* atrás de qualquer página, inclusive as que não têm z-index */
+  view-transition-name: void-bg; /* fora da animação de troca de página */
+  pointer-events: none;
+  background: var(--vb-bg);
+  font-family: var(--vb-mono);
+}
+
+.vb-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* flash de corte de cena */
+.vb-cut {
+  position: absolute;
+  inset: 0;
+  background: var(--void-accent);
+  opacity: 0;
+}
+
+/* granulado de filme */
+.vb-grain {
+  position: absolute;
+  inset: -50%;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  animation: vb-grain 0.5s steps(4) infinite;
+}
+@keyframes vb-grain {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(-1%, 3%); }
+  100% { transform: translate(3%, -1%); }
+}
+
+/* movimento reduzido: tudo parado, sem granulado */
+@media (prefers-reduced-motion: reduce) {
+  .vb-grain { display: none; }
+}
+
+/* escurece e esmaece o fundo para o conteúdo da frente ficar sempre legível */
+.vb-root::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(10, 10, 13, 0.1) 0%, rgba(10, 10, 13, 0.55) 100%),
+    rgba(10, 10, 13, 0.24);
+  pointer-events: none;
+}

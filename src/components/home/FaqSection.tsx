@@ -6,18 +6,13 @@ import { faqs } from "@/config/home";
 import { Reveal } from "./Reveal";
 import "./faq.css";
 
-export function FaqSection() {
+export function FaqSection({ scene = 4 }: { scene?: number }) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="px-6 py-24">
+    <section id="faq" data-scene={scene} className="px-6 pb-16 pt-4">
       <div className="max-w-3xl mx-auto">
-        <Reveal className="text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-silver/75">Dúvidas</p>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-white">Perguntas frequentes</h2>
-        </Reveal>
-
-        <div className="mt-12 space-y-3">
+        <div className="space-y-3">
           {faqs.map((item, i) => {
             const isOpen = open === i;
             return (

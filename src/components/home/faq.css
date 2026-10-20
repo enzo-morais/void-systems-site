@@ -1,13 +1,13 @@
 .faq-item {
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: #0d0d12;
   border: 1px solid rgba(255, 255, 255, 0.07);
   transition: background 0.25s, border-color 0.25s;
 }
 .faq-item:hover,
 .faq-item--open {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: #14141b;
+  border-color: rgba(143, 125, 255, 0.5);
 }
 
 /* altura animada: 0fr -> 1fr */

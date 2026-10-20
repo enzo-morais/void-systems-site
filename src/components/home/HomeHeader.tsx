@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { href: "#bots", label: "Bots" },
-  { href: "#como-funciona", label: "Como funciona" },
-  { href: "#clientes", label: "Clientes" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/bots", label: "Bots" },
+  { href: "/como-funciona", label: "Como funciona" },
+  { href: "/clientes", label: "Clientes" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 export function HomeHeader() {
   const { data: session } = useSession();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   const accountHref = session ? "/perfil" : "/login";
@@ -21,8 +23,8 @@ export function HomeHeader() {
 
   return (
     <header
-      className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl border-b"
-      style={{ backgroundColor: "rgba(0,0,0,0.45)", borderColor: "rgba(255,255,255,0.08)" }}
+      className="site-header fixed top-0 inset-x-0 z-50 backdrop-blur-xl border-b"
+      style={{ backgroundColor: "rgba(0,0,0,0.45)", borderColor: "rgba(255,255,255,0.08)", viewTransitionName: "site-header" }}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold tracking-tight text-white">
@@ -31,9 +33,14 @@ export function HomeHeader() {
 
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="text-sm text-silver/80 hover:text-white transition-colors">
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={pathname === link.href ? "page" : undefined}
+              className={`text-sm transition-colors ${pathname === link.href ? "text-white" : "text-silver/80 hover:text-white"}`}
+            >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -42,7 +49,7 @@ export function HomeHeader() {
             {accountLabel}
           </Link>
           <Link
-            href="/produtos"
+            href="/bots"
             className="text-sm px-5 py-2 rounded-lg font-medium text-black bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-shadow"
           >
             Ver bots
@@ -64,14 +71,15 @@ export function HomeHeader() {
           style={{ backgroundColor: "rgba(0,0,0,0.85)", borderColor: "rgba(255,255,255,0.06)" }}
         >
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="block text-sm text-silver hover:text-white transition-colors py-2.5"
+              aria-current={pathname === link.href ? "page" : undefined}
+              className={`block text-sm transition-colors py-2.5 ${pathname === link.href ? "text-white" : "text-silver hover:text-white"}`}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           <div className="pt-3 flex items-center gap-3">
             <Link
@@ -83,7 +91,7 @@ export function HomeHeader() {
               {accountLabel}
             </Link>
             <Link
-              href="/produtos"
+              href="/bots"
               onClick={() => setOpen(false)}
               className="flex-1 text-sm text-center py-2.5 rounded-lg font-medium text-black bg-white"
             >
