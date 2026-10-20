@@ -1,0 +1,149 @@
+.bc {
+  height: 100%;
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+  border-radius: 14px;
+  background: rgba(10, 10, 10, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.3s ease;
+}
+.bc:hover {
+  transform: translateY(-3px);
+}
+
+/* brilho na borda que segue o cursor */
+.bc::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(220px circle at var(--mx) var(--my), rgba(255, 255, 255, 0.85), rgba(124, 138, 255, 0.35) 45%, transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+/* leve luz interna no mesmo ponto */
+.bc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(260px circle at var(--mx) var(--my), rgba(255, 255, 255, 0.06), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.bc:hover::before,
+.bc:hover::after,
+.bc:focus-within::before,
+.bc:focus-within::after {
+  opacity: 1;
+}
+
+.bc-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+}
+
+/* mini-animação */
+.bc-demo {
+  position: relative;
+  margin-top: 16px;
+  height: 108px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1e1f22;
+  font-size: 11.5px;
+  color: #dbdee1;
+}
+.bc-hint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  transition: opacity 0.2s;
+}
+.bc:hover .bc-hint,
+.bc:focus-within .bc-hint {
+  opacity: 0;
+}
+
+.bc-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  opacity: 0;
+}
+.bc-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bc-av {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.bc-btn {
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-weight: 500;
+  color: #fff;
+  background: #5865f2;
+}
+.bc-step--user .bc-text { color: #fff; }
+.bc-step--sys { color: #949ba4; font-style: italic; }
+.bc-step--bot .bc-text { color: #fff; }
+
+.bc:hover .bc-step,
+.bc:focus-within .bc-step {
+  animation: bc-step 6s infinite;
+  animation-delay: calc(var(--i) * 0.8s);
+}
+
+/* em telas de toque não existe hover: a animação roda sempre */
+@media (hover: none) {
+  .bc-hint { display: none; }
+  .bc-step {
+    animation: bc-step 6s infinite;
+    animation-delay: calc(var(--i) * 0.8s);
+  }
+}
+
+@keyframes bc-step {
+  0% { opacity: 0; transform: translateY(6px); }
+  8%, 80% { opacity: 1; transform: translateY(0); }
+  92%, 100% { opacity: 0; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bc,
+  .bc:hover { transform: none; transition: none; }
+  .bc-hint { display: none; }
+  .bc-step,
+  .bc:hover .bc-step,
+  .bc:focus-within .bc-step {
+    animation: none;
+    opacity: 1;
+  }
+}

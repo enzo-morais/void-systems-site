@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Package, ArrowRight, Sparkles, Star, Flame, X, Eye, ShoppingCart, Plus, Minus, Percent } from "lucide-react";
 import { VoidBackground } from "@/components/landing/void-background";
 import { Header } from "@/components/landing/header";
@@ -32,12 +33,13 @@ function sortByBadge(a: Product, b: Product) {
   return orderA - orderB;
 }
 
-export default function ProdutosPage() {
+function ProdutosContent() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Todos");
   const [badgeFilter, setBadgeFilter] = useState("Todos");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => searchParams.get("busca") ?? "");
   const [selected, setSelected] = useState<Product | null>(null);
   const [cart, setCart] = useState<string[]>([]);
   const [showCart, setShowCart] = useState(false);
@@ -285,5 +287,13 @@ export default function ProdutosPage() {
         </footer>
       </main>
     </>
+  );
+}
+
+export default function ProdutosPage() {
+  return (
+    <Suspense>
+      <ProdutosContent />
+    </Suspense>
   );
 }

@@ -1,0 +1,57 @@
+.cm-viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+.cm-track {
+  display: flex;
+  width: max-content;
+  animation: cm-scroll 30s linear infinite;
+}
+.cm-viewport:hover .cm-track {
+  animation-play-state: paused;
+}
+
+/* duas listas idênticas: deslocar -50% fecha o loop sem salto */
+.cm-list {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cm-item {
+  padding: 0 clamp(28px, 5vw, 64px);
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s;
+}
+.cm-item:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes cm-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-viewport {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .cm-track {
+    width: auto;
+    justify-content: center;
+    animation: none;
+  }
+  .cm-list { flex-wrap: wrap; justify-content: center; row-gap: 12px; }
+  .cm-list:nth-child(2),
+  .cm-item[aria-hidden="true"] { display: none; }
+}

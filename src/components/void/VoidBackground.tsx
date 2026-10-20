@@ -56,6 +56,8 @@ export default function VoidBackground() {
     let focal = 1;
 
     const resize = () => {
+      // no celular a barra do navegador esconde/mostra ao rolar e dispara resize só de altura: ignorar
+      if (isMobile && w === window.innerWidth && h !== 0) return;
       const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5);
       w = window.innerWidth;
       h = window.innerHeight;
@@ -123,11 +125,16 @@ export default function VoidBackground() {
           const y0 = cy + (y * focal) / near;
           const x1 = cx + (x * focal) / far;
           const y1 = cy + (y * focal) / far;
-          const grad = ctx.createLinearGradient(x0, y0, x1, y1);
-          grad.addColorStop(0, "rgba(255,255,255,0)");
-          grad.addColorStop(0.15, `rgba(${r},${g},${b},0.16)`);
-          grad.addColorStop(1, "rgba(255,255,255,0)");
-          ctx.strokeStyle = grad;
+          if (isMobile) {
+            // celular: cor sólida, sem criar um gradiente por linha a cada quadro
+            ctx.strokeStyle = `rgba(${r},${g},${b},0.08)`;
+          } else {
+            const grad = ctx.createLinearGradient(x0, y0, x1, y1);
+            grad.addColorStop(0, "rgba(255,255,255,0)");
+            grad.addColorStop(0.15, `rgba(${r},${g},${b},0.16)`);
+            grad.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.strokeStyle = grad;
+          }
           ctx.beginPath();
           ctx.moveTo(x0, y0);
           ctx.lineTo(x1, y1);
