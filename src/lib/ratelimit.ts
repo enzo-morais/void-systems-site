@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { prisma } from "./prisma";
 
-// Rate limit compartilhado entre todas as instâncias (Upstash Redis). O limitador antigo em memória
-// (src/lib/rate-limit.ts) não funcionava na Vercel: cada instância tinha o seu contador.
+// Rate limit compartilhado entre todas as instâncias, guardado no Postgres do próprio site (tabela "RateLimit").
+// Janela fixa: a primeira tentativa abre a janela, as seguintes incrementam o contador até o limite.
+// O limitador antigo em memória (src/lib/rate-limit.ts) não funcionava na Vercel: cada instância tinha o seu contador.
 
 export interface Rule {
-  /** Prefixo da chave no Redis (também identifica a regra nos logs). */
+  /** Prefixo da chave (também identifica a regra nos logs). */
   name: string;
   limit: number;
   /** Janela, ex.: "10 m". */
@@ -27,42 +27,9 @@ export const RULES = {
   resetConfirmEmail: { name: "reset-confirm-email", limit: 5, window: "15 m" },
 } satisfies Record<string, Rule>;
 
-function makeRedis(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-  return url && token ? new Redis({ url, token }) : null;
-}
-
-const redis = makeRedis();
-const limiters = new Map<string, Ratelimit>();
-
-function limiterFor(rule: Rule): Ratelimit | null {
-  if (!redis) return null;
-  let l = limiters.get(rule.name);
-  if (!l) {
-    l = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(rule.limit, rule.window), prefix: `rl:${rule.name}` });
-    limiters.set(rule.name, l);
-  }
-  return l;
-}
-
-// Só para desenvolvimento local sem Upstash configurado. Em produção NUNCA é usado.
-const localHits = new Map<string, number[]>();
-function windowMs(rule: Rule) {
+function windowSec(rule: Rule) {
   const [n, unit] = rule.window.split(" ");
-  return Number(n) * (unit === "s" ? 1000 : unit === "m" ? 60_000 : 3_600_000);
-}
-function localLimit(rule: Rule, key: string) {
-  const now = Date.now();
-  const k = `${rule.name}:${key}`;
-  const hits = (localHits.get(k) ?? []).filter((t) => now - t < windowMs(rule));
-  if (hits.length >= rule.limit) {
-    localHits.set(k, hits);
-    return { ok: false, retryAfterSec: Math.ceil((windowMs(rule) - (now - hits[0])) / 1000) };
-  }
-  hits.push(now);
-  localHits.set(k, hits);
-  return { ok: true, retryAfterSec: 0 };
+  return Number(n) * (unit === "s" ? 1 : unit === "m" ? 60 : 3600);
 }
 
 export interface RateResult {
@@ -70,27 +37,38 @@ export interface RateResult {
   retryAfterSec: number;
 }
 
+/** Chance de limpar linhas expiradas a cada consulta; sem cron e sem variável de ambiente. */
+const CLEANUP_CHANCE = 0.02;
+
 /**
- * Consome 1 tentativa da regra para a chave (IP ou email). Se o Upstash não estiver configurado:
- * em produção bloqueia (falha fechada, para não deixar as rotas de conta sem proteção);
- * em desenvolvimento usa um contador local.
+ * Consome 1 tentativa da regra para a chave (IP ou email), de forma atômica (um único INSERT ... ON CONFLICT).
+ * Falha ABERTA: se o IP não puder ser identificado ou se o banco der erro, a requisição passa (e o erro é logado),
+ * para que um problema do limitador nunca bloqueie o login de todo mundo. O login em si já depende do mesmo banco.
  */
 export async function checkRate(rule: Rule, key: string): Promise<RateResult> {
-  const limiter = limiterFor(rule);
-  if (!limiter) {
-    if (process.env.NODE_ENV === "production") {
-      console.error("[ratelimit] Upstash não configurado em produção: bloqueando por segurança");
-      return { ok: false, retryAfterSec: 60 };
-    }
-    return localLimit(rule, key);
-  }
+  // sem IP identificável todos cairiam no mesmo balde e se bloqueariam entre si
+  if (!key || key === "unknown") return { ok: true, retryAfterSec: 0 };
+
+  const id = `${rule.name}:${key}`;
+  const secs = windowSec(rule);
   try {
-    const r = await limiter.limit(key);
-    return { ok: r.success, retryAfterSec: Math.max(1, Math.ceil((r.reset - Date.now()) / 1000)) };
+    const rows = await prisma.$queryRaw<{ count: number; secs: number }[]>`
+      INSERT INTO "RateLimit" ("key", "count", "expiresAt")
+      VALUES (${id}, 1, (NOW() AT TIME ZONE 'UTC') + ${secs} * INTERVAL '1 second')
+      ON CONFLICT ("key") DO UPDATE SET
+        "count" = CASE WHEN "RateLimit"."expiresAt" <= (NOW() AT TIME ZONE 'UTC') THEN 1 ELSE "RateLimit"."count" + 1 END,
+        "expiresAt" = CASE WHEN "RateLimit"."expiresAt" <= (NOW() AT TIME ZONE 'UTC')
+          THEN (NOW() AT TIME ZONE 'UTC') + ${secs} * INTERVAL '1 second' ELSE "RateLimit"."expiresAt" END
+      RETURNING "count", CEIL(EXTRACT(EPOCH FROM ("expiresAt" - (NOW() AT TIME ZONE 'UTC'))))::int AS secs`;
+    if (Math.random() < CLEANUP_CHANCE) {
+      prisma.$executeRaw`DELETE FROM "RateLimit" WHERE "expiresAt" < (NOW() AT TIME ZONE 'UTC') - INTERVAL '1 hour'`.catch(() => {});
+    }
+    const row = rows[0];
+    if (row.count > rule.limit) return { ok: false, retryAfterSec: Math.max(1, row.secs) };
+    return { ok: true, retryAfterSec: 0 };
   } catch (e) {
-    console.error("[ratelimit] erro ao falar com o Upstash:", e instanceof Error ? e.message : e);
-    // falha fechada nas rotas de conta
-    return { ok: false, retryAfterSec: 30 };
+    console.error("[ratelimit] erro no banco, liberando a requisição:", e instanceof Error ? e.message : e);
+    return { ok: true, retryAfterSec: 0 };
   }
 }
 

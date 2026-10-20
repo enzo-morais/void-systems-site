@@ -145,3 +145,12 @@ model DiscloudBot {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+// Contadores do rate limit (janela fixa). Linhas expiradas são apagadas automaticamente por src/lib/ratelimit.ts.
+model RateLimit {
+  key       String   @id
+  count     Int
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
