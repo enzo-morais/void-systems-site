@@ -1,14 +1,31 @@
-import { VoidBackground } from "@/components/landing/void-background";
+import { VoidBackgroundClient } from "@/components/void/VoidBackgroundClient";
+import { SmoothScroll } from "@/components/void/SmoothScroll";
 import { Header } from "@/components/landing/header";
+
+const sections = [
+  "Seção 1 — Entrando no vazio",
+  "Seção 2 — Mais fundo",
+  "Seção 3 — Sem volta",
+  "Seção 4 — Quase lá",
+  "Seção 5 — O centro do portal",
+];
 
 export default function Home() {
   return (
     <>
-      <VoidBackground />
+      <VoidBackgroundClient />
+      <SmoothScroll />
       <Header />
 
-      <main className="relative z-10 min-h-[calc(100vh-64px)] flex items-center justify-center px-6">
-        <p className="text-silver/50 text-center">Nova página inicial em construção.</p>
+      <main className="relative z-10">
+        {sections.map((title) => (
+          <section key={title} className="min-h-screen flex items-center justify-center px-6">
+            <div className="text-center max-w-2xl">
+              <h2 className="text-3xl md:text-5xl font-semibold text-white">{title}</h2>
+              <p className="mt-4 text-silver/50">Conteúdo provisório para testar o scroll.</p>
+            </div>
+          </section>
+        ))}
       </main>
     </>
   );
