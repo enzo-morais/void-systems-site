@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { parseBody } from "@/lib/validation";
+import { salePatch } from "@/lib/schemas";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
@@ -13,7 +15,9 @@ export async function PATCH(
   { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
 
   const { id } = await params;
-  const body = await req.json();
+  const parsed = await parseBody(req, salePatch);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   try {
     const sale = await prisma.sale.update({

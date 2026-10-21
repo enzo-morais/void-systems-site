@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
+import { parseBody } from "@/lib/validation";
+import { profileUpdate } from "@/lib/schemas";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 
 export async function POST(req: NextRequest) {
@@ -11,7 +13,9 @@ export async function POST(req: NextRequest) {
   const limited = await enforce(RULES.profileUpdate, sessionKey(session));
   if (limited) return limited;
 
-  const { name, email } = await req.json();
+  const parsed = await parseBody(req, profileUpdate);
+  if (!parsed.ok) return parsed.response;
+  const { name, email } = parsed.data;
 
   if (email && email !== session.user.email) {
     const existing = await prisma.siteUser.findUnique({ where: { email } });

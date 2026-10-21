@@ -17,6 +17,7 @@ async function sendLoginWebhook(username: string, id: string, provider: string, 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        allowed_mentions: { parse: [] },
         embeds: [{
           title: isDiscord ? "Login via Discord" : "Login via Email",
           color: isDiscord ? 0x5865F2 : 0xffffff,

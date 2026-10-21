@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { parseBody } from "@/lib/validation";
+import { productCreate } from "@/lib/schemas";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -16,8 +18,9 @@ export async function POST(req: NextRequest) {
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
 
-  const { name, price, category, description, badge, billing, tags } = await req.json();
-  if (!name || price == null) return NextResponse.json({ error: "Nome e preço obrigatórios" }, { status: 400 });
+  const parsed = await parseBody(req, productCreate);
+  if (!parsed.ok) return parsed.response;
+  const { name, price, category, description, badge, billing, tags } = parsed.data;
 
   const product = await prisma.product.create({
     data: { name, price: Number(price), category: category || null, description: description || null, badge: badge || null, billing: billing || "monthly", tags: tags || null },

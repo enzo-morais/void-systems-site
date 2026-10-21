@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { serverError } from "@/lib/http";
 import { userOwnsBot } from "@/lib/bot-auth";
 
 const DISCLOUD_API_URL = "https://api.discloud.app/v2";
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      return NextResponse.json({ error: err.message || "Erro ao buscar logs" }, { status: res.status });
+      return NextResponse.json({ error: "Erro ao buscar logs" }, { status: res.status === 404 ? 404 : 502 });
     }
 
     const data = await res.json();
@@ -36,6 +37,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ logs });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return serverError("bots/logs", e, "Erro ao buscar logs");
   }
 }

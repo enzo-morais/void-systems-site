@@ -132,6 +132,20 @@ try {
   for (let i = 0; i < 5; i++) appsSame.push((await post("/api/public/applications", {}, { "x-forwarded-for": sameIp })).status);
   check("candidatura pública: 3 tentativas (400, nada é criado) e a 4ª leva 429", appsSame.slice(0, 3).every((x) => x === 400) && appsSame[3] === 429, appsSame.join(","));
 
+  console.log("\n== A4: validação de entrada ==");
+  const up = await mkUser();
+  const lu = await login(up.email, up.password);
+  const upd = (body) => fetch(`${BASE}/api/profile/update`, { method: "POST", headers: { "Content-Type": "application/json", Cookie: lu.session ?? "" }, body: JSON.stringify(body) });
+  check("perfil: campo extra (isStaff) é recusado", (await upd({ name: "Novo", isStaff: true })).status === 400);
+  check("perfil: email inválido é recusado", (await upd({ email: "nao-e-email" })).status === 400);
+  check("perfil: nome válido é aceito", (await upd({ name: "Nome Novo" })).status === 200);
+  const longApp = await post("/api/public/applications", { name: "Ana", age: "20", discordId: "123456789012345678", discord: "ana", why: "x".repeat(5000), experience: "y", hours: "4" });
+  check("candidatura: texto gigante é recusado (400)", longApp.status === 400);
+  const raw = await fetch(`${BASE}/api/public/applications`, { method: "POST", headers: { "Content-Type": "application/json", "x-forwarded-for": freshIp() }, body: "{isso nao e json" });
+  check("corpo que não é JSON dá 400 (e não 500)", raw.status === 400, `status ${raw.status}`);
+  const wrongType = await post("/api/public/register", ["array"]);
+  check("corpo do tipo errado dá 400", wrongType.status === 400);
+
   console.log("\n== login: força bruta ==");
   const t = await mkUser();
   const tentativas = [];

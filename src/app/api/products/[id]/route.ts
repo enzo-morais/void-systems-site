@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { parseBody } from "@/lib/validation";
+import { productPatch } from "@/lib/schemas";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -9,9 +11,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
   const { id } = await params;
-  const body = await req.json();
+  const parsed = await parseBody(req, productPatch);
+  if (!parsed.ok) return parsed.response;
   try {
-    const product = await prisma.product.update({ where: { id }, data: body });
+    const product = await prisma.product.update({ where: { id }, data: parsed.data });
     return NextResponse.json(product);
   } catch {
     return NextResponse.json({ error: "Não encontrado" }, { status: 404 });

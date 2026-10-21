@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { parseBody } from "@/lib/validation";
+import { saleCreate } from "@/lib/schemas";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -16,10 +18,9 @@ export async function POST(req: NextRequest) {
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
 
-  const { client, product, value, notes, staffName, receipt } = await req.json();
-  if (!client || !product || value == null || !staffName) {
-    return NextResponse.json({ error: "Campos obrigatórios: cliente, produto, valor, vendedor" }, { status: 400 });
-  }
+  const parsed = await parseBody(req, saleCreate);
+  if (!parsed.ok) return parsed.response;
+  const { client, product, value, notes, staffName, receipt } = parsed.data;
 
   const sale = await prisma.sale.create({
     data: { client, product, value: Number(value), notes: notes || null, staffName, receipt: receipt || null },
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          allowed_mentions: { parse: [] },
           embeds: [{
             title: "Nova venda registrada",
             color: 0x22c55e,

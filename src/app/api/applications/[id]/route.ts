@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { parseBody } from "@/lib/validation";
+import { applicationReview } from "@/lib/schemas";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -9,18 +11,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
   const { id } = await params;
-  const { status } = await req.json();
-
-  if (!["approved", "rejected"].includes(status)) {
-    return NextResponse.json({ error: "Status inválido" }, { status: 400 });
-  }
+  const parsed = await parseBody(req, applicationReview);
+  if (!parsed.ok) return parsed.response;
+  const { status } = parsed.data;
 
   const reviewedBy = session!.user?.username || session!.user?.name || "Staff";
 
-  const app = await prisma.application.update({
-    where: { id },
-    data: { status, reviewedBy },
-  });
+  let app;
+  try {
+    app = await prisma.application.update({
+      where: { id },
+      data: { status, reviewedBy },
+    });
+  } catch {
+    return NextResponse.json({ error: "Formulário não encontrado" }, { status: 404 });
+  }
 
   await prisma.log.create({
     data: {

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { parseBody } from "@/lib/validation";
+import { staffBotCreate } from "@/lib/schemas";
+import { serverError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/staff/bots — listar todos os bots (staff only)
@@ -13,7 +16,7 @@ export async function GET() {
     const bots = await prisma.discloudBot.findMany({ orderBy: { createdAt: "desc" } });
     return NextResponse.json(bots);
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return serverError("staff/bots", e);
   }
 }
 
@@ -24,11 +27,9 @@ export async function POST(request: NextRequest) {
   { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
 
   try {
-    const { userId, discloudAppId, name, botClientId } = await request.json();
-
-    if (!userId || !discloudAppId) {
-      return NextResponse.json({ error: "userId e discloudAppId são obrigatórios" }, { status: 400 });
-    }
+    const parsed = await parseBody(request, staffBotCreate);
+    if (!parsed.ok) return parsed.response;
+    const { userId, discloudAppId, name, botClientId } = parsed.data;
 
     // Verificar se o bot já existe
     const existing = await prisma.discloudBot.findFirst({ where: { discloudAppId } });
@@ -57,6 +58,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ bot }, { status: 201 });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return serverError("staff/bots", e);
   }
 }

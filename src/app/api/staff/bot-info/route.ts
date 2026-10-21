@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { serverError } from "@/lib/http";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 
 /**
@@ -38,6 +39,6 @@ export async function GET(request: NextRequest) {
       id: data.id,
     });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return serverError("staff/bot-info", e);
   }
 }

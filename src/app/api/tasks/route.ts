@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { parseBody } from "@/lib/validation";
+import { taskCreate } from "@/lib/schemas";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -17,8 +19,9 @@ export async function POST(req: NextRequest) {
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
 
-  const { title, description, priority, assignedTo } = await req.json();
-  if (!title) return NextResponse.json({ error: "Título obrigatório" }, { status: 400 });
+  const parsed = await parseBody(req, taskCreate);
+  if (!parsed.ok) return parsed.response;
+  const { title, description, priority, assignedTo } = parsed.data;
 
   const task = await prisma.task.create({
     data: { title, description: description || null, priority: priority || "medium", assignedTo: assignedTo || null },

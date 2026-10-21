@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseBody } from "@/lib/validation";
+import { publicApplication } from "@/lib/schemas";
 import { RULES, checkRate, getClientIp, tooManyRequests } from "@/lib/ratelimit";
 
 const WEBHOOK = process.env.DISCORD_LOGIN_WEBHOOK;
@@ -8,11 +10,9 @@ export async function POST(req: NextRequest) {
   const limit = await checkRate(RULES.applicationIp, getClientIp(req.headers));
   if (!limit.ok) return tooManyRequests(limit.retryAfterSec);
 
-  const { name, age, discordId, discord, why, experience, hours, extra } = await req.json();
-
-  if (!name || !age || !discordId || !discord || !why || !experience || !hours) {
-    return NextResponse.json({ error: "Preencha todos os campos obrigatórios" }, { status: 400 });
-  }
+  const parsed = await parseBody(req, publicApplication);
+  if (!parsed.ok) return NextResponse.json({ error: "Preencha todos os campos obrigatórios (respeitando os tamanhos máximos)" }, { status: 400 });
+  const { name, age, discordId, discord, why, experience, hours, extra } = parsed.data;
 
   const existing = await prisma.application.findFirst({
     where: { discordId, status: "pending" },
@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          allowed_mentions: { parse: [] },
           embeds: [{
             title: "Novo formulário de candidatura",
             color: 0xfbbf24,

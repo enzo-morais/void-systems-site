@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { stopBot } from "@/lib/discloud-api";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { serverError } from "@/lib/http";
 import { userOwnsBot } from "@/lib/bot-auth";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +27,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }});
     return NextResponse.json({ success: true });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message || "Erro ao parar" }, { status: 500 });
+    return serverError("bots/stop", e, "Erro ao parar o bot");
   }
 }

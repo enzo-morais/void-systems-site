@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { serverError } from "@/lib/http";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 
 const GUILD_ID = process.env.DISCORD_GUILD_ID!;
@@ -65,6 +66,6 @@ export async function GET() {
     return NextResponse.json({ clients, total: clients.length });
   } catch (error: any) {
     console.error("Erro ao buscar clientes Discord:", error);
-    return NextResponse.json({ error: error.message || "Erro interno" }, { status: 500 });
+    return serverError("staff/discord-clients", error);
   }
 }
