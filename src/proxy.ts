@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   "/login",
   "/termos",
   "/privacidade",
+  "/transcript",
   "/api/auth",
   "/api/public",
   "/_next",

@@ -25,6 +25,8 @@ export const RULES = {
   resetRequestEmail: { name: "reset-req-email", limit: 3, window: "15 m" },
   resetConfirmIp: { name: "reset-confirm-ip", limit: 10, window: "10 m" },
   resetConfirmEmail: { name: "reset-confirm-email", limit: 5, window: "15 m" },
+  /** Página pública do transcript (/transcript/[id]): só por IP. */
+  transcriptIp: { name: "transcript-ip", limit: 30, window: "1 m" },
 } satisfies Record<string, Rule>;
 
 function windowSec(rule: Rule) {
