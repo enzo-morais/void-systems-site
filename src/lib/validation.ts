@@ -6,7 +6,7 @@ import { z } from "zod";
 export const PASSWORD_MIN = 8; // vale só para criar/trocar senha; o login não exige tamanho (contas antigas têm 6)
 export const PASSWORD_MAX = 72; // limite do bcrypt
 
-export const emailSchema = z.string().trim().max(254).email();
+export const emailSchema = z.string().trim().toLowerCase().max(254).email();
 export const codeSchema = z.string().regex(/^\d{6}$/, "Código inválido");
 export const PASSWORD_MSG = `A senha deve ter entre ${PASSWORD_MIN} e ${PASSWORD_MAX} caracteres.`;
 export const passwordSchema = z.string().min(PASSWORD_MIN, PASSWORD_MSG).max(PASSWORD_MAX, PASSWORD_MSG);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 const PUBLIC_PATHS = [
   "/produtos",
@@ -19,7 +20,7 @@ const PUBLIC_PATHS = [
   "/icon",
 ];
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Home pública (match exato, "/" sozinho liberaria tudo)
@@ -37,12 +38,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Verificar cookie de sessão do NextAuth
-  const sessionToken =
-    request.cookies.get("next-auth.session-token") ||
-    request.cookies.get("__Secure-next-auth.session-token");
+  // Sessão válida: confere a assinatura e a validade do JWT (e não só se o cookie existe)
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET }).catch(() => null);
 
-  if (!sessionToken) {
+  if (!token) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);

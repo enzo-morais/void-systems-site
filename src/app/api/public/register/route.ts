@@ -21,11 +21,24 @@ export async function POST(req: NextRequest) {
   if (!limit.ok) return tooManyRequests(limit.retryAfterSec);
 
   const existing = await prisma.siteUser.findUnique({ where: { email } });
-  if (existing && existing.emailVerified) {
-    return NextResponse.json({ error: "Email já cadastrado" }, { status: 409 });
-  }
-
+  // o hash roda nos dois caminhos para a resposta demorar o mesmo tempo
   const hashedPassword = await bcrypt.hash(password, 12);
+
+  if (existing && existing.emailVerified) {
+    // Não revela que o email já tem conta: mesma resposta de um cadastro novo. A conta existente não é alterada;
+    // o dono recebe um aviso por email com o caminho para entrar ou recuperar a senha.
+    try {
+      await resend.emails.send({
+        from: "VOID Systems <noreply@voidsystems.store>",
+        to: email,
+        subject: "Tentativa de cadastro - VOID Systems",
+        html: "<p>Alguém tentou criar uma conta na VØID Systems com este email, mas ele já está cadastrado.</p><p>Se foi você, é só entrar normalmente ou usar \"Esqueci minha senha\". Se não foi, ignore esta mensagem.</p>",
+      });
+    } catch (err) {
+      console.error("[EMAIL] Erro ao enviar aviso:", err instanceof Error ? err.message : "desconhecido");
+    }
+    return NextResponse.json({ needsVerification: true }, { status: 201 });
+  }
 
   if (existing) {
     await prisma.siteUser.update({ where: { email }, data: { name, password: hashedPassword } });

@@ -146,6 +146,21 @@ try {
   const wrongType = await post("/api/public/register", ["array"]);
   check("corpo do tipo errado dá 400", wrongType.status === 400);
 
+  console.log("\n== sessão e cadastro ==");
+  const forged = await fetch(`${BASE}/perfil`, { redirect: "manual", headers: { Cookie: "next-auth.session-token=cookie-forjado-qualquer" } });
+  check("cookie de sessão forjado não passa pelo proxy (307 para /login)", forged.status === 307 && (forged.headers.get("location") ?? "").includes("/login"), `status ${forged.status}`);
+  const none = await fetch(`${BASE}/perfil`, { redirect: "manual" });
+  check("sem cookie também vai para o login", none.status === 307);
+  const real = await fetch(`${BASE}/perfil`, { redirect: "manual", headers: { Cookie: l.session ?? "" } });
+  check("sessão válida passa pelo proxy (200)", real.status === 200, `status ${real.status}`);
+  const exist = await mkUser();
+  const regExisting = await post("/api/public/register", { name: "Invasor", email: exist.email.toUpperCase(), password: "SenhaDoInvasor1" });
+  check("cadastro com email já existente responde igual a um novo (201, sem 409)", regExisting.status === 201 && regExisting.json?.needsVerification === true, JSON.stringify(regExisting.json));
+  const still = await prisma.siteUser.findUnique({ where: { email: exist.email } });
+  check("a conta existente não foi alterada (nome, senha e nenhum código novo)", still.name === "Teste" && (await bcrypt.compare(exist.password, still.password)) && !still.verifyCodeHash);
+  const lower = await login(exist.email.toUpperCase(), exist.password);
+  check("login com o email em MAIÚSCULAS funciona (normalizado)", !!lower.session, lower.erro ?? "");
+
   console.log("\n== login: força bruta ==");
   const t = await mkUser();
   const tentativas = [];

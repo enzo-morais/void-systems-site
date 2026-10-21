@@ -8,6 +8,7 @@ import { AlertCircle, ChevronDown, Eye, EyeOff, Loader2, Mail } from "lucide-rea
 import { clients } from "@/config/home";
 import { DISCORD_STORE_URL } from "@/config/store";
 import "@/components/home/home.css";
+import { safeCallbackPath } from "@/lib/safe-redirect";
 import "./login.css";
 
 type Mode = "login" | "register" | "verify" | "forgot" | "reset";
@@ -86,7 +87,7 @@ function LoginContent() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = safeCallbackPath(searchParams.get("callbackUrl"));
 
   const [mode, setMode] = useState<Mode>("login");
   const [emailOpen, setEmailOpen] = useState(false);

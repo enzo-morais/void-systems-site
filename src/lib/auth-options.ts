@@ -75,7 +75,7 @@ export const authOptions: NextAuthOptions = {
           return { id: DEV_STAFF_ID, name: "Staff de Teste", email: credentials.email, image: null };
         }
 
-        const user = await prisma.siteUser.findUnique({ where: { email: credentials.email } });
+        const user = await prisma.siteUser.findUnique({ where: { email: credentials.email.trim().toLowerCase() } });
         if (!user) return null;
         if (!user.emailVerified) return null;
 
@@ -87,6 +87,14 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // depois do login/logout só se volta para caminhos do próprio site
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/") && !url.startsWith("//") && !url.includes("\\")) return `${baseUrl}${url}`;
+      try {
+        if (new URL(url).origin === baseUrl) return url;
+      } catch { /* url inválida */ }
+      return baseUrl;
+    },
     async jwt({ token, account, profile, user }) {
       if (account?.provider === "discord" && profile) {
         const discordId = (profile as { id: string }).id;
