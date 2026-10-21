@@ -110,7 +110,7 @@ export function SalesTable({ sales, loading, onDelete }: { sales: Sale[]; loadin
                       <td className="px-5 py-3 text-silver/70">{new Date(sale.createdAt).toLocaleDateString("pt-BR")}</td>
                       <td className="px-5 py-3">
                         {sale.receipt ? (
-                          <a href={sale.receipt} target="_blank" rel="noopener noreferrer" className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: "rgba(34,197,94,0.1)", color: "#22c55e" }}>Ver</a>
+                          <a href={`/api/sales/${sale.id}/receipt`} target="_blank" rel="noopener noreferrer" className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: "rgba(34,197,94,0.1)", color: "#22c55e" }}>Ver</a>
                         ) : <span className="text-xs text-silver/70">—</span>}
                       </td>
                       <td className="px-5 py-3 flex gap-1">

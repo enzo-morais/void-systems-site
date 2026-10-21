@@ -196,8 +196,8 @@ export default function TeamPage() {
                   memberAllSales.map((sale) => (
                     <div key={sale.id} className="rounded-lg p-4 flex gap-4" style={{ backgroundColor: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
                       {sale.receipt ? (
-                        <a href={sale.receipt} target="_blank" rel="noopener noreferrer" className="shrink-0 group relative">
-                          <img src={sale.receipt} alt="Comprovante" className="w-16 h-16 rounded-lg object-cover" />
+                        <a href={`/api/sales/${sale.id}/receipt`} target="_blank" rel="noopener noreferrer" className="shrink-0 group relative">
+                          <img src={`/api/sales/${sale.id}/receipt`} alt="Comprovante" className="w-16 h-16 rounded-lg object-cover" />
                           <div className="absolute inset-0 rounded-lg bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <ExternalLink className="w-4 h-4 text-white" />
                           </div>

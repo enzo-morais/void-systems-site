@@ -107,14 +107,14 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
       setLoading(false); return;
     }
 
-    let receiptUrl: string | undefined;
+    let receiptPathName: string | undefined;
     if (receiptFile) {
       setUploading(true);
       const formData = new FormData();
       formData.append("file", receiptFile);
       const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
       setUploading(false);
-      if (uploadRes.ok) { receiptUrl = (await uploadRes.json()).url; }
+      if (uploadRes.ok) { receiptPathName = (await uploadRes.json()).path; }
       else { setError("Erro ao enviar comprovante"); setLoading(false); return; }
     }
 
@@ -131,7 +131,7 @@ export function SaleForm({ onSuccess }: { onSuccess: () => void }) {
         value: total,
         notes: notesWithDiscount || undefined,
         staffName,
-        receipt: receiptUrl
+        receipt: receiptPathName
       }),
     });
 

@@ -33,7 +33,8 @@ describe("schemas de entrada", () => {
   });
 
   it("venda: tamanhos e tipos", () => {
-    ok(saleCreate, { client: "Ana", product: "Bot", value: 50, staffName: "Enzo", notes: "ok", receipt: "https://x/y.png" });
+    ok(saleCreate, { client: "Ana", product: "Bot", value: 50, staffName: "Enzo", notes: "ok", receipt: "1789000000000-3f2b8c1e-4d5a-4b6c-8e7f-9a0b1c2d3e4f.png" });
+    bad(saleCreate, { client: "Ana", product: "Bot", value: 50, staffName: "Enzo", receipt: "https://x/y.png" });
     bad(saleCreate, { client: "Ana", product: "Bot", value: 50, staffName: "Enzo", staffId: "x" });
     bad(saleCreate, { client: "Ana", product: "Bot", value: NaN, staffName: "Enzo" });
     bad(saleCreate, { client: "Ana", product: "Bot", value: 50 });

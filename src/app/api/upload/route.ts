@@ -4,12 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 import { detectFileType } from "@/lib/file-type";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
+import { RECEIPTS_BUCKET, supabaseAdmin } from "@/lib/receipts";
 
 const MAX_BYTES = 5 * 1024 * 1024; // comprovantes são fotos/prints/PDF: 5 MB sobra
 const BODY_SLACK = 512 * 1024; // cabeçalhos do multipart
@@ -42,8 +37,8 @@ export async function POST(req: NextRequest) {
   // nome 100% gerado aqui (a extensão vem do conteúdo detectado, nunca do nome enviado)
   const filename = `${Date.now()}-${randomUUID()}.${type.ext}`;
 
-  const { error } = await supabase.storage
-    .from("receipts")
+  const { error } = await supabaseAdmin().storage
+    .from(RECEIPTS_BUCKET)
     .upload(filename, buffer, { contentType: type.mime, upsert: false });
 
   if (error) {
@@ -51,7 +46,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Erro ao enviar arquivo" }, { status: 500 });
   }
 
-  const { data } = supabase.storage.from("receipts").getPublicUrl(filename);
-
-  return NextResponse.json({ url: data.publicUrl });
+  // o bucket é privado: devolve só o nome; o comprovante é aberto por /api/sales/[id]/receipt (URL assinada)
+  return NextResponse.json({ path: filename });
 }

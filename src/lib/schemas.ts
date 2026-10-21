@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { emailSchema } from "./validation";
+import { RECEIPT_NAME } from "./receipts";
 
 // Schemas do corpo das rotas de escrita. Todos .strict(): campo desconhecido (ex.: "id", "createdAt", "role")
 // é recusado em vez de ir parar no banco. Os limites de tamanho valem para o painel e para a API.
@@ -37,7 +38,7 @@ export const saleCreate = z
     value: money,
     notes: optText(2000),
     staffName: text(100),
-    receipt: z.string().trim().max(500).nullish(),
+    receipt: z.string().trim().regex(RECEIPT_NAME, "Comprovante inválido").nullish(),
   })
   .strict();
 export const salePatch = saleCreate.omit({ receipt: true }).partial().strict();

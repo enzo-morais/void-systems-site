@@ -184,6 +184,8 @@ try {
   check("endpoint de relatório de CSP responde 204 (não exige Origin do site)", csp.status === 204, `status ${csp.status}`);
   const upl = await fetch(`${BASE}/api/upload`, { method: "POST", headers: { Cookie: l.session ?? "" }, body: new FormData() });
   check("upload exige staff (cliente comum leva 401)", upl.status === 401, `status ${upl.status}`);
+  const rcpt = await fetch(`${BASE}/api/sales/qualquer-id/receipt`, { redirect: "manual", headers: { Cookie: l.session ?? "" } });
+  check("comprovante: cliente comum não consegue URL assinada (401)", rcpt.status === 401, `status ${rcpt.status}`);
 
   console.log("\n== login: força bruta ==");
   const t = await mkUser();

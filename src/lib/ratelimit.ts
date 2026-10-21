@@ -43,6 +43,8 @@ export const RULES = {
   discloudGlobal: { name: "discloud-global", limit: 120, window: "1 m" },
   /** Relatórios de CSP do navegador (por IP). */
   cspReport: { name: "csp-report", limit: 30, window: "1 m" },
+  /** Staff abrindo comprovantes (cada abertura gera uma URL assinada). */
+  receiptView: { name: "receipt-view", limit: 60, window: "1 m" },
   /** Staff: consultas que chamam a API do Discord. */
   staffDiscord: { name: "staff-discord", limit: 30, window: "1 m" },
 } satisfies Record<string, Rule>;
