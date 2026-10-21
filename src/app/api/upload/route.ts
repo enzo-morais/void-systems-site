@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
+import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -11,6 +12,7 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  { const limited = await enforce(RULES.upload, sessionKey(session)); if (limited) return limited; }
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;

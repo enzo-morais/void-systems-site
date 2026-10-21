@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
+import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 import { prisma } from "@/lib/prisma";
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
   const { id } = await params;
   try {
     await prisma.client.delete({ where: { id } });

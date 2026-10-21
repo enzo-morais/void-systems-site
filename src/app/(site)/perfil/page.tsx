@@ -233,12 +233,12 @@ export default function PerfilPage() {
                 <div>
                   <label className="block text-xs text-silver/75 mb-1.5">Nova senha</label>
                   <div className="relative">
-                    <input type={showPw ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required placeholder="••••••" minLength={6} className={inputClass + " pr-10"} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
+                    <input type={showPw ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required placeholder="••••••" minLength={8} className={inputClass + " pr-10"} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs text-silver/75 mb-1.5">Confirmar nova senha</label>
-                  <input type={showPw ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required placeholder="••••••" minLength={6} className={inputClass} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
+                  <input type={showPw ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required placeholder="••••••" minLength={8} className={inputClass} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
                 </div>
                 {pwError && <p className="text-red-400 text-xs">{pwError}</p>}
                 {pwMsg && <p className="text-green-400 text-xs flex items-center gap-1"><CheckCircle className="w-3 h-3" />{pwMsg}</p>}
@@ -280,7 +280,7 @@ export default function PerfilPage() {
                     <div>
                       <label className="block text-xs text-silver/75 mb-1.5">Nova senha</label>
                       <div className="relative">
-                        <input type={showResetPw ? "text" : "password"} value={resetNewPw} onChange={(e) => setResetNewPw(e.target.value)} required placeholder="••••••" minLength={6} className={inputClass + " pr-10"} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
+                        <input type={showResetPw ? "text" : "password"} value={resetNewPw} onChange={(e) => setResetNewPw(e.target.value)} required placeholder="••••••" minLength={8} className={inputClass + " pr-10"} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
                         <button type="button" onClick={() => setShowResetPw(!showResetPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-silver/75 hover:text-white transition-colors cursor-pointer">
                           {showResetPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -288,7 +288,7 @@ export default function PerfilPage() {
                     </div>
                     <div>
                       <label className="block text-xs text-silver/75 mb-1.5">Confirmar nova senha</label>
-                      <input type={showResetPw ? "text" : "password"} value={resetConfirmPw} onChange={(e) => setResetConfirmPw(e.target.value)} required placeholder="••••••" minLength={6} className={inputClass} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
+                      <input type={showResetPw ? "text" : "password"} value={resetConfirmPw} onChange={(e) => setResetConfirmPw(e.target.value)} required placeholder="••••••" minLength={8} className={inputClass} style={{ borderColor: "rgba(255,255,255,0.12)" }} />
                     </div>
                     {forgotError && <p className="text-red-400 text-xs">{forgotError}</p>}
                     <button type="submit" disabled={forgotLoading || resetCode.length < 6}

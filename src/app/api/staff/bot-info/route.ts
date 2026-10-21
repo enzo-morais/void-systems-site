@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 
 /**
@@ -9,6 +10,7 @@ import { authOptions, isStaffMember } from "@/lib/auth-options";
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
+  { const limited = await enforce(RULES.staffDiscord, sessionKey(session)); if (limited) return limited; }
 
   const clientId = request.nextUrl.searchParams.get("clientId");
   if (!clientId) return NextResponse.json({ error: "clientId obrigatório" }, { status: 400 });

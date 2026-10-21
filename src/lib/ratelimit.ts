@@ -27,6 +27,20 @@ export const RULES = {
   resetConfirmEmail: { name: "reset-confirm-email", limit: 5, window: "15 m" },
   /** Página pública do transcript (/transcript/[id]): só por IP. */
   transcriptIp: { name: "transcript-ip", limit: 30, window: "1 m" },
+  /** Formulário público de candidatura: por IP. */
+  applicationIp: { name: "application-ip", limit: 3, window: "10 m" },
+  /** Rotas de usuário logado (chave = id do usuário). */
+  profilePassword: { name: "profile-password", limit: 5, window: "15 m" },
+  profileUpdate: { name: "profile-update", limit: 20, window: "10 m" },
+  upload: { name: "upload", limit: 20, window: "10 m" },
+  /** Ligar/desligar/reiniciar/remover bot (chama a API da Discloud). */
+  botControl: { name: "bot-control", limit: 10, window: "1 m" },
+  /** Leituras que chamam a Discloud (status e logs). */
+  botRead: { name: "bot-read", limit: 60, window: "1 m" },
+  /** Escritas do painel do staff (criar/editar/apagar). */
+  staffWrite: { name: "staff-write", limit: 60, window: "1 m" },
+  /** Staff: consultas que chamam a API do Discord. */
+  staffDiscord: { name: "staff-discord", limit: 30, window: "1 m" },
 } satisfies Record<string, Rule>;
 
 function windowSec(rule: Rule) {
@@ -94,6 +108,18 @@ export async function checkIpAndEmail(ipRule: Rule, emailRuleDef: Rule, ip: stri
   const byIp = await checkRate(ipRule, ip);
   if (!byIp.ok) return byIp;
   return checkRate(emailRuleDef, emailKey(email));
+}
+
+/** Chave do usuário logado para o rate limit (id do site, Discord ID ou email). */
+export function sessionKey(session: { user?: { id?: string; discordId?: string; email?: string | null } } | null): string {
+  const u = session?.user;
+  return u?.id ?? u?.discordId ?? u?.email ?? "anon";
+}
+
+/** Consome 1 tentativa da regra; devolve a resposta 429 se passou do limite, ou null se pode seguir. */
+export async function enforce(rule: Rule, key: string): Promise<NextResponse | null> {
+  const r = await checkRate(rule, key);
+  return r.ok ? null : tooManyRequests(r.retryAfterSec);
 }
 
 export function tooManyRequests(retryAfterSec: number) {

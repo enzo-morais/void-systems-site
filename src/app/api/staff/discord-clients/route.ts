@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 
 const GUILD_ID = process.env.DISCORD_GUILD_ID!;
@@ -15,6 +16,7 @@ export async function GET() {
   if (!isStaffMember(session)) {
     return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
   }
+  { const limited = await enforce(RULES.staffDiscord, sessionKey(session)); if (limited) return limited; }
 
   if (!CLIENT_ROLE_ID) {
     return NextResponse.json({ error: "DISCORD_CLIENT_ROLE_ID não configurado" }, { status: 500 });

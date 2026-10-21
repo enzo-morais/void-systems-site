@@ -105,6 +105,33 @@ try {
   check("email inexistente responde sucesso (não revela a conta)", s[0].status === 200 && s[0].json?.success === true);
   check("pedidos repetidos para o mesmo email levam 429", s.some((x) => x.status === 429), s.map((x) => x.status).join(","));
 
+  console.log("\n== A2: senha mínima de 8 ==");
+  const reg7 = await post("/api/public/register", { name: "Teste", email: `seg-${uniq()}@example.invalid`, password: "1234567" });
+  check("cadastro com 7 caracteres é recusado (400) com mensagem clara", reg7.status === 400 && /8/.test(reg7.json?.error ?? ""), JSON.stringify(reg7.json));
+  const rc7 = await post("/api/public/reset-password/confirm", { email: (await mkUser()).email, code: "123456", newPassword: "1234567" });
+  check("redefinição com 7 caracteres é recusada (400)", rc7.status === 400 && /8/.test(rc7.json?.error ?? ""));
+  const pw = await mkUser();
+  const lp = await login(pw.email, pw.password);
+  const chg = (body) => fetch(`${BASE}/api/profile/password`, { method: "POST", headers: { "Content-Type": "application/json", Cookie: lp.session ?? "" }, body: JSON.stringify(body) });
+  const c7 = await chg({ currentPassword: pw.password, newPassword: "1234567" });
+  check("troca de senha para 7 caracteres é recusada (400)", c7.status === 400, `status ${c7.status}`);
+  const same = await prisma.siteUser.findUnique({ where: { email: pw.email } });
+  check("a senha não mudou", await bcrypt.compare(pw.password, same.password));
+  const old6 = await mkUser({ password: "abc123" });
+  const l6 = await login(old6.email, "abc123");
+  check("quem tem senha antiga de 6 caracteres ainda consegue ENTRAR", !!l6.session, l6.erro ?? "");
+
+  console.log("\n== A1: rate limit nas rotas de usuário logado ==");
+  const lim = await mkUser();
+  const ll = await login(lim.email, lim.password);
+  const tries = [];
+  for (let i = 0; i < 7; i++) tries.push((await fetch(`${BASE}/api/profile/password`, { method: "POST", headers: { "Content-Type": "application/json", Cookie: ll.session ?? "" }, body: JSON.stringify({ currentPassword: "errada-errada", newPassword: "NovaSenha123" }) })).status);
+  check("troca de senha: 5 tentativas (400) e depois 429", tries.slice(0, 5).every((x) => x === 400) && tries[5] === 429, tries.join(","));
+  const appsSame = [];
+  const sameIp = freshIp();
+  for (let i = 0; i < 5; i++) appsSame.push((await post("/api/public/applications", {}, { "x-forwarded-for": sameIp })).status);
+  check("candidatura pública: 3 tentativas (400, nada é criado) e a 4ª leva 429", appsSame.slice(0, 3).every((x) => x === 400) && appsSame[3] === 429, appsSame.join(","));
+
   console.log("\n== login: força bruta ==");
   const t = await mkUser();
   const tentativas = [];

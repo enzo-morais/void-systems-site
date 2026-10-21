@@ -308,7 +308,7 @@ function LoginContent() {
               <FieldError id="lg-code-err" msg={errFor("code")} />
               <div>
                 <label htmlFor="lg-newpw" className="lg-label">Nova senha</label>
-                <input id="lg-newpw" type="password" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required placeholder="••••••" minLength={6} className="lg-input" />
+                <input id="lg-newpw" type="password" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required placeholder="••••••" minLength={8} className="lg-input" />
               </div>
               <button type="submit" disabled={loading || verifyCode.length < 6} className="lg-btn lg-btn--light">
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -400,7 +400,7 @@ function LoginContent() {
                           onChange={(e) => setPassword(e.target.value)}
                           required
                           placeholder="••••••"
-                          minLength={6}
+                          minLength={registering ? 8 : undefined}
                           className="lg-input pr-11"
                           aria-invalid={!!errFor("password")}
                           aria-describedby={errFor("password") ? "lg-password-err" : undefined}

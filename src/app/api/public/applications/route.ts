@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { rateLimit } from "@/lib/rate-limit";
+import { RULES, checkRate, getClientIp, tooManyRequests } from "@/lib/ratelimit";
 
 const WEBHOOK = process.env.DISCORD_LOGIN_WEBHOOK;
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
-  if (!rateLimit(ip, 2, 300000)) {
-    return NextResponse.json({ error: "Muitas tentativas. Aguarde 5 minutos." }, { status: 429 });
-  }
+  const limit = await checkRate(RULES.applicationIp, getClientIp(req.headers));
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSec);
+
   const { name, age, discordId, discord, why, experience, hours, extra } = await req.json();
 
   if (!name || !age || !discordId || !discord || !why || !experience || !hours) {

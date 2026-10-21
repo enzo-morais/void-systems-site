@@ -3,12 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { startBot } from "@/lib/discloud-api";
+import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 import { userOwnsBot } from "@/lib/bot-auth";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+  { const limited = await enforce(RULES.botControl, sessionKey(session)); if (limited) return limited; }
 
   const bot = await prisma.discloudBot.findUnique({ where: { id } });
   if (!bot || !userOwnsBot(bot, session)) return NextResponse.json({ error: "Bot não encontrado" }, { status: 404 });

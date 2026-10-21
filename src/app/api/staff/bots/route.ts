@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
+import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/staff/bots — listar todos os bots (staff only)
@@ -20,6 +21,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
+  { const limited = await enforce(RULES.staffWrite, sessionKey(session)); if (limited) return limited; }
 
   try {
     const { userId, discloudAppId, name, botClientId } = await request.json();
