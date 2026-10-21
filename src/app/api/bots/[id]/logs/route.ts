@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
-import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { RULES, enforceDiscloud } from "@/lib/ratelimit";
 import { serverError } from "@/lib/http";
 import { userOwnsBot } from "@/lib/bot-auth";
 
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-  { const limited = await enforce(RULES.botRead, sessionKey(session)); if (limited) return limited; }
+  { const limited = await enforceDiscloud(RULES.botRead, session); if (limited) return limited; }
 
   const bot = await prisma.discloudBot.findUnique({ where: { id } });
   if (!bot || !userOwnsBot(bot, session)) {

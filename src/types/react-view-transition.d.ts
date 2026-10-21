@@ -1,4 +1,4 @@
-// <ViewTransition> vem do React usado pelo Next (experimental.viewTransition) e ainda não está em @types/react.
+// <ViewTransition> vem do React usado pelo Next (embutido no Next 16.4, sem configuração) e ainda não está em @types/react.
 import "react";
 
 declare module "react" {

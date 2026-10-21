@@ -39,6 +39,10 @@ export const RULES = {
   botRead: { name: "bot-read", limit: 60, window: "1 m" },
   /** Escritas do painel do staff (criar/editar/apagar). */
   staffWrite: { name: "staff-write", limit: 60, window: "1 m" },
+  /** Teto GLOBAL de chamadas à Discloud (todos os usuários somados), para não estourar o limite da API deles. */
+  discloudGlobal: { name: "discloud-global", limit: 120, window: "1 m" },
+  /** Relatórios de CSP do navegador (por IP). */
+  cspReport: { name: "csp-report", limit: 30, window: "1 m" },
   /** Staff: consultas que chamam a API do Discord. */
   staffDiscord: { name: "staff-discord", limit: 30, window: "1 m" },
 } satisfies Record<string, Rule>;
@@ -120,6 +124,11 @@ export function sessionKey(session: { user?: { id?: string; discordId?: string; 
 export async function enforce(rule: Rule, key: string): Promise<NextResponse | null> {
   const r = await checkRate(rule, key);
   return r.ok ? null : tooManyRequests(r.retryAfterSec);
+}
+
+/** Limite por usuário e, em seguida, o teto global da Discloud. */
+export async function enforceDiscloud(rule: Rule, session: Parameters<typeof sessionKey>[0]): Promise<NextResponse | null> {
+  return (await enforce(rule, sessionKey(session))) ?? (await enforce(RULES.discloudGlobal, "global"));
 }
 
 export function tooManyRequests(retryAfterSec: number) {

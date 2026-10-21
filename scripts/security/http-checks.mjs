@@ -161,6 +161,30 @@ try {
   const lower = await login(exist.email.toUpperCase(), exist.password);
   check("login com o email em MAIÚSCULAS funciona (normalizado)", !!lower.session, lower.erro ?? "");
 
+  console.log("\n== cabeçalhos e origem ==");
+  const home = await fetch(`${BASE}/login`);
+  const hh = (k) => home.headers.get(k) ?? "";
+  check("cabeçalhos de segurança presentes (nosniff, frame DENY, referrer, permissions, HSTS)", hh("x-content-type-options") === "nosniff" && hh("x-frame-options") === "DENY" && !!hh("referrer-policy") && !!hh("permissions-policy") && !!hh("strict-transport-security"));
+  check("CSP em modo report-only (não bloqueia) com frame-ancestors 'none'", /frame-ancestors 'none'/.test(hh("content-security-policy-report-only")) && !hh("content-security-policy"));
+  check("não anuncia X-Powered-By", !hh("x-powered-by"));
+  const tr = await fetch(`${BASE}/transcript/zzzz`);
+  check("/transcript mantém o próprio Referrer-Policy: no-referrer", tr.headers.get("referrer-policy") === "no-referrer" && /script-src 'none'/.test(tr.headers.get("content-security-policy") ?? ""));
+  const probe = `p-${uniq()}@example.invalid`;
+  const evilOrigin = await post("/api/public/verify", { email: probe, code: "000000" }, { Origin: "https://evil.example.com" });
+  check("POST vindo de outro site (Origin estranho) é barrado com 403", evilOrigin.status === 403, `status ${evilOrigin.status}`);
+  const crossSite = await post("/api/public/verify", { email: probe, code: "000000" }, { "Sec-Fetch-Site": "cross-site" });
+  check("POST com Sec-Fetch-Site cross-site e sem Origin também é barrado (403)", crossSite.status === 403, `status ${crossSite.status}`);
+  const nullOrigin = await post("/api/public/verify", { email: probe, code: "000000" }, { Origin: "null" });
+  check("Origin 'null' (iframe sandbox) é barrado (403)", nullOrigin.status === 403);
+  const sameOrigin = await post("/api/public/verify", { email: probe, code: "000000" }, { Origin: BASE, "Sec-Fetch-Site": "same-origin" });
+  check("POST do próprio site passa normalmente (400 de código errado, não 403)", sameOrigin.status === 400, `status ${sameOrigin.status}`);
+  const noOrigin = await post("/api/public/verify", { email: probe, code: "000000" });
+  check("cliente sem Origin (curl/servidor) continua funcionando", noOrigin.status === 400, `status ${noOrigin.status}`);
+  const csp = await fetch(`${BASE}/api/public/csp-report`, { method: "POST", headers: { "Content-Type": "application/csp-report", Origin: "https://evil.example.com" }, body: "{}" });
+  check("endpoint de relatório de CSP responde 204 (não exige Origin do site)", csp.status === 204, `status ${csp.status}`);
+  const upl = await fetch(`${BASE}/api/upload`, { method: "POST", headers: { Cookie: l.session ?? "" }, body: new FormData() });
+  check("upload exige staff (cliente comum leva 401)", upl.status === 401, `status ${upl.status}`);
+
   console.log("\n== login: força bruta ==");
   const t = await mkUser();
   const tentativas = [];

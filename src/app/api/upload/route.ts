@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { getServerSession } from "next-auth";
 import { authOptions, isStaffMember } from "@/lib/auth-options";
 import { RULES, enforce, sessionKey } from "@/lib/ratelimit";
+import { detectFileType } from "@/lib/file-type";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -9,26 +11,43 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY!
 );
 
+const MAX_BYTES = 5 * 1024 * 1024; // comprovantes são fotos/prints/PDF: 5 MB sobra
+const BODY_SLACK = 512 * 1024; // cabeçalhos do multipart
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!isStaffMember(session)) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   { const limited = await enforce(RULES.upload, sessionKey(session)); if (limited) return limited; }
 
-  const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 });
+  // recusa antes de ler o corpo inteiro na memória
+  const declared = Number(req.headers.get("content-length") ?? 0);
+  if (declared > MAX_BYTES + BODY_SLACK) return NextResponse.json({ error: "Arquivo muito grande (máximo 5 MB)" }, { status: 413 });
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const ext = file.name.split(".").pop() || "png";
-  const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+  let file: File | null = null;
+  try {
+    const formData = await req.formData();
+    const f = formData.get("file");
+    file = f instanceof File ? f : null;
+  } catch {
+    return NextResponse.json({ error: "Envio inválido" }, { status: 400 });
+  }
+  if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 });
+  if (file.size === 0) return NextResponse.json({ error: "Arquivo vazio" }, { status: 400 });
+  if (file.size > MAX_BYTES) return NextResponse.json({ error: "Arquivo muito grande (máximo 5 MB)" }, { status: 413 });
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const type = detectFileType(buffer);
+  if (!type) return NextResponse.json({ error: "Tipo de arquivo não permitido. Envie PNG, JPG, WEBP, GIF ou PDF." }, { status: 415 });
+
+  // nome 100% gerado aqui (a extensão vem do conteúdo detectado, nunca do nome enviado)
+  const filename = `${Date.now()}-${randomUUID()}.${type.ext}`;
 
   const { error } = await supabase.storage
     .from("receipts")
-    .upload(filename, buffer, { contentType: file.type, upsert: false });
+    .upload(filename, buffer, { contentType: type.mime, upsert: false });
 
   if (error) {
-    console.error("Supabase upload error:", error);
+    console.error("Supabase upload error:", error.message);
     return NextResponse.json({ error: "Erro ao enviar arquivo" }, { status: 500 });
   }
 
