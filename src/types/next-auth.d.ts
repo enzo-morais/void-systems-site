@@ -24,5 +24,8 @@ declare module "next-auth/jwt" {
     accessToken?: string;
     image?: string;
     isClient?: boolean;
+    /** Quando os cargos do Discord foram conferidos pela última vez / com sucesso (ms). */
+    rolesCheckedAt?: number;
+    rolesOkAt?: number;
   }
 }

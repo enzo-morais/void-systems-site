@@ -4,10 +4,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { RULES, checkRate, emailKey, getClientIp } from "./ratelimit";
+import { CLIENT_ROLE_ID, SESSION_MAX_AGE_S, STAFF_ROLE_ID, revalidateRoles } from "./staff-check";
 
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID!;
-const STAFF_ROLE_ID = "1462664924936274144";
-const CLIENT_ROLE_ID = "1462664263096205457";
 const LOGIN_WEBHOOK = process.env.DISCORD_LOGIN_WEBHOOK;
 
 async function sendLoginWebhook(username: string, id: string, provider: string, avatar?: string) {
@@ -121,6 +120,7 @@ export const authOptions: NextAuthOptions = {
             const roles = member.roles as string[];
             token.isStaff = roles.includes(STAFF_ROLE_ID);
             token.isClient = roles.includes(CLIENT_ROLE_ID);
+            token.rolesCheckedAt = token.rolesOkAt = Date.now();
           } else {
             token.isStaff = false;
             token.isClient = false;
@@ -138,6 +138,9 @@ export const authOptions: NextAuthOptions = {
         if (user?.id !== DEV_STAFF_ID) await sendLoginWebhook(token.name || "Usuário", token.email || "email", "credentials"); // o staff de teste não avisa o Discord
       }
 
+      // nas requisições seguintes, confere de novo se a pessoa ainda tem o cargo (a cada ~10 min)
+      if (!account) await revalidateRoles(token);
+
       return token;
     },
     async session({ session, token }) {
@@ -154,7 +157,9 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: { signIn: "/login" },
-  session: { strategy: "jwt" },
+  // sessão curta: depois de 24h é preciso entrar de novo (e o cargo de staff é revalidado no meio do caminho)
+  session: { strategy: "jwt", maxAge: SESSION_MAX_AGE_S },
+  jwt: { maxAge: SESSION_MAX_AGE_S },
 };
 
 export function isStaffMember(session: { user?: { isStaff?: boolean } } | null): boolean {
