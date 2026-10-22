@@ -1,5 +1,5 @@
 import "./hero.css";
-import { DISCORD_STORE_URL } from "@/config/store";
+import { DISCORD_SUPPORT_URL } from "@/config/store";
 import { Reveal } from "./Reveal";
 
 interface JoinCtaProps {
@@ -19,7 +19,7 @@ export function JoinCta({ scene, title, text, button }: JoinCtaProps) {
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">{title}</h2>
             <p className="mt-3 text-silver max-w-xl">{text}</p>
           </div>
-          <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--primary shrink-0">
+          <a href={DISCORD_SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--primary shrink-0">
             {button}
           </a>
         </div>

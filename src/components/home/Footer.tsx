@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DISCORD_STORE_URL } from "@/config/store";
+import { DISCORD_INVITE_URL, DISCORD_SUPPORT_URL } from "@/config/store";
 import { DISCORD_DISCLAIMER } from "@/config/legal";
 
 const columns = [
@@ -61,8 +61,13 @@ export function Footer() {
             <p className="eyebrow-l">Contato</p>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
-                <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-silver hover:text-white transition-colors">
+                <a href={DISCORD_SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="text-silver hover:text-white transition-colors">
                   Suporte no Discord
+                </a>
+              </li>
+              <li>
+                <a href={DISCORD_INVITE_URL} target="_blank" rel="noopener noreferrer" className="text-silver hover:text-white transition-colors">
+                  Entrar no servidor
                 </a>
               </li>
             </ul>

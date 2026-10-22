@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { clients, trust } from "@/config/home";
-import { DISCORD_STORE_URL } from "@/config/store";
+import { DISCORD_SUPPORT_URL } from "@/config/store";
 import { DiscordMockup } from "./DiscordMockup";
 import { KineticTitle } from "./KineticTitle";
 import "./hero.css";
@@ -28,7 +28,7 @@ export function Hero() {
             <Link href="/#combos" className="hero-cta hero-cta--primary">
               Ver combos
             </Link>
-            <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--ghost">
+            <a href={DISCORD_SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--ghost">
               Bot personalizado
             </a>
           </div>

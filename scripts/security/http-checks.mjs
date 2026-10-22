@@ -225,6 +225,12 @@ try {
   check("/perfil (logado): noindex e SEM preview", has(perfilHtml2, 'name="robots" content="noindex') && !has(perfilHtml2, 'property="og:'));
   const ogGone = await fetch(`${BASE}/og.png`, { redirect: "manual" });
   check("não existe mais imagem de compartilhamento (/og.png não responde 200)", ogGone.status !== 200, `status ${ogGone.status}`);
+  const SUPPORT = "https://discord.com/channels/1456484615840596123/1456484618286141647";
+  const INVITE = "https://discord.gg/JcuBjj5kH7";
+  check("home: links do Discord novos (atendimento e convite) e nenhum link antigo", has(homeHtml, `href="${SUPPORT}"`) && has(homeHtml, `href="${INVITE}"`) && !has(homeHtml, "discord.gg/voidsystems"));
+  const faqPg = await pg("/faq");
+  check("/faq: botão aponta para o atendimento", has(faqPg.body, `href="${SUPPORT}"`) && !has(faqPg.body, "discord.gg/voidsystems"));
+
   const robots = await pg("/robots.txt");
   check("robots.txt libera o site e bloqueia painel, perfil, api e transcripts", robots.status === 200 && /Disallow: \/dashboard/.test(robots.body) && /Disallow: \/perfil/.test(robots.body) && /Disallow: \/api\//.test(robots.body) && /Disallow: \/transcript\//.test(robots.body) && /Sitemap:/.test(robots.body));
   const sm = await pg("/sitemap.xml");

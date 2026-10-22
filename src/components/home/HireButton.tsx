@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Check, Copy, ExternalLink, X } from "lucide-react";
 import { formatPrice } from "@/config/bots";
-import { DISCORD_STORE_URL } from "@/config/store";
+import { DISCORD_INVITE_URL, DISCORD_SUPPORT_URL } from "@/config/store";
 import { DISCORD_DISCLAIMER, POLICY } from "@/config/legal";
 import "./hero.css";
 import "./hire-modal.css";
@@ -102,10 +102,18 @@ export function HireButton({ items, label = "Contratar pelo Discord", className 
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {copied ? "Copiado!" : "Copiar mensagem"}
                 </button>
-                <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--primary hm-btn">
+                <a href={DISCORD_SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--primary hm-btn">
                   Ir para o Discord <ExternalLink className="w-4 h-4" />
                 </a>
               </div>
+
+              <p className="mt-4 text-xs text-zinc-500">
+                Ainda não está no servidor?{" "}
+                <a href={DISCORD_INVITE_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-white">
+                  Entre pelo convite
+                </a>{" "}
+                e depois abra o ticket.
+              </p>
 
               {/* canal de suporte e links legais */}
               <div className="mt-5 pt-4 space-y-1.5 text-[11px] leading-relaxed text-zinc-500" style={{ borderTop: "1px solid #27272a" }}>

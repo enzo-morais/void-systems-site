@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Reveal } from "@/components/home/Reveal";
 import { Users2, CheckCircle, ArrowRight, Loader2, Clock, Shield, Zap, Send } from "lucide-react";
 import Link from "next/link";
-import { DISCORD_STORE_URL } from "@/config/store";
+import { DISCORD_INVITE_URL } from "@/config/store";
 
 const inputClass = "w-full bg-[#111111] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver backdrop-blur-sm";
 
@@ -186,7 +186,7 @@ export default function EquipePage() {
             </p>
             <div className="flex items-center gap-3">
               <a
-                href={DISCORD_STORE_URL}
+                href={DISCORD_INVITE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-black font-medium px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] text-sm"
