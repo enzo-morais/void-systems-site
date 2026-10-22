@@ -1,13 +1,10 @@
-import type { Metadata } from "next";
 import { PageHeader } from "@/components/home/PageHeader";
 import { CombosSection } from "@/components/home/CombosSection";
 import { CatalogSection } from "@/components/home/CatalogSection";
+import { pageMetadata } from "@/config/seo";
 import { CustomBotCta } from "@/components/home/CustomBotCta";
 
-export const metadata: Metadata = {
-  title: "Combos e bots para Discord — VØID Systems",
-  description: "Os 4 combos da VØID (Simples, Community, DayZ e Server Games) e o catálogo de bots avulsos: ticket, registro, verificação, boas-vindas e mais.",
-};
+export const metadata = pageMetadata("bots");
 
 export default function BotsPage() {
   return (

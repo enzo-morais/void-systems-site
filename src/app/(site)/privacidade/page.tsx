@@ -1,15 +1,9 @@
-import type { Metadata } from "next";
 import { LegalDocument } from "@/components/legal/LegalDocument";
 import { privacidade } from "@/config/legal";
+import { pageMetadata } from "@/config/seo";
 
-const doc = privacidade();
-
-export const metadata: Metadata = {
-  title: `${doc.title} — VØID Systems`,
-  description: doc.description,
-  alternates: { canonical: "/privacidade" },
-};
+export const metadata = pageMetadata("privacidade");
 
 export default function Page() {
-  return <LegalDocument doc={doc} />;
+  return <LegalDocument doc={privacidade()} />;
 }

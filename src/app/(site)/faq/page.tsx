@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
 import { PageHeader } from "@/components/home/PageHeader";
 import { FaqSection } from "@/components/home/FaqSection";
+import { pageMetadata } from "@/config/seo";
 import { JoinCta } from "@/components/home/JoinCta";
 
-export const metadata: Metadata = {
-  title: "Perguntas frequentes — VØID Systems",
-  description: "Pagamento, prazos, hospedagem, bots personalizados e outras dúvidas sobre os bots da VØID Systems.",
-};
+export const metadata = pageMetadata("faq");
 
 export default function FaqPage() {
   return (

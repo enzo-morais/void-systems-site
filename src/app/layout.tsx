@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
@@ -7,6 +7,7 @@ import { Providers } from "@/components/providers";
 import { VoidBackgroundClient } from "@/components/void/VoidBackgroundClient";
 import { MeshBackground } from "@/components/void/MeshBackground";
 import { SITE_URL } from "@/config/store";
+import { pages, themeColor } from "@/config/seo";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -30,29 +31,17 @@ const satoshi = localFont({
   ],
 });
 
-const OG_IMAGE = { url: "/og-image.png", width: 1200, height: 630, alt: "VØID Systems: bots e combos para Discord" };
-
+// Padrão do site: título e descrição de reserva. O Open Graph e o Twitter card de cada página pública vêm de src/config/seo.ts;
+// as páginas privadas (painel, perfil, login...) ficam sem preview e com noindex.
 export const metadata: Metadata = {
-  title: "VØID Systems — Bots para Discord",
-  description: "Combos e bots para Discord, hospedados e atendidos pela nossa equipe: tickets, boas-vindas, registro, verificação, economia, níveis e mais.",
+  title: pages.home.title,
+  description: pages.home.description,
   metadataBase: new URL(SITE_URL),
-  openGraph: {
-    title: "VØID Systems — Bots para Discord",
-    description: "Combos e bots para Discord, hospedados e atendidos pela nossa equipe.",
-    url: SITE_URL,
-    siteName: "VØID Systems",
-    type: "website",
-    locale: "pt_BR",
-    images: [OG_IMAGE],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "VØID Systems — Bots para Discord",
-    description: "Combos e bots para Discord, hospedados e atendidos pela nossa equipe.",
-    images: [OG_IMAGE.url],
-  },
   icons: { icon: "/icon.png", apple: "/icon.png" },
 };
+
+/** theme-color: cor da barrinha do embed no Discord e da barra do navegador no celular. */
+export const viewport: Viewport = { themeColor };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

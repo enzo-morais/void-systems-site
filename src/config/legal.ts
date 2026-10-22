@@ -35,8 +35,6 @@ export interface LegalSection {
 export interface LegalDoc {
   slug: string;
   title: string;
-  /** Descrição para o Google e para o cartão de compartilhamento. */
-  description: string;
   sections: LegalSection[];
 }
 
@@ -48,7 +46,6 @@ const UL = (ul: string[]): LegalBlock => ({ ul });
 export const termos = (): LegalDoc => ({
   slug: "termos",
   title: "Termos de Uso",
-  description: "Termos de uso dos serviços da VØID Systems: combos e bots para Discord, pagamento, cancelamento e responsabilidades.",
   sections: [
     {
       title: "Identificação, aceitação e idade",
@@ -151,7 +148,6 @@ export const termos = (): LegalDoc => ({
 export const reembolso = (): LegalDoc => ({
   slug: "reembolso",
   title: "Política de Reembolso",
-  description: `Direito de arrependimento em até ${POLICY.ARREPENDIMENTO_DIAS} dias, cancelamento sem multa e o que acontece se o serviço falhar.`,
   sections: [
     {
       title: `Você pode desistir em até ${POLICY.ARREPENDIMENTO_DIAS} dias`,
@@ -198,7 +194,6 @@ export const reembolso = (): LegalDoc => ({
 export const privacidade = (): LegalDoc => ({
   slug: "privacidade",
   title: "Política de Privacidade",
-  description: "Como a VØID Systems trata dados pessoais, para quê, por quanto tempo e como você exerce os seus direitos (LGPD).",
   sections: [
     {
       title: "Quem somos",

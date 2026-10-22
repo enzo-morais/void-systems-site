@@ -1,11 +1,8 @@
-import type { Metadata } from "next";
 import { Reveal } from "@/components/home/Reveal";
+import { pageMetadata } from "@/config/seo";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Sobre — VØID Systems",
-  description: "Conheça a VØID Systems: estúdio de bots e sistemas personalizados para Discord.",
-};
+export const metadata = pageMetadata("sobre");
 
 export default function SobrePage() {
   return (

@@ -202,13 +202,33 @@ try {
   check("/privacidade traz direitos (art. 18), operadora/controlador e cookies", priv.status === 200 && /OPERADORA/.test(priv.body) && /art\. 18/.test(priv.body) && /Cookies/.test(priv.body));
   const home2 = await pg("/");
   check("rodapé: Termos, Privacidade, Reembolso, Suporte no Discord, aviso do Discord e nada a preencher", /Política de Reembolso/.test(home2.body) && /Suporte no Discord/.test(home2.body) && /não é afiliada ao Discord Inc/.test(home2.body) && !/PREENCHER/.test(home2.body));
-  check("meta tags: Open Graph e Twitter com imagem", /property="og:image"/.test(home2.body) && /name="twitter:image"/.test(home2.body) && /summary_large_image/.test(home2.body));
+  console.log("\n== preview do link (Open Graph / Twitter) ==");
+  const URLBASE = "https://www.voidsystems.store";
+  const has = (html, str) => html.includes(str);
+  const homeHtml = home2.body;
+  check("home: og:title e og:description exatos", has(homeHtml, 'property="og:title" content="VØID Systems — Bots para Discord"') && has(homeHtml, 'property="og:description" content="4 combos prontos para o seu servidor: Simples, Community, DayZ e Server Games. Pix pelo Discord, suporte direto e cancele quando quiser."'));
+  check("home: og:site_name, og:type, og:locale e og:url", has(homeHtml, 'property="og:site_name" content="VØID Systems"') && has(homeHtml, 'property="og:type" content="website"') && has(homeHtml, 'property="og:locale" content="pt_BR"') && (has(homeHtml, `property="og:url" content="${URLBASE}/"`) || has(homeHtml, `property="og:url" content="${URLBASE}"`)));
+  check("home: SEM imagem (nenhum og:image nem twitter:image)", !has(homeHtml, 'property="og:image') && !has(homeHtml, 'name="twitter:image'));
+  check("home: Twitter card (summary) com o mesmo título e descrição", has(homeHtml, 'name="twitter:card" content="summary"') && has(homeHtml, 'name="twitter:title" content="VØID Systems — Bots para Discord"') && has(homeHtml, 'name="twitter:description" content="4 combos prontos'));
+  check("home: theme-color #000000", has(homeHtml, 'name="theme-color" content="#000000"'));
+  check("home: canonical aponta para o www", has(homeHtml, `rel="canonical" href="${URLBASE}/"`) || has(homeHtml, `rel="canonical" href="${URLBASE}"`));
+  for (const [path, title] of [["/termos", "Termos de Uso — VØID Systems"], ["/privacidade", "Política de Privacidade — VØID Systems"], ["/reembolso", "Política de Reembolso — VØID Systems"], ["/bots", "Combos e bots para Discord — VØID Systems"], ["/faq", "Perguntas frequentes — VØID Systems"]]) {
+    const r = await pg(path);
+    check(`${path}: título e descrição próprios e canonical`, has(r.body, `property="og:title" content="${title}"`) && has(r.body, `rel="canonical" href="${URLBASE}${path}"`) && has(r.body, 'property="og:description" content="') && !has(r.body, 'property="og:image') && !has(r.body, 'content="4 combos prontos para o seu servidor: Simples'));
+  }
+  const botPg = await pg("/bots/ticket");
+  check("/bots/[id]: título do bot", has(botPg.body, 'property="og:title" content="Bot de Ticket — VØID Systems"'));
+  const loginPg = await pg("/login");
+  check("/login: noindex e SEM preview (nenhuma tag og:)", has(loginPg.body, 'name="robots" content="noindex') && !has(loginPg.body, 'property="og:'));
+  const perfilPg2 = await fetch(`${BASE}/perfil`, { redirect: "manual", headers: { Cookie: l.session ?? "" } });
+  const perfilHtml2 = await perfilPg2.text();
+  check("/perfil (logado): noindex e SEM preview", has(perfilHtml2, 'name="robots" content="noindex') && !has(perfilHtml2, 'property="og:'));
+  const ogGone = await fetch(`${BASE}/og.png`, { redirect: "manual" });
+  check("não existe mais imagem de compartilhamento (/og.png não responde 200)", ogGone.status !== 200, `status ${ogGone.status}`);
   const robots = await pg("/robots.txt");
   check("robots.txt libera o site e bloqueia painel, perfil, api e transcripts", robots.status === 200 && /Disallow: \/dashboard/.test(robots.body) && /Disallow: \/perfil/.test(robots.body) && /Disallow: \/api\//.test(robots.body) && /Disallow: \/transcript\//.test(robots.body) && /Sitemap:/.test(robots.body));
   const sm = await pg("/sitemap.xml");
   check("sitemap.xml lista as páginas públicas e não lista o painel", sm.status === 200 && /\/reembolso/.test(sm.body) && /\/bots\/ticket/.test(sm.body) && !/dashboard|perfil|login/.test(sm.body));
-  const og = await fetch(`${BASE}/og-image.png`);
-  check("imagem de compartilhamento existe (PNG)", og.status === 200 && /image\/png/.test(og.headers.get("content-type") ?? ""));
   const perfilPg = await fetch(`${BASE}/perfil`, { redirect: "manual", headers: { Cookie: l.session ?? "" } });
   const perfilHtml = await perfilPg.text();
   check("/perfil (logado) tem noindex", /name="robots" content="noindex/.test(perfilHtml));

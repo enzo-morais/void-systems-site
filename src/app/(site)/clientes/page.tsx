@@ -1,13 +1,10 @@
-import type { Metadata } from "next";
 import { PageHeader } from "@/components/home/PageHeader";
 import { ClientsWall } from "@/components/home/ClientsWall";
 import { StatsSection } from "@/components/home/StatsSection";
+import { pageMetadata } from "@/config/seo";
 import { JoinCta } from "@/components/home/JoinCta";
 
-export const metadata: Metadata = {
-  title: "Clientes — VØID Systems",
-  description: "Os servidores de Discord que já rodam bots da VØID Systems.",
-};
+export const metadata = pageMetadata("clientes");
 
 export default function ClientesPage() {
   return (

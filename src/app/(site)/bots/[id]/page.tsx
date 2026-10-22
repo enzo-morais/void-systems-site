@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { bots, formatPrice } from "@/config/bots";
+import { buildMetadata } from "@/config/seo";
 import { KineticTitle } from "@/components/home/KineticTitle";
 import { Reveal } from "@/components/home/Reveal";
 import { HireButton } from "@/components/home/HireButton";
@@ -19,10 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const bot = bots.find((b) => b.id === id);
   if (!bot) return {};
-  return {
-    title: `${bot.name} — VØID Systems`,
-    description: bot.description,
-  };
+  return buildMetadata({ title: `${bot.name} — VØID Systems`, description: bot.description }, `/bots/${bot.id}`);
 }
 
 export default async function BotDetailPage({ params }: Props) {
