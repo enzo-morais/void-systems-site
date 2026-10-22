@@ -53,7 +53,7 @@ const VARIANTS: Variant[] = [
     category: "Atendimento",
     panelChannel: { name: "painel-tickets", icon: Ticket },
     resultChannel: { name: "ticket-lucas", icon: Lock },
-    user: { name: "Lucas", tone: "linear-gradient(135deg,#f59e0b,#ef4444)" },
+    user: { name: "Lucas", tone: "#3f3f46" },
     roleLabel: "Cliente",
     panel: {
       title: "Central de Atendimento",
@@ -79,7 +79,7 @@ const VARIANTS: Variant[] = [
     category: "Entrada",
     panelChannel: { name: "verificacao", icon: ShieldCheck },
     resultChannel: { name: "boas-vindas", icon: Hash },
-    user: { name: "Marina", tone: "linear-gradient(135deg,#10b981,#0ea5e9)" },
+    user: { name: "Marina", tone: "#3f3f46" },
     roleLabel: "Membro",
     panel: {
       title: "Verificação de membros",
@@ -105,7 +105,7 @@ const VARIANTS: Variant[] = [
     category: "Loja",
     panelChannel: { name: "vitrine", icon: ShoppingCart },
     resultChannel: { name: "pedido-davi", icon: Lock },
-    user: { name: "Davi", tone: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
+    user: { name: "Davi", tone: "#3f3f46" },
     roleLabel: "Cliente",
     panel: {
       title: "Vitrine de produtos",
@@ -131,7 +131,7 @@ const VARIANTS: Variant[] = [
     category: "Eventos",
     panelChannel: { name: "sorteios", icon: Gift },
     resultChannel: { name: "participantes", icon: Hash },
-    user: { name: "Rafa", tone: "linear-gradient(135deg,#a855f7,#ec4899)" },
+    user: { name: "Rafa", tone: "#3f3f46" },
     roleLabel: "Participante",
     panel: {
       title: "Sorteio: Nitro de 1 mês",
@@ -157,7 +157,7 @@ const VARIANTS: Variant[] = [
     category: "Cidadania",
     panelChannel: { name: "registro", icon: ClipboardList },
     resultChannel: { name: "registro-bruno", icon: Lock },
-    user: { name: "Bruno", tone: "linear-gradient(135deg,#14b8a6,#22c55e)" },
+    user: { name: "Bruno", tone: "#3f3f46" },
     roleLabel: "Cidadão",
     panel: {
       title: "Registro de cidadão",
@@ -433,8 +433,8 @@ export function DiscordMockup() {
 
           <div className="dm-members">
             <div className="dm-cat">Equipe — 2</div>
-            <Member name="Ana" color="#f0b232" tone="#7c3aed" />
-            <Member name="VØID Bot" color="#5865f2" tone="#111" bot />
+            <Member name="Ana" color="#d4d4d8" tone="#ffffff" />
+            <Member name="VØID Bot" color="#e4e4e7" tone="#111" bot />
             <div className="dm-cat">Membros — 3</div>
             <div className="dm-member dm-member--lucas">
               <span className="dm-mav" style={{ background: v.user.tone }}>
@@ -443,8 +443,8 @@ export function DiscordMockup() {
               </span>
               <span className="dm-mname dm-user-name">{v.user.name}</span>
             </div>
-            <Member name="Davi" tone="#0ea5e9" />
-            <Member name="Marina" tone="#10b981" />
+            <Member name="Davi" tone="#a1a1aa" />
+            <Member name="Marina" tone="#3f3f46" />
           </div>
         </div>
       </div>

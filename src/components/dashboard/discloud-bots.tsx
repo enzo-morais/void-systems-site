@@ -19,8 +19,8 @@ interface DiscloudBot {
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
   online:   { color: "#22c55e", bg: "rgba(34,197,94,0.14)",  label: "Online"      },
   offline:  { color: "#ef4444", bg: "rgba(239,68,68,0.14)",  label: "Offline"     },
-  starting: { color: "#eab308", bg: "rgba(234,179,8,0.14)",  label: "Iniciando..."  },
-  stopping: { color: "#f97316", bg: "rgba(249,115,22,0.14)", label: "Parando..."  },
+  starting: { color: "#d4d4d8", bg: "rgba(234,179,8,0.14)",  label: "Iniciando..."  },
+  stopping: { color: "#a1a1aa", bg: "rgba(255, 255, 255, 0.07)", label: "Parando..."  },
   error:    { color: "#ef4444", bg: "rgba(239,68,68,0.14)",  label: "Erro"        },
 };
 
@@ -44,8 +44,8 @@ function colorizeLog(line: string): React.ReactNode {
     { test: /erro|error|fatal|exception/i,    color: "#f87171" },
     { test: /warn|aviso/i,                    color: "#facc15" },
     { test: /online|pronto|ready|started/i,   color: "#4ade80" },
-    { test: /carregando|loading|iniciando/i,  color: "#60a5fa" },
-    { test: /comando|command|event|evento/i,  color: "#b4a9ff" },
+    { test: /carregando|loading|iniciando/i,  color: "#a1a1aa" },
+    { test: /comando|command|event|evento/i,  color: "#e4e4e7" },
   ];
 
   let color = "#a7f3d0";
@@ -101,7 +101,7 @@ function BotTerminal({ botId, botName }: { botId: string; botName: string }) {
   return (
     <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
       <div className="flex items-center justify-between px-4 py-2.5"
-        style={{ background: "#15151c", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+        style={{ background: "#111111", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-silver/70" />
           <span className="text-xs text-silver/80 font-mono">{botName} — console</span>
@@ -109,7 +109,7 @@ function BotTerminal({ botId, botName }: { botId: string; botName: string }) {
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-1.5 text-xs text-silver/70 cursor-pointer select-none">
             <input type="checkbox" checked={autoReload} onChange={e => setAutoReload(e.target.checked)}
-              className="w-3 h-3 accent-[#8f7dff]" />
+              className="w-3 h-3 accent-[#ffffff]" />
             Auto reload
           </label>
           <button onClick={fetchLogs}
@@ -126,7 +126,7 @@ function BotTerminal({ botId, botName }: { botId: string; botName: string }) {
 
       <div ref={termRef}
         className="h-72 overflow-y-auto p-4 font-mono text-xs leading-5 space-y-0.5"
-        style={{ background: "#0a0a0d" }}>
+        style={{ background: "#0a0a0a" }}>
         {loading ? (
           <span className="text-silver/70">Carregando logs...</span>
         ) : lines.length === 0 ? (
@@ -156,7 +156,7 @@ function LogsPreview({ botId, refreshKey }: { botId: string; refreshKey: number 
   }, [botId, refreshKey]);
 
   return (
-    <div className="rounded-lg p-3 font-mono text-[11px] leading-5" style={{ background: "#0a0a0d", border: "1px solid rgba(255,255,255,0.1)" }}>
+    <div className="rounded-lg p-3 font-mono text-[11px] leading-5" style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)" }}>
       <p className="font-mono text-[10px] uppercase tracking-wider text-silver/70 mb-1.5">Últimos logs</p>
       {lines === null ? (
         <span className="text-silver/70">Carregando...</span>
@@ -277,7 +277,7 @@ export function DiscloudBots({ embedded = false }: { embedded?: boolean }) {
   );
 
   return (
-    <div className={embedded ? "" : "px-4 py-8 max-w-4xl mx-auto"}>
+    <div className={embedded ? "" : "wrap py-4"}>
       <div className="mb-8">
         <h1 className="pt-title flex items-center gap-3">
           <Bot className="w-7 h-7 text-[var(--void-accent)]" />
@@ -307,7 +307,7 @@ export function DiscloudBots({ embedded = false }: { embedded?: boolean }) {
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
                   <div className="flex items-center gap-4 min-w-0">
                     <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center shrink-0"
-                      style={{ background: "linear-gradient(135deg, rgba(143,125,255,0.4), rgba(143,125,255,0.1))", border: "1px solid rgba(143,125,255,0.4)" }}>
+                      style={{ background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.16)" }}>
                       {bot.botAvatar
                         // eslint-disable-next-line @next/next/no-img-element
                         ? <img src={bot.botAvatar} alt={bot.name} className="w-full h-full object-cover" />
@@ -324,15 +324,15 @@ export function DiscloudBots({ embedded = false }: { embedded?: boolean }) {
 
                 {/* indicadores */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-                  <div className="rounded-lg px-3 py-2.5" style={{ background: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div className="rounded-lg px-3 py-2.5" style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.1)" }}>
                     <p className="font-mono text-[10px] uppercase tracking-wider text-silver/70 flex items-center gap-1.5 mb-1"><MemoryStick className="w-3 h-3" /> Memória</p>
                     {bot.memory ? <p className="text-sm font-medium">{bot.memory}</p> : <span className="pt-soon">Em breve</span>}
                   </div>
-                  <div className="rounded-lg px-3 py-2.5" style={{ background: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div className="rounded-lg px-3 py-2.5" style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.1)" }}>
                     <p className="font-mono text-[10px] uppercase tracking-wider text-silver/70 flex items-center gap-1.5 mb-1"><Clock className="w-3 h-3" /> Última ação</p>
                     <p className="text-sm font-medium">{bot.lastAction ? new Date(bot.lastAction).toLocaleString("pt-BR") : "Sem ações recentes"}</p>
                   </div>
-                  <div className="rounded-lg px-3 py-2.5" style={{ background: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div className="rounded-lg px-3 py-2.5" style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.1)" }}>
                     <p className="font-mono text-[10px] uppercase tracking-wider text-silver/70 flex items-center gap-1.5 mb-1"><Cpu className="w-3 h-3" /> Hospedagem</p>
                     <p className="text-sm font-medium">Discloud</p>
                   </div>
@@ -369,7 +369,7 @@ export function DiscloudBots({ embedded = false }: { embedded?: boolean }) {
                     onClick={() => setOpenLogs(openLogs === bot.id ? null : bot.id)}
                     aria-expanded={openLogs === bot.id}
                     className="pt-btn pt-btn--ghost"
-                    style={openLogs === bot.id ? { borderColor: "rgba(143,125,255,0.7)", color: "#d4ccff" } : undefined}>
+                    style={openLogs === bot.id ? { borderColor: "rgba(255, 255, 255, 0.28)", color: "#f4f4f5" } : undefined}>
                     <Terminal className="w-4 h-4" />
                     Console completo
                   </button>

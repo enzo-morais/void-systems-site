@@ -4,8 +4,10 @@
   --my: 50%;
   position: relative;
   border-radius: 14px;
-  background: #0d0d12;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 10, 10, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid #27272a;
   transition: transform 0.3s ease;
 }
 .bc:hover {
@@ -19,7 +21,7 @@
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: radial-gradient(220px circle at var(--mx) var(--my), rgba(255, 255, 255, 0.85), rgba(124, 138, 255, 0.35) 45%, transparent 70%);
+  background: radial-gradient(220px circle at var(--mx) var(--my), rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.14) 45%, transparent 70%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
@@ -61,8 +63,8 @@
   display: grid;
   place-items: center;
   color: #fff;
-  background: linear-gradient(135deg, rgba(143, 125, 255, 0.5), rgba(143, 125, 255, 0.1));
-  border: 1px solid rgba(143, 125, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 .bc-buy {
   display: inline-flex;
@@ -73,15 +75,15 @@
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  color: #0a0a0d;
+  color: #0a0a0a;
   background: #fff;
   transition: box-shadow 0.3s, transform 0.2s;
 }
-.bc-buy:hover { box-shadow: 0 6px 30px rgba(143, 125, 255, 0.5); transform: translateY(-1px); }
+.bc-buy:hover { box-shadow: 0 6px 30px rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
 .bc-buy--on {
   color: #fff;
-  background: rgba(143, 125, 255, 0.35);
-  border: 1px solid rgba(143, 125, 255, 0.7);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 /* botão discreto: adiciona o bot à calculadora de desconto */
@@ -92,10 +94,10 @@
   height: 38px;
   border-radius: 10px;
   color: rgba(255, 255, 255, 0.8);
-  background: #15151c;
+  background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.14);
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
 }
-.bc-calc:hover { color: #fff; border-color: rgba(143, 125, 255, 0.7); }
-.bc-calc--on { color: #fff; background: rgba(143, 125, 255, 0.3); border-color: rgba(143, 125, 255, 0.8); }
+.bc-calc:hover { color: #fff; border-color: rgba(255, 255, 255, 0.28); }
+.bc-calc--on { color: #fff; background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.32); }

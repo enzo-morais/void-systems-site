@@ -1,14 +1,14 @@
 /* Cor de destaque do fundo: troque aqui (ou sobrescreva em outro lugar) para mudar tudo de uma vez. */
 :root {
-  --void-accent: #8f7dff;
+  --void-accent: #ffffff;
 }
 
 /* Camada fixa atrás de todo o conteúdo (main usa z-10, header z-50). */
 .vb-root {
-  --vb-bg: #0a0a0d;
-  --vb-ink: #ecebf2;
-  --vb-muted: #8d8b99;
-  --vb-line: rgba(236, 235, 242, 0.14);
+  --vb-bg: #050505;
+  --vb-ink: #ffffff;
+  --vb-muted: #a1a1aa;
+  --vb-line: rgba(255, 255, 255, 0.1);
   --vb-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   position: fixed;
@@ -40,7 +40,7 @@
 .vb-grain {
   position: absolute;
   inset: -50%;
-  opacity: 0.07;
+  opacity: 0.03;
   mix-blend-mode: overlay;
   animation: vb-grain 0.5s steps(4) infinite;
 }
@@ -63,7 +63,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 45%, rgba(10, 10, 13, 0.1) 0%, rgba(10, 10, 13, 0.55) 100%),
-    rgba(10, 10, 13, 0.24);
+    radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.45) 100%),
+    rgba(0, 0, 0, 0.2);
   pointer-events: none;
 }

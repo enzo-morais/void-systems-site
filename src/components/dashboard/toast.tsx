@@ -37,7 +37,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const icons = { success: CheckCircle, error: AlertTriangle, info: Info };
-  const colors = { success: "#22c55e", error: "#ef4444", info: "#3b82f6" };
+  const colors = { success: "#22c55e", error: "#ef4444", info: "#a1a1aa" };
 
   return (
     <ToastContext.Provider value={{ toast }}>

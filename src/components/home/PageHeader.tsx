@@ -7,23 +7,25 @@ interface PageHeaderProps {
   title: string;
   accent: string;
   lead: string;
-  /** Altura mínima do bloco; deixa espaço para a forma do fundo aparecer. */
+  /** Ajuste opcional de altura/espaço do bloco. */
   className?: string;
 }
 
-/** Cabeçalho de cada página interna. */
-export function PageHeader({ scene, eyebrow, title, accent, lead, className = "min-h-[62vh]" }: PageHeaderProps) {
+/** Cabeçalho de cada página interna: título grande à esquerda, texto de apoio à direita em telas largas. */
+export function PageHeader({ scene, eyebrow, title, accent, lead, className = "" }: PageHeaderProps) {
   return (
-    <section data-scene={scene} className={`flex items-center justify-center px-6 pt-24 pb-10 ${className}`}>
-      <div className="max-w-3xl mx-auto text-center">
-        <Reveal>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-silver/80">{eyebrow}</p>
-        </Reveal>
-        <KineticTitle as="h1" className="mt-3 text-4xl sm:text-6xl font-bold tracking-tight leading-[1.06] text-white" accent={accent}>
-          {title}
-        </KineticTitle>
+    <section data-scene={scene} className={`pt-36 pb-12 sm:pb-16 ${className}`}>
+      <div className="wrap grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+        <div>
+          <Reveal>
+            <p className="eyebrow-l">{eyebrow}</p>
+          </Reveal>
+          <KineticTitle as="h1" className="mt-3 text-4xl sm:text-6xl 2xl:text-7xl font-bold tracking-tight leading-[1.04] text-white" accent={accent}>
+            {title}
+          </KineticTitle>
+        </div>
         <Reveal delay={150}>
-          <p className="mt-5 text-base sm:text-lg text-silver/85 max-w-xl mx-auto">{lead}</p>
+          <p className="sec-lead">{lead}</p>
         </Reveal>
       </div>
     </section>

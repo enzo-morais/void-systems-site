@@ -41,9 +41,9 @@ function notFoundPage(status: number, title: string, text: string, cache: string
 <meta name="robots" content="noindex,nofollow"><title>${title} — VØID Systems</title>
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:#000;color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-.n{font-size:clamp(7rem,28vw,12rem);font-weight:700;line-height:1;letter-spacing:-.05em;color:rgba(143,125,255,.16);margin:0}
-h1{font-size:clamp(1.5rem,5vw,1.9rem);margin:-1.4rem 0 .75rem}p{color:rgba(192,192,192,.8);font-size:.9rem;max-width:26rem;margin:0 0 2rem;line-height:1.5}
-a{display:inline-block;padding:.75rem 1.6rem;border-radius:999px;background:#7c3aed;color:#fff;text-decoration:none;font-weight:600;font-size:.9rem}a:hover{background:#6d28d9}
+.n{font-size:clamp(7rem,28vw,12rem);font-weight:700;line-height:1;letter-spacing:-.05em;color:rgba(255,255,255,.08);margin:0}
+h1{font-size:clamp(1.5rem,5vw,1.9rem);margin:-1.4rem 0 .75rem}p{color:#a1a1aa;font-size:.9rem;max-width:26rem;margin:0 0 2rem;line-height:1.5}
+a{display:inline-block;padding:.75rem 1.6rem;border-radius:999px;background:#fff;color:#000;text-decoration:none;font-weight:600;font-size:.9rem}a:hover{background:#e4e4e7}
 </style></head><body><p class="n">${status === 404 ? "404" : status}</p><h1>${title}</h1><p>${text}</p><a href="/">Voltar ao início</a></body></html>`;
   return new NextResponse(html, { status, headers: { ...BASE_HEADERS, "Cache-Control": cache } });
 }

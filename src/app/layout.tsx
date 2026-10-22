@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { VoidBackgroundClient } from "@/components/void/VoidBackgroundClient";
+import { MeshBackground } from "@/components/void/MeshBackground";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -53,7 +54,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" suppressHydrationWarning className={`${inter.variable} ${geistMono.variable} ${clash.variable} ${satoshi.variable}`}>
       <body suppressHydrationWarning className="min-h-screen bg-background text-foreground font-sans antialiased">
         <Providers>
-          {/* o fundo fica no layout raiz: nunca é desmontado ao navegar e faz a transição de cena por rota */}
+          {/* o fundo fica no layout raiz: gradient mesh em todas as páginas; o login troca por partículas */}
+          <MeshBackground />
           <VoidBackgroundClient />
           {children}
         </Providers>

@@ -106,7 +106,7 @@ export default function DashboardPage() {
       {/* precisa de atenção */}
       <div className="pt-card p-5">
         <h2 className="font-mono text-xs uppercase tracking-wider text-silver/80 flex items-center gap-2 mb-4">
-          <AlertTriangle className="w-4 h-4 text-amber-400" /> Precisa de atenção
+          <AlertTriangle className="w-4 h-4 text-zinc-300" /> Precisa de atenção
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
@@ -118,7 +118,7 @@ export default function DashboardPage() {
             ) : (
               <ul className="space-y-2">
                 {offlineBots.slice(0, 5).map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2" style={{ background: "#15151c", border: "1px solid rgba(239,68,68,0.25)" }}>
+                  <li key={b.id} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2" style={{ background: "#111111", border: "1px solid rgba(239,68,68,0.25)" }}>
                     <span className="text-sm truncate">{b.name}</span>
                     <span className="font-mono text-[10px] uppercase tracking-wider text-red-400">{b.status}</span>
                   </li>
@@ -171,7 +171,7 @@ export default function DashboardPage() {
             <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
               <div className="h-full rounded-full transition-all duration-700 ease-out" style={{
                 width: `${Math.min(Math.round((me.salesCount / MONTHLY_GOAL) * 100), 100)}%`,
-                background: me.salesCount >= MONTHLY_GOAL ? "linear-gradient(90deg, #22c55e, #4ade80)" : "linear-gradient(90deg, var(--void-accent), #c4bbff)",
+                background: me.salesCount >= MONTHLY_GOAL ? "linear-gradient(90deg, #22c55e, #4ade80)" : "linear-gradient(90deg, var(--void-accent), #e4e4e7)",
               }} />
             </div>
             <p className="text-xs text-silver/70 mt-2">
@@ -202,7 +202,7 @@ export default function DashboardPage() {
                   <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
                     <div className="h-full rounded-full transition-all duration-500" style={{
                       width: `${Math.min(Math.round((member.salesCount / MONTHLY_GOAL) * 100), 100)}%`,
-                      background: member.salesCount >= MONTHLY_GOAL ? "linear-gradient(90deg, #22c55e, #4ade80)" : i === 0 && member.salesCount > 0 ? "linear-gradient(90deg, var(--void-accent), #c4bbff)" : "rgba(255,255,255,0.35)",
+                      background: member.salesCount >= MONTHLY_GOAL ? "linear-gradient(90deg, #22c55e, #4ade80)" : i === 0 && member.salesCount > 0 ? "linear-gradient(90deg, var(--void-accent), #e4e4e7)" : "rgba(255,255,255,0.35)",
                     }} />
                   </div>
                 </div>

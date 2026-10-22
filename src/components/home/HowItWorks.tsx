@@ -2,36 +2,36 @@ import { steps } from "@/config/home";
 import { KineticTitle } from "./KineticTitle";
 import { Reveal } from "./Reveal";
 
-/** Cena dos anéis: título no topo, passos embaixo, e o centro livre para a forma do fundo. */
+/** Como funciona: título à esquerda, texto de apoio à direita e os 3 passos em colunas largas. */
 export function HowItWorks() {
   return (
-    <section data-scene="3" className="px-6 pt-28 pb-20 min-h-[118vh] flex flex-col justify-between gap-16">
-      <div className="max-w-3xl mx-auto text-center">
-        <Reveal>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-silver/80">Como funciona</p>
-        </Reveal>
-        <KineticTitle as="h1" className="mt-3 text-4xl sm:text-6xl font-bold tracking-tight leading-[1.06] text-white" accent="em 3 passos">
-          Do pedido ao bot rodando
-        </KineticTitle>
-        <Reveal delay={150}>
-          <p className="mt-5 text-base sm:text-lg text-silver/85 max-w-xl mx-auto">
-            Sem complicação: você escolhe, a gente configura com você e o bot passa a trabalhar sozinho.
-          </p>
-        </Reveal>
-      </div>
-
-      <div className="max-w-6xl mx-auto w-full grid gap-4 md:grid-cols-3">
-        {steps.map((step, i) => (
-          <Reveal key={step.title} delay={i * 160} className="h-full">
-            <div className="panel h-full p-7">
-              <span className="font-display text-5xl font-bold" style={{ color: "var(--void-accent)" }}>
-                0{i + 1}
-              </span>
-              <h3 className="mt-5 text-xl font-semibold text-white">{step.title}</h3>
-              <p className="mt-2 text-sm text-silver/85 leading-relaxed">{step.desc}</p>
-            </div>
+    <section data-scene="3" className="pt-36 pb-12 sm:pb-20">
+      <div className="wrap">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+          <div>
+            <Reveal>
+              <p className="eyebrow-l">Como funciona</p>
+            </Reveal>
+            <KineticTitle as="h1" className="mt-3 text-4xl sm:text-6xl 2xl:text-7xl font-bold tracking-tight leading-[1.04] text-white" accent="em 3 passos">
+              Do pedido ao bot rodando
+            </KineticTitle>
+          </div>
+          <Reveal delay={150}>
+            <p className="sec-lead">Sem complicação: você escolhe, a gente configura com você e o bot passa a trabalhar sozinho.</p>
           </Reveal>
-        ))}
+        </div>
+
+        <div className="mt-16 grid gap-4 md:grid-cols-3">
+          {steps.map((step, i) => (
+            <Reveal key={step.title} delay={i * 160} className="h-full">
+              <div className="panel h-full p-8">
+                <span className="font-display text-5xl font-bold text-zinc-600">0{i + 1}</span>
+                <h3 className="mt-6 text-xl font-semibold text-white">{step.title}</h3>
+                <p className="mt-2 text-sm text-silver leading-relaxed">{step.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

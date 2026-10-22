@@ -3,16 +3,16 @@
 @theme inline {
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
-  --color-background: #000000;
+  --color-background: #050505;
   --color-background-secondary: #0a0a0a;
-  --color-card: #1a1a1a;
-  --color-card-hover: #2a2a2a;
+  --color-card: #0a0a0a;
+  --color-card-hover: #111111;
   --color-foreground: #ffffff;
-  --color-silver: #c0c0c0;
-  --color-border: rgba(255,255,255,0.1);
-  --color-border-hover: rgba(255,255,255,0.3);
-  --color-primary: #7c3aed;
-  --color-primary-hover: #6d28d9;
+  --color-silver: #a1a1aa;
+  --color-border: #27272a;
+  --color-border-hover: #3f3f46;
+  --color-primary: #ffffff;
+  --color-primary-hover: #e4e4e7;
   --color-muted: #a1a1aa;
   --color-danger: #ef4444;
   --color-success: #22c55e;
@@ -68,7 +68,7 @@
 }
 
 body {
-  background: #000000;
+  background: #050505;
   color: #ffffff;
   scrollbar-gutter: stable;
 }
@@ -84,19 +84,19 @@ body {
 
 /* ---- Transição entre páginas (View Transitions API) ---- */
 
-/* o conteúdo antigo sai com fade + leve blur; o novo entra logo depois */
+/* o conteúdo antigo some com fade e o novo aparece com fade (sem borrão nem deslocamento) */
 ::view-transition-old(.page-out) {
-  animation: 260ms ease-in both vt-out;
+  animation: 200ms ease-in both vt-out;
 }
 ::view-transition-new(.page-in) {
-  animation: 420ms ease-out 120ms both vt-in;
+  animation: 320ms ease-out 100ms both vt-in;
 }
 @keyframes vt-out {
-  to { opacity: 0; filter: blur(8px); }
+  to { opacity: 0; }
 }
 @keyframes vt-in {
-  from { opacity: 0; filter: blur(8px); transform: translateY(10px); }
-  to { opacity: 1; filter: blur(0); transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* o fundo animado e o header não participam da animação */

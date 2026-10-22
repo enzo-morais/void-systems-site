@@ -12,7 +12,7 @@ interface KineticTitleProps {
   accent?: string;
 }
 
-/** Título com tipografia cinética: desliza com borrão e inclinação e estabiliza ao entrar na tela. */
+/** Título que aparece com fade (e uma subida curta) ao entrar na tela. */
 export function KineticTitle({ as: Tag = "h2", className = "", children, accent }: KineticTitleProps) {
   const ref = useRef<HTMLHeadingElement>(null);
 
@@ -23,11 +23,11 @@ export function KineticTitle({ as: Tag = "h2", className = "", children, accent 
       (entries) =>
         entries.forEach((en) => {
           if (!en.isIntersecting) return;
-          // só na primeira entrada: ao rolar de volta o título não borra de novo
+          // só na primeira entrada: ao rolar de volta o título não anima de novo
           el.classList.add("kin-hit");
           io.disconnect();
         }),
-      { threshold: 0.6 }
+      { threshold: 0.1 }
     );
     io.observe(el);
     return () => io.disconnect();

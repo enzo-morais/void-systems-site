@@ -10,7 +10,7 @@ interface Product {
   id: string; name: string; price: number; description: string | null; category: string | null; badge: string | null; billing: string; tags: string | null; active: boolean; createdAt: string;
 }
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/70 backdrop-blur-sm";
 
 export default function ProductsPage() {
@@ -174,7 +174,7 @@ export default function ProductsPage() {
               {p.tags && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {p.tags.split(",").map((t: string) => t.trim()).filter(Boolean).map((t: string) => (
-                    <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "#15151c", color: "rgba(255,255,255,0.4)" }}>{t}</span>
+                    <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "#111111", color: "rgba(255,255,255,0.4)" }}>{t}</span>
                   ))}
                 </div>
               )}
@@ -188,7 +188,7 @@ export default function ProductsPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={() => setEditingProduct(null)}>
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           <div className="relative rounded-xl w-full max-w-lg mx-4 p-6" onClick={(e) => e.stopPropagation()}
-            style={{ background: "rgba(13,13,18,0.97)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            style={{ background: "rgba(10, 10, 10, 0.97)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <h2 className="text-lg font-semibold mb-4">Editar Produto</h2>
             <form onSubmit={handleSaveEdit} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">

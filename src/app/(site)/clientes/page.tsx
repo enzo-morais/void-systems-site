@@ -18,7 +18,6 @@ export default function ClientesPage() {
         title="Servidores que"
         accent="confiam na VØID"
         lead="Comunidades que já rodam bots feitos pela gente, 24 horas por dia."
-        className="min-h-[88vh]"
       />
       <ClientsWall />
       <StatsSection scene={1} />

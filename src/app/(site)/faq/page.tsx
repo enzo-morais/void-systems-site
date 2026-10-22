@@ -17,7 +17,6 @@ export default function FaqPage() {
         title="Perguntas"
         accent="frequentes"
         lead="Tudo o que costumam perguntar antes de contratar um bot."
-        className="min-h-[50vh]"
       />
       <FaqSection scene={4} />
       <JoinCta

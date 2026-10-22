@@ -1,20 +1,26 @@
 import { Hero } from "@/components/home/Hero";
+import { CombosSection } from "@/components/home/CombosSection";
+import { ComboSpotlights } from "@/components/home/ComboSpotlight";
+import { ComparisonSection, Differentials, Marquee, PlansSection, Testimonials } from "@/components/home/HomeSections";
 import { HomeClients } from "@/components/home/HomeClients";
-import { FeaturedBots } from "@/components/home/FeaturedBots";
-import { StatsSection } from "@/components/home/StatsSection";
-import { HomeExplore } from "@/components/home/HomeExplore";
+import { FaqSection } from "@/components/home/FaqSection";
 import { FinalCta } from "@/components/home/FinalCta";
 
-// Cada seção ativa uma cena do fundo (data-scene): 0 hero, 1 clientes, 2 destaques,
-// 3 números, 4 explore, 5 final. A ordem aqui é a ordem das cenas ao rolar.
+// Ordem da home: hero, faixa de diferenciais, combos, uma seção de destaque por combo, diferenciais,
+// comparação, planos, clientes, depoimentos (ocultos sem depoimentos reais), FAQ e CTA final.
 export default function Home() {
   return (
     <>
       <Hero />
+      <Marquee />
+      <CombosSection />
+      <ComboSpotlights />
+      <Differentials />
+      <ComparisonSection />
+      <PlansSection />
       <HomeClients />
-      <FeaturedBots />
-      <StatsSection scene={3} tall />
-      <HomeExplore />
+      <Testimonials />
+      <FaqSection heading />
       <FinalCta />
     </>
   );

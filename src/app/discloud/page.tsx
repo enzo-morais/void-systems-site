@@ -26,7 +26,7 @@ export default async function DiscloudDashboard() {
   return (
     <div className="site-root pt">
       <HomeHeader />
-      <main className="relative z-10 pt-24 pb-16 px-4">
+      <main className="relative z-10 pt-28 pb-16">
         <DiscloudBots />
       </main>
       <div className="relative z-10">

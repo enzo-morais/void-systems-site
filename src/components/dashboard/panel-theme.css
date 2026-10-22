@@ -6,7 +6,7 @@
 
 .pt-side,
 .pt-top {
-  background: rgba(10, 10, 14, 0.72);
+  background: rgba(10, 10, 10, 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -29,13 +29,13 @@
 .pt-nav:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
 .pt-nav--active {
   color: #fff;
-  background: rgba(143, 125, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
   box-shadow: inset 2px 0 0 var(--void-accent);
 }
 
 /* cartão em vidro escuro (usa a classe .panel da home quando possível) */
 .pt-card {
-  background: rgba(13, 13, 18, 0.92);
+  background: rgba(10, 10, 10, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
 }
@@ -55,18 +55,18 @@
 .pt select:focus,
 .pt textarea:focus {
   outline: none;
-  border-color: rgba(143, 125, 255, 0.75) !important;
-  box-shadow: 0 0 0 3px rgba(143, 125, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.07);
 }
 .pt input::placeholder,
 .pt textarea::placeholder { color: rgba(255, 255, 255, 0.4); }
 .pt input:-webkit-autofill,
 .pt textarea:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px #15151c inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #111111 inset !important;
   -webkit-text-fill-color: #fff !important;
   caret-color: #fff;
 }
-.pt option { background: #15151c; color: #fff; }
+.pt option { background: #111111; color: #fff; }
 
 /* botão principal e secundário dos painéis */
 .pt-btn {
@@ -82,10 +82,10 @@
   transition: transform 0.2s, box-shadow 0.3s, background 0.2s, opacity 0.2s;
 }
 .pt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.pt-btn--primary { color: #0a0a0d; background: #fff; }
-.pt-btn--primary:not(:disabled):hover { box-shadow: 0 8px 30px rgba(143, 125, 255, 0.45); transform: translateY(-1px); }
-.pt-btn--ghost { color: #fff; background: #15151c; border: 1px solid rgba(255, 255, 255, 0.14); }
-.pt-btn--ghost:not(:disabled):hover { background: #1c1c26; }
+.pt-btn--primary { color: #0a0a0a; background: #fff; }
+.pt-btn--primary:not(:disabled):hover { box-shadow: 0 8px 30px rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+.pt-btn--ghost { color: #fff; background: #111111; border: 1px solid rgba(255, 255, 255, 0.14); }
+.pt-btn--ghost:not(:disabled):hover { background: #1c1c1c; }
 
 /* selo "Em breve" para dados que o sistema ainda não tem */
 .pt-soon {
@@ -98,8 +98,8 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.75);
-  background: rgba(143, 125, 255, 0.16);
-  border: 1px solid rgba(143, 125, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 /* títulos de seção dentro dos painéis: texto normal (Clash fica só nos títulos de página e números) */

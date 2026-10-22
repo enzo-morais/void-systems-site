@@ -43,21 +43,32 @@ export function CatalogSection() {
   }, []);
 
   return (
-    <section data-scene="2" className="px-6 pb-16 pt-4">
-      <div className="max-w-7xl mx-auto">
-        <Reveal className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-silver/90">
-          {discountTiers
-            .slice()
-            .reverse()
-            .map((t) => (
-              <span key={t.min} className="inline-flex items-center gap-2 font-mono text-xs">
-                <Percent className="w-3.5 h-3.5 text-[var(--void-accent)]" />
-                {t.min === 4 ? "4+ bots" : `${t.min} bots`} → <b className="text-white">{t.pct}% OFF</b>
-              </span>
-            ))}
-        </Reveal>
+    <section id="bots-avulsos" data-scene="2" className="sec scroll-mt-20">
+      <div className="wrap">
+        <div className="sec-head">
+          <div>
+            <Reveal>
+              <p className="eyebrow-l">Bots avulsos</p>
+              <h2 className="sec-title mt-3">Prefere montar o seu?</h2>
+            </Reveal>
+            <Reveal delay={100}>
+              <p className="sec-lead mt-4">Escolha só os bots de que precisa. Adicione mais de um e a calculadora aplica o desconto na hora.</p>
+            </Reveal>
+          </div>
+          <Reveal className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-silver">
+            {discountTiers
+              .slice()
+              .reverse()
+              .map((t) => (
+                <span key={t.min} className="inline-flex items-center gap-2 font-mono text-xs">
+                  <Percent className="w-3.5 h-3.5 text-white" />
+                  {t.min === 4 ? "4+ bots" : `${t.min} bots`} → <b className="text-white">{t.pct}% OFF</b>
+                </span>
+              ))}
+          </Reveal>
+        </div>
 
-        <Reveal className="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <Reveal className="mb-8 flex flex-wrap items-center gap-2">
           {filters.map((f) => (
             <button
               key={f}
@@ -65,18 +76,18 @@ export function CatalogSection() {
               onClick={() => setFilter(f)}
               aria-pressed={filter === f}
               className={`font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-full cursor-pointer transition-colors ${
-                filter === f ? "bg-white text-black" : "text-silver/90 hover:text-white"
+                filter === f ? "bg-white text-black" : "text-silver hover:text-white"
               }`}
-              style={filter === f ? undefined : { border: "1px solid rgba(255,255,255,0.2)", background: "rgba(13,13,18,0.85)" }}
+              style={filter === f ? undefined : { border: "1px solid #3f3f46", background: "rgba(10,10,10,0.6)" }}
             >
               {f}
             </button>
           ))}
         </Reveal>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {shown.map((bot, i) => (
-            <Reveal key={bot.id} delay={(i % 3) * 100} className="h-full">
+            <Reveal key={bot.id} delay={(i % 4) * 90} className="h-full">
               <BotCard bot={bot} inCart={cart.includes(bot.id)} onToggle={() => toggle(bot.id)} />
             </Reveal>
           ))}

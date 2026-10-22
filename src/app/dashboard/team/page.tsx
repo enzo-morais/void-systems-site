@@ -13,7 +13,7 @@ interface Sale {
 }
 
 const MONTHLY_GOAL = 5;
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 export default function TeamPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
@@ -48,7 +48,7 @@ export default function TeamPage() {
         <h1 className="text-2xl font-bold flex items-center gap-2"><Users2 className="w-6 h-6" /> Equipe</h1>
         <button onClick={handleRefresh} disabled={refreshing}
           className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg transition-colors cursor-pointer"
-          style={{ backgroundColor: "#15151c", border: "1px solid rgba(255,255,255,0.1)", color: "#a0a0a0" }}
+          style={{ backgroundColor: "#111111", border: "1px solid rgba(255,255,255,0.1)", color: "#a0a0a0" }}
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} /> Atualizar
         </button>
@@ -89,7 +89,7 @@ export default function TeamPage() {
                       )}
                       {i < 3 && (
                         <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
-                          style={{ backgroundColor: i === 0 ? "#fbbf24" : i === 1 ? "#9ca3af" : "#cd7f32", color: "#000" }}
+                          style={{ backgroundColor: i === 0 ? "#d4d4d8" : i === 1 ? "#9ca3af" : "#cd7f32", color: "#000" }}
                         >{i + 1}</span>
                       )}
                     </div>
@@ -111,7 +111,7 @@ export default function TeamPage() {
                       background: completed ? "linear-gradient(90deg, #22c55e, #4ade80)" : "linear-gradient(90deg, #fff, #c0c0c0)",
                     }} />
                   </div>
-                  <p className="text-xs mt-2" style={{ color: completed ? "#22c55e" : "rgba(192,192,192,0.4)" }}>
+                  <p className="text-xs mt-2" style={{ color: completed ? "#22c55e" : "rgba(161, 161, 170, 0.4)" }}>
                     {completed ? "Meta atingida!" : `Faltam ${MONTHLY_GOAL - member.salesCount}`}
                   </p>
                 </div>
@@ -151,7 +151,7 @@ export default function TeamPage() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           <div
             className="relative rounded-lg w-full max-w-2xl max-h-[80vh] overflow-hidden mx-4 flex flex-col"
-            style={{ background: "rgba(13,13,18,0.97)", border: "1px solid rgba(255,255,255,0.1)", animation: "fadeIn 0.15s ease-out" }}
+            style={{ background: "rgba(10, 10, 10, 0.97)", border: "1px solid rgba(255,255,255,0.1)", animation: "fadeIn 0.15s ease-out" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -180,7 +180,7 @@ export default function TeamPage() {
                 <button key={tab} onClick={() => setModalTab(tab)}
                   className="flex-1 py-3 text-xs uppercase tracking-wider font-medium transition-colors cursor-pointer"
                   style={{
-                    color: modalTab === tab ? "#fff" : "rgba(192,192,192,0.4)",
+                    color: modalTab === tab ? "#fff" : "rgba(161, 161, 170, 0.4)",
                     borderBottom: modalTab === tab ? "2px solid #fff" : "2px solid transparent",
                   }}
                 >{tab}</button>
@@ -194,7 +194,7 @@ export default function TeamPage() {
                   <p className="text-center text-silver/70 text-sm py-8">Nenhuma venda registrada.</p>
                 ) : (
                   memberAllSales.map((sale) => (
-                    <div key={sale.id} className="rounded-lg p-4 flex gap-4" style={{ backgroundColor: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <div key={sale.id} className="rounded-lg p-4 flex gap-4" style={{ backgroundColor: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
                       {sale.receipt ? (
                         <a href={`/api/sales/${sale.id}/receipt`} target="_blank" rel="noopener noreferrer" className="shrink-0 group relative">
                           <img src={`/api/sales/${sale.id}/receipt`} alt="Comprovante" className="w-16 h-16 rounded-lg object-cover" />
@@ -203,7 +203,7 @@ export default function TeamPage() {
                           </div>
                         </a>
                       ) : (
-                        <div className="w-16 h-16 rounded-lg shrink-0 flex items-center justify-center" style={{ backgroundColor: "#15151c" }}>
+                        <div className="w-16 h-16 rounded-lg shrink-0 flex items-center justify-center" style={{ backgroundColor: "#111111" }}>
                           <ImageIcon className="w-5 h-5 text-silver/70" />
                         </div>
                       )}
@@ -224,7 +224,7 @@ export default function TeamPage() {
                   <p className="text-center text-silver/70 text-sm py-8">Nenhuma fatura.</p>
                 ) : (
                   invoices.map((inv) => (
-                    <div key={inv.month} className="rounded-lg p-4" style={{ backgroundColor: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <div key={inv.month} className="rounded-lg p-4" style={{ backgroundColor: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <p className="text-sm font-medium capitalize">{inv.label}</p>

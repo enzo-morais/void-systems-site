@@ -17,7 +17,7 @@ interface DiscordClient {
   id: string; username: string; displayName: string; avatar: string;
 }
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/70 backdrop-blur-sm";
 
 export default function ClientsPage() {
@@ -187,7 +187,7 @@ export default function ClientsPage() {
             <tbody>
               {clients.map((c) => (
                 <tr key={c.id} className="transition-colors" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(13,13,18,0.92)"; }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(10, 10, 10, 0.92)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
                 >
                   <td className="px-5 py-3 font-medium">{c.name}</td>
@@ -223,7 +223,7 @@ export default function ClientsPage() {
           <h3 className="text-sm font-semibold text-silver/70 uppercase tracking-wider">Clientes no Discord</h3>
           <button onClick={fetchDiscordClients} disabled={loadingDiscord}
             className="text-xs text-silver/70 hover:text-white transition-colors px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
-            style={{ backgroundColor: "#15151c" }}>
+            style={{ backgroundColor: "#111111" }}>
             {loadingDiscord ? <Loader2 className="w-3 h-3 animate-spin" /> : "↻"} Atualizar
           </button>
         </div>
@@ -237,7 +237,7 @@ export default function ClientsPage() {
               const hasBot = bots.some(b => b.userId === c.id);
               return (
                 <div key={c.id} className="flex items-center justify-between p-3 rounded-lg"
-                  style={{ background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  style={{ background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)" }}>
                   <div className="flex items-center gap-3">
                     <img src={c.avatar} alt="" className="w-8 h-8 rounded-full" />
                     <div>
@@ -270,7 +270,7 @@ export default function ClientsPage() {
           <div>
             <label className="block text-xs text-silver/70 mb-1.5">Cliente *</label>
             <select value={botUserId} onChange={(e) => setBotUserId(e.target.value)} required
-              className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)", backgroundColor: "#101016" }}>
+              className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)", backgroundColor: "#0f0f0f" }}>
               <option value="">Selecione um cliente...</option>
               {discordClients.map(c => (
                 <option key={c.id} value={c.id}>{c.displayName} ({c.id})</option>
@@ -297,10 +297,10 @@ export default function ClientsPage() {
               </button>
             </div>
             {botPreview && (
-              <div className="flex items-center gap-2 mt-2 p-2 rounded-lg" style={{ background: "#15151c" }}>
+              <div className="flex items-center gap-2 mt-2 p-2 rounded-lg" style={{ background: "#111111" }}>
                 {botPreview.avatar
                   ? <img src={botPreview.avatar} alt="" className="w-8 h-8 rounded-full" />
-                  : <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">🤖</div>
+                  : <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs">🤖</div>
                 }
                 <span className="text-sm font-medium">{botPreview.name}</span>
                 <span className="text-xs text-green-400 ml-auto">✓ Encontrado</span>

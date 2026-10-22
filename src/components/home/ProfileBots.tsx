@@ -19,8 +19,8 @@ interface ClientBot {
 
 const STATUS: Record<string, { color: string; label: string }> = {
   online: { color: "#22c55e", label: "Online" },
-  starting: { color: "#eab308", label: "Iniciando" },
-  stopping: { color: "#f97316", label: "Parando" },
+  starting: { color: "#d4d4d8", label: "Iniciando" },
+  stopping: { color: "#a1a1aa", label: "Parando" },
 };
 
 function Soon() {
@@ -81,10 +81,10 @@ export function ProfileBots() {
           const soonDue = days !== null && days <= 3;
 
           return (
-            <div key={bot.id} className="panel p-5 sm:p-6" style={soonDue ? { borderColor: "rgba(245,158,11,0.55)" } : undefined}>
+            <div key={bot.id} className="panel p-5 sm:p-6" style={soonDue ? { borderColor: "rgba(255, 255, 255, 0.28)" } : undefined}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, rgba(143,125,255,0.4), rgba(143,125,255,0.1))", border: "1px solid rgba(143,125,255,0.4)" }}>
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.16)" }}>
                     <Bot className="w-5 h-5" />
                   </div>
                   <h3 className="font-display font-semibold truncate">{bot.name}</h3>
@@ -96,11 +96,11 @@ export function ProfileBots() {
               </div>
 
               <div className="grid sm:grid-cols-2 gap-3 mt-5">
-                <div className="rounded-lg px-3 py-2.5" style={{ background: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="rounded-lg px-3 py-2.5" style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.1)" }}>
                   <p className="font-mono text-[10px] uppercase tracking-wider text-silver/70 flex items-center gap-1.5 mb-1"><Server className="w-3 h-3" /> Instalado em</p>
                   {bot.guildName ? <p className="text-sm font-medium">{bot.guildName}</p> : <Soon />}
                 </div>
-                <div className="rounded-lg px-3 py-2.5" style={{ background: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="rounded-lg px-3 py-2.5" style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.1)" }}>
                   <p className="font-mono text-[10px] uppercase tracking-wider text-silver/70 flex items-center gap-1.5 mb-1"><CalendarClock className="w-3 h-3" /> Próxima cobrança</p>
                   {days === null ? (
                     <Soon />
@@ -113,7 +113,7 @@ export function ProfileBots() {
               </div>
 
               {soonDue && (
-                <div role="alert" className="mt-4 flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm" style={{ background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.4)", color: "#fcd34d" }}>
+                <div role="alert" className="mt-4 flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm" style={{ background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.2)", color: "#d4d4d8" }}>
                   <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
                   {days! < 0 ? "A cobrança deste bot está vencida. Renove para ele continuar no ar." : `Faltam ${days} dia${days === 1 ? "" : "s"} para o vencimento. Renove para o bot não sair do ar.`}
                 </div>

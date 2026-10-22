@@ -21,9 +21,9 @@ const icons: Record<BotIcon, LucideIcon> = {
 };
 
 const badgeStyle: Record<Badge, { bg: string; color: string }> = {
-  Destaque: { bg: "rgba(168,85,247,0.16)", color: "#d8b4fe" },
-  Popular: { bg: "rgba(251,191,36,0.16)", color: "#fcd34d" },
-  Novo: { bg: "rgba(59,130,246,0.18)", color: "#93c5fd" },
+  Destaque: { bg: "#ffffff", color: "#000000" },
+  Popular: { bg: "rgba(255,255,255,0.12)", color: "#ffffff" },
+  Novo: { bg: "transparent", color: "#d4d4d8" },
 };
 
 export function BotCard({ bot, inCart = false, onToggle }: { bot: BotItem; inCart?: boolean; onToggle?: () => void }) {

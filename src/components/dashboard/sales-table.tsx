@@ -7,7 +7,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { useToast } from "./toast";
 import type { Sale } from "@/app/dashboard/sales/page";
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 export function SalesTable({ sales, loading, onDelete }: { sales: Sale[]; loading: boolean; onDelete: () => void }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -81,7 +81,7 @@ export function SalesTable({ sales, loading, onDelete }: { sales: Sale[]; loadin
             <tbody>
               {filtered.map((sale) => (
                 <tr key={sale.id} className="transition-colors" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(13,13,18,0.92)"; }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(10, 10, 10, 0.92)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
                 >
                   {editId === sale.id ? (

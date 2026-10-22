@@ -15,7 +15,7 @@ const MONTHLY_GOAL = 5;
 const COMMISSION_BEFORE_GOAL = 0.10; // 10%
 const COMMISSION_AFTER_GOAL = 1.00; // 100%
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 export default function CommissionsPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
@@ -154,7 +154,7 @@ export default function CommissionsPage() {
                           <td className="py-1.5">R${b.value.toFixed(2).replace(".", ",")}</td>
                           <td className="py-1.5">
                             <span className="px-1.5 py-0.5 rounded text-[10px]" style={{
-                              backgroundColor: b.rate === 1 ? "rgba(34,197,94,0.1)" : "#15151c",
+                              backgroundColor: b.rate === 1 ? "rgba(34,197,94,0.1)" : "#111111",
                               color: b.rate === 1 ? "#22c55e" : "#999",
                             }}>
                               {b.rate === 1 ? "100%" : "10%"}

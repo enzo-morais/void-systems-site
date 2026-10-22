@@ -12,9 +12,9 @@ interface Application {
   status: string; reviewedBy: string | null; createdAt: string;
 }
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 const statusColors: Record<string, { bg: string; color: string; label: string }> = {
-  pending: { bg: "rgba(251,191,36,0.1)", color: "#fbbf24", label: "Pendente" },
+  pending: { bg: "rgba(255, 255, 255, 0.05)", color: "#d4d4d8", label: "Pendente" },
   approved: { bg: "rgba(34,197,94,0.1)", color: "#22c55e", label: "Aprovado" },
   rejected: { bg: "rgba(239,68,68,0.1)", color: "#ef4444", label: "Reprovado" },
 };
@@ -77,9 +77,9 @@ export default function ApplicationsPage() {
             <button key={f} onClick={() => setFilter(f)}
               className="text-xs px-4 py-2 rounded-full transition-all duration-200 cursor-pointer"
               style={{
-                backgroundColor: filter === f ? "rgba(255,255,255,0.1)" : "rgba(13,13,18,0.92)",
+                backgroundColor: filter === f ? "rgba(255,255,255,0.1)" : "rgba(10, 10, 10, 0.92)",
                 border: `1px solid rgba(255,255,255,${filter === f ? 0.2 : 0.06})`,
-                color: filter === f ? "#fff" : "rgba(192,192,192,0.5)",
+                color: filter === f ? "#fff" : "rgba(161, 161, 170, 0.5)",
               }}
             >
               {labels[f]} ({counts[f]})

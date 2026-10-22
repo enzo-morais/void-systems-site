@@ -20,8 +20,6 @@
 // "scenes: 'page'" significa: a página decide as cenas pelos blocos data-scene="0".."5"
 // e o scroll controla a mudança entre elas (é o caso da home).
 
-import { bots } from "@/config/bots";
-
 export type SceneName = "orbit" | "torus" | "grid" | "rings" | "squares" | "logo" | "calm";
 export type TransitionKind = "morph" | "explode" | "cascade" | "spiral" | "vortex" | "dissolve";
 
@@ -58,16 +56,7 @@ export interface RouteScene {
 
 /** Primeira regra que casar vence: coloque as mais específicas antes. */
 export const routeScenes: RouteScene[] = [
-  // detalhe de um bot: anel girando com o nome do bot
-  {
-    path: "/bots/",
-    scenes: "rings",
-    transition: "spiral",
-    ringText: (pathname) => bots.find((b) => b.id === pathname.split("/")[2])?.name,
-  },
-  // catálogo: grade com onda e reação ao mouse
-  { path: "/bots", exact: true, scenes: "grid", transition: "cascade" },
-  // login: o logo se forma
+  // login: o logo de partículas se forma (monocromático)
   {
     path: "/login",
     scenes: "logo",
@@ -78,16 +67,8 @@ export const routeScenes: RouteScene[] = [
         ? { cx: 460 + (w - 460) / 2, cy: h * 0.42, width: Math.min((w - 460) * 0.72, 640, h * 0.9) }
         : { cx: w / 2, cy: 100, width: Math.min(w * 0.6, 260) },
   },
-  // painel: só estrelas, calmo
-  { path: "/dashboard", scenes: "calm", transition: "dissolve" },
-  { path: "/discloud", scenes: "calm", transition: "dissolve" },
-  { path: "/meus-bots", scenes: "calm", transition: "dissolve" },
-  { path: "/perfil", scenes: "calm", transition: "dissolve" },
-  // home e páginas do site com cenas controladas pelo scroll
-  { path: "/", exact: true, scenes: "page", transition: "explode" },
-  { path: "/como-funciona", scenes: "page", transition: "morph" },
-  { path: "/clientes", scenes: "page", transition: "morph" },
-  { path: "/faq", scenes: "page", transition: "morph" },
+  // todo o resto do site: só o campo de estrelas, bem sutil (visual clean preto e branco).
+  // As cenas orbit/torus/grid/rings/squares continuam disponíveis no motor, é só apontar uma rota para elas.
 ];
 
 /** Qualquer rota sem regra (loja, termos, sobre...) fica só com as estrelas. */

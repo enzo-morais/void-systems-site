@@ -1,0 +1,186 @@
+/* Mockup de tablet em CSS puro + as interfaces simuladas dos bots (sem imagens). Verde só em "online" e resultados positivos. */
+
+.tb {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  padding-bottom: 34px;
+  perspective: 1600px;
+}
+.tb--right { margin-left: auto; --ry: -7deg; --rz: 0.6deg; }
+.tb--left { margin-right: auto; --ry: 7deg; --rz: -0.6deg; }
+
+/* inclinação leve + flutuação lenta */
+.tb-tilt {
+  transform: rotateY(var(--ry)) rotateX(2deg) rotateZ(var(--rz));
+  animation: tb-float 11s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes tb-float {
+  from { transform: rotateY(var(--ry)) rotateX(2deg) rotateZ(var(--rz)) translateY(0); }
+  to { transform: rotateY(var(--ry)) rotateX(2deg) rotateZ(var(--rz)) translateY(-12px); }
+}
+
+.tb-frame {
+  position: relative;
+  padding: 14px;
+  border-radius: 28px;
+  background: #0b0b0b;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+/* câmera frontal */
+.tb-cam {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #161616;
+  border: 1px solid #333;
+  transform: translateX(-50%);
+}
+.tb-screen {
+  position: relative;
+  min-height: 330px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #0a0a0a;
+  border: 1px solid #1f1f1f;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #e4e4e7;
+  text-shadow: none;
+}
+/* reflexo sutil na tela */
+.tb-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 26%, transparent 38%);
+  pointer-events: none;
+}
+
+/* cartão verde de resultado, no pé do mockup */
+.tb-result {
+  position: absolute;
+  right: 26px;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4ade80;
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.tb--left .tb-result { right: auto; left: 26px; }
+.tb-result svg { width: 15px; height: 15px; }
+
+/* ---- peças das interfaces ---- */
+.mk-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #1f1f1f; }
+.mk-mono { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12px; color: #fff; }
+.mk-dim { font-size: 11px; color: #71717a; }
+.mk-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #a1a1aa; margin-bottom: 10px; }
+.mk-card { padding: 14px; border-radius: 12px; background: #0f0f0f; border: 1px solid #1f1f1f; }
+.mk-card + .mk-card { margin-top: 10px; }
+
+/* Simples: módulos com interruptor, botão e toast */
+.mk-modules { display: grid; gap: 8px; }
+.mk-modules li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #0f0f0f; border: 1px solid #1f1f1f; }
+.mk-switch { position: relative; width: 30px; height: 17px; border-radius: 999px; background: #27272a; flex-shrink: 0; }
+.mk-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; border-radius: 50%; background: #71717a; transition: transform 0.2s; }
+.mk-switch--on { background: #fff; }
+.mk-switch--on::after { transform: translateX(13px); background: #000; }
+.mk-btn { margin-top: 14px; padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #000; background: #fff; }
+.mk-toast {
+  position: absolute;
+  bottom: 18px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4ade80;
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  animation: mk-toast 7s ease-in-out infinite;
+}
+.mk-toast svg { width: 14px; height: 14px; }
+@keyframes mk-toast {
+  0%, 12% { opacity: 0; }
+  20%, 78% { opacity: 1; }
+  88%, 100% { opacity: 0; }
+}
+
+/* Community: ranking de XP e compra na loja */
+.mk-rank { display: grid; gap: 11px; }
+.mk-rank-row { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; }
+.mk-av { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; background: #3f3f46; }
+.mk-rank-name { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; color: #fff; font-weight: 500; }
+.mk-rank-name small { color: #71717a; font-size: 11px; font-weight: 400; }
+.mk-bar-track { margin-top: 5px; height: 6px; border-radius: 999px; background: #1f1f1f; overflow: hidden; }
+.mk-bar-fill { height: 100%; border-radius: inherit; background: #fff; }
+.mk-lv { font-family: var(--font-geist-mono), monospace; font-size: 11px; color: #a1a1aa; }
+.mk-purchase { display: flex; align-items: center; gap: 12px; }
+.mk-purchase-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: #151515; border: 1px solid #27272a; color: #fff; flex-shrink: 0; }
+.mk-purchase-ico svg { width: 16px; height: 16px; }
+.mk-purchase p { color: #fff; font-weight: 600; }
+.mk-purchase small { color: #71717a; font-size: 11px; }
+.mk-green-dot { margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+
+/* DayZ: status, estatísticas e barras de uptime */
+.mk-live { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-geist-mono), monospace; font-size: 10px; letter-spacing: 0.1em; color: #4ade80; }
+.mk-live i { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: mk-pulse 1.6s ease-in-out infinite; }
+@keyframes mk-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  50% { opacity: 0.45; box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+}
+.mk-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mk-stat { padding: 10px 12px; border-radius: 10px; background: #0f0f0f; border: 1px solid #1f1f1f; }
+.mk-stat small { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #71717a; }
+.mk-stat b { display: block; margin-top: 3px; font-size: 15px; font-weight: 600; color: #fff; }
+.mk-servers { margin-top: 10px; display: grid; gap: 8px; }
+.mk-server { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: #0f0f0f; border: 1px solid #1f1f1f; }
+.mk-server .mk-green-dot { margin: 0; }
+.mk-server span:last-child { font-family: var(--font-geist-mono), monospace; font-size: 11px; color: #a1a1aa; }
+.mk-uptime { margin-top: 12px; }
+.mk-uptime-bars { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; margin-top: 6px; }
+.mk-uptime-bars i { height: 20px; border-radius: 2px; background: rgba(34, 197, 94, 0.75); }
+.mk-uptime-bars i.off { background: #3f3f46; }
+
+/* Server Games: chave de torneio e campeão */
+.mk-bracket { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mk-match { padding: 10px 12px; border-radius: 10px; background: #0f0f0f; border: 1px solid #1f1f1f; }
+.mk-match small { display: block; margin-bottom: 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #71717a; }
+.mk-team { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 0; color: #a1a1aa; }
+.mk-team b { font-family: var(--font-geist-mono), monospace; font-size: 12px; }
+.mk-team--win { color: #fff; font-weight: 600; }
+.mk-champion { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: #141414; border: 1px solid #3f3f46; }
+.mk-champion svg { width: 22px; height: 22px; color: #fff; flex-shrink: 0; }
+.mk-champion small { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #71717a; }
+.mk-champion b { font-size: 15px; color: #fff; }
+
+@media (max-width: 639px) {
+  .tb { padding-bottom: 30px; }
+  .tb-screen { min-height: 0; padding: 14px; font-size: 12px; }
+  .tb-frame { padding: 10px; border-radius: 22px; }
+  .tb--right, .tb--left { --ry: 0deg; --rz: 0deg; }
+  .mk-bracket { grid-template-columns: 1fr; }
+  .mk-uptime-bars { gap: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-tilt, .mk-toast, .mk-live i { animation: none; }
+}

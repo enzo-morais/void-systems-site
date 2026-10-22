@@ -9,7 +9,7 @@ interface Client { id: string; name: string; }
 interface Product { id: string; name: string; price: number; }
 interface Staff { id: string; displayName: string; username: string; }
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/70 backdrop-blur-sm";
 
 // Regra de desconto automático por quantidade de bots

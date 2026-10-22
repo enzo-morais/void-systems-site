@@ -7,7 +7,7 @@ interface Log {
   id: string; action: string; details: string | null; staffName: string; createdAt: string;
 }
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 export default function LogsPage() {
   const [logs, setLogs] = useState<Log[]>([]);
@@ -42,7 +42,7 @@ export default function LogsPage() {
             <tbody>
               {logs.map((log) => (
                 <tr key={log.id} className="transition-colors" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(13,13,18,0.92)"; }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(10, 10, 10, 0.92)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
                 >
                   <td className="px-5 py-3 font-medium">{log.action}</td>

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { ProfileBots } from "@/components/home/ProfileBots";
 import "@/components/dashboard/panel-theme.css";
 
-const inputClass = "w-full bg-[#15151c] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/75 ";
+const inputClass = "w-full bg-[#111111] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/75 ";
 
 export default function PerfilPage() {
   const { data: session, update } = useSession();
@@ -121,7 +121,7 @@ export default function PerfilPage() {
 
   return (
     <>
-      <main className="pt-28 pb-20 px-6 max-w-3xl mx-auto min-h-screen pt">
+      <main className="pt-36 pb-24 wrap min-h-screen pt">
         <h1 className="text-2xl font-bold mb-8 flex items-center gap-2"><User className="w-6 h-6" /> Meu Perfil</h1>
 
         {/* Profile info */}
@@ -144,18 +144,18 @@ export default function PerfilPage() {
             <div className="flex items-center gap-2">
               {!isDiscord && !editing && (
                 <button onClick={startEdit} className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-white transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
-                  style={{ backgroundColor: "#15151c" }}>
+                  style={{ backgroundColor: "#111111" }}>
                   <Pencil className="w-3 h-3" /> Editar
                 </button>
               )}
               {(session?.user as { isStaff?: boolean } | undefined)?.isStaff === true && (
                 <Link href="/dashboard" className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-white transition-colors px-3 py-1.5 rounded-lg"
-                  style={{ backgroundColor: "#15151c" }}>
+                  style={{ backgroundColor: "#111111" }}>
                   <LayoutDashboard className="w-3 h-3" /> Painel
                 </Link>
               )}
               <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-red-400 transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
-                style={{ backgroundColor: "#15151c" }}>
+                style={{ backgroundColor: "#111111" }}>
                 <LogOut className="w-3 h-3" /> Sair
               </button>
             </div>
@@ -169,7 +169,7 @@ export default function PerfilPage() {
               </div>
               <div>
                 <label className="block text-xs text-silver/75 mb-1.5">Email</label>
-                <input type="email" value={session?.user?.email || ""} disabled className={inputClass + " opacity-40 cursor-not-allowed"} style={{ borderColor: "#15151c" }} />
+                <input type="email" value={session?.user?.email || ""} disabled className={inputClass + " opacity-40 cursor-not-allowed"} style={{ borderColor: "#111111" }} />
               </div>
               {editError && <p className="text-red-400 text-xs">{editError}</p>}
               <div className="flex gap-2">
@@ -207,12 +207,12 @@ export default function PerfilPage() {
               <div className="flex gap-2">
                 <button onClick={() => { setShowPassword(!showPassword); setShowForgot(false); }}
                   className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-white transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
-                  style={{ backgroundColor: "#15151c" }}>
+                  style={{ backgroundColor: "#111111" }}>
                   <Lock className="w-3 h-3" /> {showPassword ? "Fechar" : "Alterar senha"}
                 </button>
                 <button onClick={() => { setShowForgot(!showForgot); setShowPassword(false); setResetStep("email"); }}
                   className="flex items-center gap-1.5 text-xs text-silver/75 hover:text-white transition-colors cursor-pointer px-3 py-1.5 rounded-lg"
-                  style={{ backgroundColor: "#15151c" }}>
+                  style={{ backgroundColor: "#111111" }}>
                   <KeyRound className="w-3 h-3" /> Esqueci senha
                 </button>
               </div>

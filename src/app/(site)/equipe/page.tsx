@@ -6,7 +6,7 @@ import { Users2, CheckCircle, ArrowRight, Loader2, Clock, Shield, Zap, Send } fr
 import Link from "next/link";
 import { DISCORD_STORE_URL } from "@/config/store";
 
-const inputClass = "w-full bg-[#15151c] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/75 backdrop-blur-sm";
+const inputClass = "w-full bg-[#111111] border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver backdrop-blur-sm";
 
 const benefits = [
   { icon: Zap, title: "Comissão por venda", desc: "Ganhe uma porcentagem em cada venda realizada." },
@@ -50,26 +50,26 @@ export default function EquipePage() {
 
   return (
     <>
-      <main className="pt-28 pb-20 px-6 max-w-7xl mx-auto min-h-screen">
+      <main className="pt-36 pb-24 wrap min-h-screen">
 
         {!started && !submitted && (
           <>
-            <Reveal className="text-center mb-14">
-              <p className="text-sm text-silver/75 uppercase tracking-widest mb-3">Faça parte</p>
-              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Entre para a Equipe</h1>
-              <p className="text-silver/75 mt-4 max-w-lg mx-auto">
+            <Reveal className="mb-14">
+              <p className="eyebrow-l">Faça parte</p>
+              <h1 className="sec-title mt-3">Entre para a Equipe</h1>
+              <p className="sec-lead mt-4">
                 Estamos sempre em busca de pessoas comprometidas para fazer parte da VØID Systems. Veja como funciona e candidate-se.
               </p>
             </Reveal>
 
             {/* Como funciona */}
             <Reveal>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
                 {benefits.map((b) => (
-                  <div key={b.title} className="panel text-center py-8">
-                    <b.icon className="w-7 h-7 text-white/50 mx-auto mb-3" />
+                  <div key={b.title} className="panel p-8">
+                    <b.icon className="w-7 h-7 text-white/60 mb-4" />
                     <h3 className="text-sm font-semibold mb-1">{b.title}</h3>
-                    <p className="text-xs text-silver/75">{b.desc}</p>
+                    <p className="text-xs text-silver">{b.desc}</p>
                   </div>
                 ))}
               </div>
@@ -87,7 +87,7 @@ export default function EquipePage() {
                   ].map((step, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>{i + 1}</div>
-                      <p className="text-sm text-silver/75">{step}</p>
+                      <p className="text-sm text-silver">{step}</p>
                     </div>
                   ))}
                 </div>
@@ -104,49 +104,49 @@ export default function EquipePage() {
 
         {started && !submitted && (
           <Reveal>
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-3xl">
               <h1 className="text-2xl font-bold mb-2 flex items-center gap-2"><Users2 className="w-6 h-6" /> Formulário de Candidatura</h1>
-              <p className="text-xs text-silver/75 mb-8">Preencha todos os campos com atenção</p>
+              <p className="text-xs text-silver mb-8">Preencha todos os campos com atenção</p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-silver/75 mb-1.5">Seu nome *</label>
+                    <label className="block text-xs text-silver mb-1.5">Seu nome *</label>
                     <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Nome completo" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                   </div>
                   <div>
-                    <label className="block text-xs text-silver/75 mb-1.5">Idade *</label>
+                    <label className="block text-xs text-silver mb-1.5">Idade *</label>
                     <input type="text" value={age} onChange={(e) => setAge(e.target.value)} required placeholder="Ex: 18" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                   </div>
                   <div>
-                    <label className="block text-xs text-silver/75 mb-1.5">Seu Discord (user) *</label>
+                    <label className="block text-xs text-silver mb-1.5">Seu Discord (user) *</label>
                     <input type="text" value={discord} onChange={(e) => setDiscord(e.target.value)} required placeholder="Ex: usuario" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                   </div>
                   <div>
-                    <label className="block text-xs text-silver/75 mb-1.5">Seu Discord ID *</label>
+                    <label className="block text-xs text-silver mb-1.5">Seu Discord ID *</label>
                     <input type="text" value={discordId} onChange={(e) => setDiscordId(e.target.value)} required placeholder="Ex: 123456789012345678" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-silver/75 mb-1.5">Por que quer fazer parte da equipe? *</label>
+                  <label className="block text-xs text-silver mb-1.5">Por que quer fazer parte da equipe? *</label>
                   <textarea value={why} onChange={(e) => setWhy(e.target.value)} required placeholder="Conte um pouco sobre sua motivação..." rows={3}
                     className={inputClass + " resize-none"} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-silver/75 mb-1.5">Tem experiência com vendas ou atendimento? *</label>
+                  <label className="block text-xs text-silver mb-1.5">Tem experiência com vendas ou atendimento? *</label>
                   <textarea value={experience} onChange={(e) => setExperience(e.target.value)} required placeholder="Descreva sua experiência..." rows={3}
                     className={inputClass + " resize-none"} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-silver/75 mb-1.5">Quantas horas por dia pode dedicar? *</label>
+                  <label className="block text-xs text-silver mb-1.5">Quantas horas por dia pode dedicar? *</label>
                   <input type="text" value={hours} onChange={(e) => setHours(e.target.value)} required placeholder="Ex: 2-4 horas" className={inputClass} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-silver/75 mb-1.5">Algo mais que queira dizer?</label>
+                  <label className="block text-xs text-silver mb-1.5">Algo mais que queira dizer?</label>
                   <textarea value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="Opcional" rows={2}
                     className={inputClass + " resize-none"} style={{ borderColor: "rgba(255,255,255,0.1)" }} />
                 </div>
@@ -160,7 +160,7 @@ export default function EquipePage() {
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     {loading ? "Enviando..." : "Enviar candidatura"}
                   </button>
-                  <button type="button" onClick={() => setStarted(false)} className="text-xs text-silver/75 hover:text-white transition-colors cursor-pointer">Voltar</button>
+                  <button type="button" onClick={() => setStarted(false)} className="text-xs text-silver hover:text-white transition-colors cursor-pointer">Voltar</button>
                 </div>
               </form>
             </div>
@@ -168,15 +168,15 @@ export default function EquipePage() {
         )}
 
         {submitted && (
-          <Reveal className="text-center py-20 flex flex-col items-center justify-center min-h-[60vh]">
+          <Reveal className="py-20 flex flex-col items-start justify-center min-h-[60vh]">
             <div className="inline-flex p-4 rounded-2xl mb-6" style={{ backgroundColor: "rgba(34,197,94,0.1)" }}>
               <CheckCircle className="w-10 h-10 text-green-400" />
             </div>
             <h1 className="text-3xl font-bold mb-3">Candidatura enviada!</h1>
-            <p className="text-silver/75 max-w-md mx-auto mb-2">
+            <p className="text-silver max-w-md mb-2">
               Sua candidatura foi recebida e será analisada pela nossa equipe.
             </p>
-            <p className="text-silver/75 text-sm max-w-md mx-auto mb-8">
+            <p className="text-silver text-sm max-w-md mb-8">
               Fique de olho no canal de anúncios do nosso Discord — os aprovados serão divulgados lá.
             </p>
             <div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export default function EquipePage() {
               </a>
               <Link
                 href="/"
-                className="text-xs text-silver/75 hover:text-white transition-colors px-4 py-3"
+                className="text-xs text-silver hover:text-white transition-colors px-4 py-3"
               >
                 Voltar ao início
               </Link>

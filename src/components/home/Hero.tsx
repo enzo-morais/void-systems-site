@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { clients, trust } from "@/config/home";
 import { DISCORD_STORE_URL } from "@/config/store";
 import { DiscordMockup } from "./DiscordMockup";
@@ -8,49 +8,46 @@ import "./hero.css";
 
 export function Hero() {
   return (
-    <section data-scene="0" className="relative min-h-screen flex items-center px-6 pt-28 pb-20 lg:pt-20">
-      <div className="max-w-7xl mx-auto w-full grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-10 items-center">
-        <div className="text-center lg:text-left">
+    <section data-scene="0" className="relative flex items-center min-h-[92vh] pt-32 pb-20 lg:pt-28">
+      {/* duas colunas coladas nas margens: texto à esquerda, mockup do Discord à direita */}
+      <div className="wrap grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-20 items-center">
+        <div>
           <KineticTitle
             as="h1"
-            className="text-[2.5rem] sm:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.04] text-white"
+            className="text-[2.6rem] sm:text-6xl 2xl:text-[5.4rem] font-bold tracking-tight leading-[1.03] text-white"
             accent="de verdade."
           >
             Automatize seu servidor Discord
           </KineticTitle>
 
-          <p className="mt-6 text-base sm:text-lg text-silver/85 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+          <p className="mt-6 text-base sm:text-lg text-silver max-w-xl leading-relaxed">
             Bots de tickets, registro, verificação e boas-vindas, feitos sob medida e rodando 24h no seu servidor. Você configura em minutos e esquece.
           </p>
 
-          <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-            <Link href="/bots" className="hero-cta hero-cta--primary">
-              Ver bots
+          <div className="mt-9 flex flex-col sm:flex-row gap-3">
+            <Link href="/#combos" className="hero-cta hero-cta--primary">
+              Ver combos
             </Link>
             <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--ghost">
               Bot personalizado
             </a>
           </div>
 
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 justify-center lg:justify-start text-sm text-silver/85">
+          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-silver">
             {trust.map((item) => (
               <li key={item} className="inline-flex items-center gap-2">
-                <Check className="w-4 h-4 text-[var(--void-accent)]" />
+                <Check className="w-4 h-4 text-white" />
                 {item}
               </li>
             ))}
           </ul>
 
-          <p className="mt-8 text-xs uppercase tracking-[0.18em] text-silver/70">
+          <p className="mt-10 text-xs uppercase tracking-[0.18em] text-zinc-500">
             Usado por {clients.slice(0, 3).join(", ")} e outros servidores
           </p>
         </div>
 
         <DiscordMockup />
-      </div>
-
-      <div className="hero-scroll" aria-hidden="true">
-        <ChevronDown className="w-5 h-5" />
       </div>
     </section>
   );

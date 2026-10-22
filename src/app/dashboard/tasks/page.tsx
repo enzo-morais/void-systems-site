@@ -10,16 +10,16 @@ interface Task {
   id: string; title: string; description: string | null; status: string; priority: string; assignedTo: string | null; createdAt: string;
 }
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 const inputClass = "w-full bg-black/40 border rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors placeholder:text-silver/70 backdrop-blur-sm";
 
 const statusIcons: Record<string, React.ReactNode> = {
   pending: <Circle className="w-4 h-4 text-silver/70" />,
-  in_progress: <Clock className="w-4 h-4 text-amber-400" />,
+  in_progress: <Clock className="w-4 h-4 text-zinc-300" />,
   done: <CheckCircle2 className="w-4 h-4 text-green-400" />,
 };
 const statusLabels: Record<string, string> = { pending: "Pendente", in_progress: "Em andamento", done: "Concluída" };
-const priorityColors: Record<string, string> = { low: "#3b82f6", medium: "#f59e0b", high: "#ef4444" };
+const priorityColors: Record<string, string> = { low: "#71717a", medium: "#a1a1aa", high: "#ffffff" };
 const priorityLabels: Record<string, string> = { low: "Baixa", medium: "Média", high: "Alta" };
 
 export default function TasksPage() {

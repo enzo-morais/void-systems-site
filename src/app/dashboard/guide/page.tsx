@@ -2,7 +2,7 @@
 
 import { BookOpen, UserPlus, ShoppingCart, Target, ArrowRight, CheckCircle, Package, DollarSign, FileText } from "lucide-react";
 
-const cardStyle = { background: "rgba(13,13,18,0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
+const cardStyle = { background: "rgba(10, 10, 10, 0.92)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" };
 
 const steps = [
   {
@@ -103,7 +103,7 @@ export default function GuidePage() {
         {steps.map((step) => (
           <div key={step.title} className="rounded-lg p-6" style={cardStyle}>
             <div className="flex items-center gap-3 mb-5">
-              <div className="p-2.5 rounded-xl backdrop-blur-sm" style={{ backgroundColor: "#15151c", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div className="p-2.5 rounded-xl backdrop-blur-sm" style={{ backgroundColor: "#111111", border: "1px solid rgba(255,255,255,0.1)" }}>
                 <step.icon className="w-5 h-5 text-white/70" />
               </div>
               <div>

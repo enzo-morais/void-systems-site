@@ -10,16 +10,17 @@ export const metadata: Metadata = {
 export default function SobrePage() {
   return (
     <>
-      <main className="pt-28 pb-20 px-6 max-w-4xl mx-auto min-h-screen flex flex-col">
-        <Reveal className="text-center mb-12">
-          <p className="text-sm text-silver/75 uppercase tracking-widest mb-3">Sobre nós</p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Quem é a VØID?</h1>
+      <main className="pt-36 pb-24 wrap min-h-screen">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-20">
+        <Reveal className="lg:sticky lg:top-32 self-start">
+          <p className="eyebrow-l">Sobre nós</p>
+          <h1 className="sec-title mt-3">Quem é a VØID?</h1>
         </Reveal>
 
         <Reveal>
-          <div className="panel p-10 sm:p-14">
-            <p className="text-xs text-silver/75 mb-6">Atualizado em 01/04/2026</p>
-            <div className="space-y-5 text-sm text-silver/75 leading-relaxed">
+          <div className="panel p-8 sm:p-12 max-w-4xl">
+            <p className="text-xs text-silver mb-6">Atualizado em 01/04/2026</p>
+            <div className="space-y-5 text-sm text-silver leading-relaxed">
               <p>A <span className="text-white font-medium">VØID Systems</span> é um estúdio de tecnologia especializado na criação de sistemas digitais personalizados e soluções prontas, com foco em automação, organização e controle de comunidades online.</p>
               <p>Nossa atuação vai além do desenvolvimento de bots ou ferramentas isoladas. Projetamos estruturas completas, pensadas para operar de forma clara, estável e escalável. Cada sistema é desenvolvido com o objetivo de resolver problemas reais, otimizar processos e eliminar a desorganização comum em servidores e plataformas digitais.</p>
               <p>O conceito <span className="text-white font-medium">VØID</span> representa a eliminação do excesso. Trabalhamos com a proposta de remover tudo o que é desnecessário, mantendo apenas o essencial: funcionalidade, eficiência e confiabilidade. Por isso, nossas soluções são diretas, bem estruturadas e fáceis de administrar.</p>
@@ -30,6 +31,7 @@ export default function SobrePage() {
             </div>
           </div>
         </Reveal>
+        </div>
       </main>
     </>
   );

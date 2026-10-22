@@ -64,11 +64,11 @@ export function StatsSection({ scene = 1, tall = false }: StatsSectionProps) {
   if (list.length === 0) return null;
 
   const grid = (
-    <div className="max-w-5xl mx-auto w-full flex flex-wrap justify-center gap-4">
+    <div className="wrap grid grid-cols-2 gap-4 xl:grid-cols-4">
       {list.map((stat, i) => (
-        <Reveal key={stat.label} delay={i * 120} className="panel text-center basis-[44%] sm:basis-[200px] px-4 py-6">
+        <Reveal key={stat.label} delay={i * 120} className="panel h-full p-6 sm:p-8">
           <Counter stat={stat} />
-          <p className="mt-2 text-xs sm:text-sm uppercase tracking-wider text-silver/75">{stat.label}</p>
+          <p className="mt-2 text-xs sm:text-sm uppercase tracking-wider text-silver">{stat.label}</p>
         </Reveal>
       ))}
     </div>
@@ -76,19 +76,19 @@ export function StatsSection({ scene = 1, tall = false }: StatsSectionProps) {
 
   if (!tall) {
     return (
-      <section data-scene={scene} className="px-6 py-16">
+      <section data-scene={scene} className="sec-tight">
         {grid}
       </section>
     );
   }
 
   return (
-    <section data-scene={scene} className="px-6 py-24 min-h-[75vh] flex flex-col justify-center gap-14">
-      <div className="max-w-3xl mx-auto text-center">
+    <section data-scene={scene} className="sec">
+      <div className="wrap mb-12">
         <Reveal>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-silver/80">Em números</p>
+          <p className="eyebrow-l">Em números</p>
         </Reveal>
-        <KineticTitle className="mt-3 text-3xl sm:text-5xl font-bold tracking-tight leading-[1.08] text-white" accent="trabalhando por você">
+        <KineticTitle as="h2" className="sec-title mt-3" accent="trabalhando por você">
           Bots rodando e
         </KineticTitle>
       </div>

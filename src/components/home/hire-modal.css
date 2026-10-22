@@ -15,7 +15,7 @@
   width: 100%;
   max-width: 520px;
   padding: 28px 24px 24px;
-  border-color: rgba(143, 125, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.16);
   animation: hm-pop 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hm-x {
@@ -33,7 +33,7 @@
   font-size: 14px;
   line-height: 1.55;
   color: #fff;
-  background: #15151c;
+  background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.12);
   user-select: all;
 }

@@ -30,7 +30,7 @@ interface SceneGroup {
 
 const TAU = Math.PI * 2;
 const SCENES = 7; // 0..5 + 6 = calm (só estrelas)
-const BG = "#0a0a0d";
+const BG = "#050505";
 const RING_WORDS = "TICKET · REGISTRO · VERIFICAÇÃO · BOAS-VINDAS · ANÚNCIO · BATE-PONTO · ";
 const RING_SMALL = "AUTOMAÇÃO · DISCORD · 24H · SUPORTE · HOSPEDADO · ";
 
@@ -54,8 +54,8 @@ function parseColor(value: string): [number, number, number] {
   const c = document.createElement("canvas");
   c.width = c.height = 1;
   const x = c.getContext("2d");
-  if (!x) return [143, 125, 255];
-  x.fillStyle = "#8f7dff";
+  if (!x) return [255, 255, 255];
+  x.fillStyle = "#ffffff";
   x.fillStyle = value;
   x.fillRect(0, 0, 1, 1);
   const d = x.getImageData(0, 0, 1, 1).data;
@@ -110,7 +110,7 @@ export function startVoidEngine(els: VoidEngineEls): VoidEngine {
   const ui = { hoverTarget: 0, hoverX: 0, hoverY: 0, hoverAmt: 0, loadTarget: 0, loadAmt: 0, errT: 0, succ: false, succT: 0 };
   let X = new Float32Array(0);
   let Y = new Float32Array(0);
-  let accent: [number, number, number] = [143, 125, 255];
+  let accent: [number, number, number] = [255, 255, 255];
   let displayFont = '"Arial Black", sans-serif';
   let monoFont = "monospace";
 
@@ -130,7 +130,7 @@ export function startVoidEngine(els: VoidEngineEls): VoidEngine {
 
   function readTheme() {
     const v = cssVar("--void-accent");
-    accent = parseColor(v || "#8f7dff");
+    accent = parseColor(v || "#ffffff");
     const d = cssVar("--font-clash");
     displayFont = `${d ? d + ", " : ""}"Arial Black", sans-serif`;
     const m = cssVar("--font-geist-mono");
@@ -551,26 +551,12 @@ export function startVoidEngine(els: VoidEngineEls): VoidEngine {
 
     // rastro: em vez de limpar, pinta o fundo semitransparente
     g2d.globalCompositeOperation = "source-over";
-    g2d.fillStyle = reduce ? BG : `rgba(10,10,13,${routeActive ? 0.07 : 0.2 + clamp(Math.abs(vel) * 0.01, 0, 0.25)})`; // na troca de rota o rastro fica mais longo
+    g2d.fillStyle = reduce ? BG : `rgba(5,5,5,${routeActive ? 0.07 : 0.2 + clamp(Math.abs(vel) * 0.01, 0, 0.25)})`; // na troca de rota o rastro fica mais longo
     g2d.fillRect(0, 0, W, H);
 
-    // brilho central
-    const glow = g2d.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, S * 0.75);
-    glow.addColorStop(0, accA((0.035 + 0.015 * Math.sin(t * 0.8)) * (1 - 0.7 * weight(6))));
-    glow.addColorStop(1, accA(0));
-    g2d.fillStyle = glow;
-    g2d.fillRect(0, 0, W, H);
-
-    // estrelas em camadas, com parallax de profundidade (mais calmas na cena sem forma)
+    // (sem estrelas: o login mostra só o logo de partículas sobre o fundo escuro)
     const calmW = weight(6);
     g2d.globalCompositeOperation = "lighter";
-    for (const s of stars) {
-      const y = (((s.y - scrollY * s.z * 0.35) % H) + H) % H;
-      const x = s.x + (mx > 0 ? (mx - W / 2) * s.z * -0.015 : 0);
-      const a = (0.15 + 0.35 * s.z) * (0.6 + 0.4 * Math.sin(t * 1.5 * (1 - 0.65 * calmW) + s.tw));
-      g2d.fillStyle = `rgba(236,235,242,${a})`;
-      g2d.fillRect(x, y, s.z * 1.6, s.z * 1.6);
-    }
 
     // partículas: transição escalonada com redemoinho, mistura aditiva
     const split = Math.abs(vel) > 3 && !reduce ? clamp(Math.abs(vel) * 0.35, 0, 9) : 0; // glitch no scroll rápido
@@ -641,11 +627,11 @@ export function startVoidEngine(els: VoidEngineEls): VoidEngine {
       if (a < 0.02) continue;
       const isAcc = i % 9 === 0 || (k === 0 && i < 2 && e < 0.5) || k === 5 || (k2 === 5 && e > 0.5);
       if (split > 0) {
-        g2d.fillStyle = `rgba(255,40,80,${a * 0.5})`;
+        g2d.fillStyle = `rgba(255,255,255,${a * 0.22})`;
         g2d.beginPath();
         g2d.arc(X[i] - split, Y[i], r, 0, TAU);
         g2d.fill();
-        g2d.fillStyle = `rgba(40,200,255,${a * 0.5})`;
+        g2d.fillStyle = `rgba(161,161,170,${a * 0.22})`;
         g2d.beginPath();
         g2d.arc(X[i] + split, Y[i], r, 0, TAU);
         g2d.fill();

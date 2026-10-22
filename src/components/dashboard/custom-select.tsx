@@ -49,9 +49,9 @@ export function CustomSelect({ value, onChange, options, placeholder = "Selecion
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between rounded-lg px-4 py-2.5 text-sm text-left transition-all duration-200 cursor-pointer backdrop-blur-sm"
         style={{
-          backgroundColor: "#101016",
+          backgroundColor: "#0f0f0f",
           border: `1px solid rgba(255,255,255,${open ? 0.2 : 0.1})`,
-          color: selected ? "#fff" : "rgba(192,192,192,0.3)",
+          color: selected ? "#fff" : "rgba(161, 161, 170, 0.3)",
         }}
       >
         <span className="truncate">{selected ? selected.label : placeholder}</span>
@@ -81,10 +81,10 @@ export function CustomSelect({ value, onChange, options, placeholder = "Selecion
               className="w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer"
               style={{
                 backgroundColor: option.value === value ? "rgba(255,255,255,0.08)" : "transparent",
-                color: option.value === value ? "#fff" : "rgba(192,192,192,0.7)",
+                color: option.value === value ? "#fff" : "rgba(161, 161, 170, 0.7)",
               }}
               onMouseEnter={(e) => {
-                if (option.value !== value) (e.currentTarget as HTMLElement).style.backgroundColor = "#15151c";
+                if (option.value !== value) (e.currentTarget as HTMLElement).style.backgroundColor = "#111111";
               }}
               onMouseLeave={(e) => {
                 if (option.value !== value) (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";

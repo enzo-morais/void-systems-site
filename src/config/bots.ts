@@ -151,7 +151,7 @@ export const bots: BotItem[] = [
         kind: "embed",
         title: "Evento neste sábado",
         text: "Participe! Os detalhes estão no canal #eventos.",
-        color: "#f0b232",
+        color: "#d4d4d8",
       },
       { kind: "sys", text: "@everyone notificado" },
     ],

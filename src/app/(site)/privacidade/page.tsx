@@ -9,12 +9,16 @@ export const metadata: Metadata = {
 export default function PrivacidadePage() {
   return (
     <>
-      <main className="pt-28 pb-20 px-6 max-w-3xl mx-auto min-h-screen">
-        <div className="rounded-2xl p-10 sm:p-14 panel">
-        <h1 className="text-3xl font-bold mb-2">Política de Privacidade</h1>
-        <p className="text-xs text-silver/75 mb-10">Atualizado em 01/04/2026</p>
+      <main className="pt-36 pb-24 wrap min-h-screen">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-20">
+        <header className="lg:sticky lg:top-32 self-start">
+          <p className="eyebrow-l">Legal</p>
+          <h1 className="sec-title mt-3">Política de Privacidade</h1>
+          <p className="mt-3 text-xs text-zinc-500">Atualizado em 01/04/2026</p>
+        </header>
+        <div className="panel p-8 sm:p-12 max-w-4xl">
 
-        <div className="space-y-6 text-sm text-silver/75 leading-relaxed">
+        <div className="space-y-6 text-sm text-silver leading-relaxed">
           <section>
             <h2 className="text-white font-semibold mb-2">1. Dados Coletados</h2>
             <p>Ao utilizar nosso site e serviços, podemos coletar: nome de usuário do Discord, ID do Discord, email (quando cadastrado), avatar e informações de navegação. Não coletamos dados sensíveis como senhas do Discord.</p>
@@ -61,6 +65,7 @@ export default function PrivacidadePage() {
           </section>
         </div>
         </div>
+      </div>
       </main>
     </>
   );

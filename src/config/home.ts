@@ -40,14 +40,40 @@ export const reasons = [
   { icon: "setup", title: "Configuração simples", desc: "Sem código e sem complicação: você configura e a gente ajuda no que precisar." },
 ] as const;
 
-/** Perguntas do FAQ. */
+/** Perguntas do FAQ da home (5 a 6). */
 export const faqs = [
   { q: "Como funciona o pagamento?", a: PAYMENT_NOTE },
-  { q: "Quanto tempo leva pra configurar?", a: "A maioria dos bots fica pronto no mesmo dia. Configurações mais complexas podem levar 48 horas ou mais." },
+  { q: "Qual combo escolher?", a: "O Simples cobre o essencial de qualquer servidor. O Community soma economia, loja, níveis e eventos. DayZ e Server Games são feitos para comunidades desses jogos. Na dúvida, chame a equipe no Discord." },
+  { q: "Quanto tempo leva pra configurar?", a: "A maioria dos combos fica pronta no mesmo dia. Configurações mais complexas podem levar 48 horas ou mais." },
   { q: "O bot fica hospedado onde?", a: "Os bots ficam hospedados em servidores nossos. Você não precisa se preocupar com hospedagem nem com manutenção." },
+  { q: "Posso trocar de combo depois?", a: "Sim, você pode fazer upgrade ou downgrade a qualquer momento. A diferença é ajustada no próximo pagamento." },
   { q: "E se eu precisar de algo personalizado?", a: "Fazemos bots sob medida. Entre no Discord, abra um ticket e descreva o que precisa. Enviamos um orçamento sem compromisso." },
-  { q: "Posso trocar de plano depois?", a: "Sim, você pode fazer upgrade ou downgrade a qualquer momento. A diferença é ajustada no próximo pagamento." },
 ];
+
+/** Diferenciais da VØID (grade numerada de 6). */
+export const differentials = [
+  { title: "Um único /config", desc: "Todos os módulos do seu combo ficam num só comando: liga, desliga e ajusta sem sair do Discord." },
+  { title: "Emojis e cores da sua marca", desc: "Mensagens, painéis e botões usam os emojis e as cores do seu servidor, não os nossos." },
+  { title: "Os dados são seus", desc: "Tudo o que o bot guarda pertence ao seu servidor, e você pode pedir uma cópia quando quiser." },
+  { title: "Painel web", desc: "Acompanhe e ajuste o bot pelo navegador, com a visão completa do que está acontecendo." },
+  { title: "Transcript web", desc: "O histórico de cada ticket vira uma página para a equipe consultar quando precisar." },
+  { title: "Suporte direto no Discord", desc: "Atendimento de verdade pelo nosso Discord, sem robô no meio do caminho." },
+] as const;
+
+/** Frases da faixa em rolagem contínua (cinza, bem sutil). */
+export const marqueeItems = ["Um único /config", "Hospedagem 24h", "Painel web", "Transcript web", "Seus dados são seus", "Suporte no Discord", "Pix pelo Discord", "Sem fidelidade"];
+
+export interface Testimonial {
+  quote: string;
+  name: string;
+  role: string;
+}
+
+/**
+ * Depoimentos REAIS de clientes. Enquanto esta lista estiver vazia, a seção de depoimentos fica oculta.
+ * Exemplo: { quote: "Texto do cliente", name: "Nome", role: "Dono do servidor X" }
+ */
+export const testimonials: Testimonial[] = [];
 
 /** Itens de confiança abaixo dos botões do hero. */
 export const trust = ["Pix pelo Discord", "Cancele quando quiser", "Suporte direto no Discord"];

@@ -14,19 +14,51 @@
   font-family: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-/* legibilidade do conteúdo sobre o fundo animado */
-.home-main h1,
-.home-main h2,
-.home-main h3,
-.home-main p,
-.home-main li {
-  text-shadow: 0 0 22px rgba(10, 10, 13, 0.95), 0 1px 3px rgba(10, 10, 13, 0.9);
+/* ---- layout de largura total ----
+   Margem lateral de 40px (24px no celular) e container de até 1600px, centralizado em telas muito largas. Textos alinhados à esquerda por padrão. */
+.wrap {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding-inline: 40px;
+}
+@media (max-width: 639px) {
+  .wrap { padding-inline: 24px; }
+}
+/* seção: mais espaço em branco entre blocos */
+.sec { padding-block: clamp(72px, 9vw, 136px); }
+.sec-tight { padding-block: clamp(48px, 6vw, 88px); }
+.eyebrow-l {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #a1a1aa;
+}
+.sec-title {
+  font-size: clamp(2rem, 4.2vw, 3.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+  color: #fff;
+}
+.sec-lead { color: #a1a1aa; font-size: clamp(1rem, 1.3vw, 1.15rem); line-height: 1.6; max-width: 58ch; }
+/* título à esquerda, ação à direita, alinhados às duas margens */
+.sec-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px 40px;
+  margin-bottom: clamp(32px, 4vw, 56px);
 }
 
 /* painel sólido para blocos de conteúdo (cards, listas) */
 .panel {
-  background: rgba(13, 13, 18, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(10, 10, 10, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid #27272a;
   border-radius: 16px;
 }
 

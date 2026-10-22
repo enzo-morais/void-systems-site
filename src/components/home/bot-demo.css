@@ -4,11 +4,11 @@
   height: 236px;
   overflow: hidden;
   border-radius: 10px;
-  background: #1e1f22;
+  background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 11.5px;
   line-height: 1.35;
-  color: #dbdee1;
+  color: #e4e4e7;
 }
 
 .bd-head {
@@ -19,10 +19,10 @@
   padding: 0 12px;
   font-weight: 700;
   color: #fff;
-  background: #2b2d31;
+  background: #0f0f0f;
   border-bottom: 1px solid #1a1b1e;
 }
-.bd-head svg { color: #949ba4; }
+.bd-head svg { color: #71717a; }
 
 .bd-feed {
   display: flex;
@@ -43,7 +43,7 @@
   font-size: 12px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.75);
-  background: linear-gradient(180deg, rgba(30, 31, 34, 0.6), #1e1f22 70%);
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0.6), #0a0a0a 70%);
   transition: opacity 0.25s;
 }
 .bd-play {
@@ -53,9 +53,9 @@
   display: grid;
   place-items: center;
   color: #fff;
-  background: rgba(143, 125, 255, 0.35);
-  border: 1px solid rgba(143, 125, 255, 0.7);
-  box-shadow: 0 0 24px rgba(143, 125, 255, 0.35);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.14);
 }
 
 /* linhas da conversa */
@@ -70,7 +70,7 @@
   align-items: center;
   gap: 8px;
   font-style: italic;
-  color: #949ba4;
+  color: #71717a;
 }
 .bd-row--sys::before,
 .bd-row--sys::after {
@@ -90,7 +90,7 @@
   font-weight: 700;
   color: #fff;
 }
-.bd-av--user { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.bd-av--user { background: #3f3f46; }
 .bd-av--bot { background: #000; border: 1px solid rgba(255, 255, 255, 0.3); }
 .bd-col { position: relative; display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .bd-name { font-size: 11px; color: #fff; }
@@ -103,9 +103,9 @@
   font-weight: 700;
   font-style: normal;
   text-transform: uppercase;
-  background: #5865f2;
+  background: #e4e4e7;
 }
-.bd-text { color: #dbdee1; }
+.bd-text { color: #e4e4e7; }
 
 /* embed */
 .bd-embed {
@@ -114,15 +114,15 @@
   gap: 2px;
   margin-top: 3px;
   padding: 7px 9px;
-  border-left: 3px solid #8f7dff;
+  border-left: 3px solid #ffffff;
   border-radius: 3px;
-  background: #2b2d31;
+  background: #0f0f0f;
 }
 .bd-embed-title { color: #fff; }
-.bd-embed-text { color: #dbdee1; }
+.bd-embed-text { color: #e4e4e7; }
 .bd-fields { display: flex; gap: 16px; margin-top: 3px; }
 .bd-fields small { display: block; font-size: 9px; font-weight: 700; color: #fff; }
-.bd-fields em { font-style: normal; color: #dbdee1; }
+.bd-fields em { font-style: normal; color: #e4e4e7; }
 .bd-buttons { display: flex; gap: 6px; margin-top: 5px; }
 .bd-btn {
   display: inline-block;
@@ -130,10 +130,10 @@
   border-radius: 3px;
   font-weight: 500;
   color: #fff;
-  background: #4e5058;
+  background: #27272a;
 }
-.bd-btn--blurple { background: #5865f2; }
-.bd-btn--danger { background: #da373c; }
+.bd-btn--blurple { background: #e4e4e7; }
+.bd-btn--danger { background: #3f3f46; }
 
 /* clique no botão + cursor */
 .bd-clickwrap { position: relative; display: inline-block; margin-top: 3px; align-self: flex-start; }
@@ -161,7 +161,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #dbdee1;
+  background: #e4e4e7;
   animation: bd-dot 0.9s infinite;
 }
 .bd-dots i:nth-child(2) { animation-delay: 0.15s; }
@@ -205,9 +205,9 @@
 }
 
 @keyframes bd-row {
-  0% { opacity: 0; transform: translateY(8px); }
-  5%, 86% { opacity: 1; transform: translateY(0); }
-  94%, 100% { opacity: 0; transform: translateY(0); }
+  0% { opacity: 0; }
+  5%, 86% { opacity: 1; }
+  94%, 100% { opacity: 0; }
 }
 @keyframes bd-dots {
   0% { opacity: 0; }
@@ -231,9 +231,9 @@
   19%, 100% { opacity: 0; transform: translate(0, 0); }
 }
 @keyframes bd-press {
-  0%, 11% { transform: scale(1); background: #5865f2; }
-  13% { transform: scale(0.92); background: #4752c4; }
-  17%, 100% { transform: scale(1); background: #5865f2; }
+  0%, 11% { transform: scale(1); background: #e4e4e7; }
+  13% { transform: scale(0.92); background: #d4d4d8; }
+  17%, 100% { transform: scale(1); background: #e4e4e7; }
 }
 
 /* movimento reduzido: sem convite nem animação, a conversa já aparece pronta */
@@ -245,3 +245,7 @@
   .bd-dots, .bd-cursor { display: none; }
   .bc:hover .bd-after, .bd--auto .bd-after { animation: none; opacity: 1; }
 }
+
+/* sobre os fundos claros do tema preto e branco o texto fica preto */
+.bd-tag,
+.bd-btn--blurple { color: #000; }

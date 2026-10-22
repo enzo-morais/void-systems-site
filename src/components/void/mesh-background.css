@@ -1,0 +1,57 @@
+/* Gradient mesh preto e branco (fixo atrás de tudo, em todas as páginas). */
+.mesh {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: #050505;
+  view-transition-name: void-bg; /* fora da animação de troca de página */
+  --mesh-blur: 100px;
+}
+
+.mesh-blob {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  /* --o = opacidade máxima da mancha (todas ficam entre 5% e 12%) */
+  background: radial-gradient(closest-side, rgba(var(--c, 255, 255, 255), var(--o)) 0%, rgba(var(--c, 255, 255, 255), calc(var(--o) * 0.4)) 55%, transparent 100%);
+  filter: blur(var(--mesh-blur));
+  will-change: transform;
+  animation: mesh-float var(--d) ease-in-out infinite alternate;
+}
+
+@keyframes mesh-float {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(var(--x), var(--y), 0) scale(var(--s)); }
+}
+
+/* 6 manchas em cantos e no meio, sobrepostas, cada uma com duração e trajeto próprios (25s a 40s) */
+.mesh-b1 { width: 62vw; height: 62vw; left: -16vw; top: -20vw; --o: 0.11; --d: 34s; --x: 7vw; --y: 6vw; --s: 1.12; }
+.mesh-b2 { width: 48vw; height: 48vw; right: -12vw; top: 4vh; --c: 161, 161, 170; --o: 0.1; --d: 28s; --x: -7vw; --y: 8vw; --s: 0.92; }
+.mesh-b3 { width: 56vw; height: 56vw; left: 22vw; top: 36vh; --o: 0.07; --d: 38s; --x: 6vw; --y: -7vw; --s: 1.15; }
+.mesh-b4 { width: 42vw; height: 42vw; right: 2vw; bottom: -16vw; --o: 0.12; --d: 31s; --x: -7vw; --y: -5vw; --s: 1.08; }
+.mesh-b5 { width: 38vw; height: 38vw; left: -10vw; bottom: -10vw; --c: 161, 161, 170; --o: 0.08; --d: 26s; --x: 8vw; --y: -6vw; --s: 0.9; }
+.mesh-b6 { width: 30vw; height: 30vw; left: 46vw; top: -10vw; --o: 0.06; --d: 40s; --x: -5vw; --y: 7vw; --s: 1.2; }
+
+/* ruído fino por cima (3% a 5%) */
+.mesh-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.2 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* celular: 3 manchas e desfoque menor (mais leve para a GPU) */
+@media (max-width: 639px) {
+  .mesh { --mesh-blur: 56px; }
+  .mesh-b4, .mesh-b5, .mesh-b6 { display: none; }
+  .mesh-b1 { width: 110vw; height: 110vw; left: -35vw; top: -30vw; }
+  .mesh-b2 { width: 90vw; height: 90vw; right: -35vw; }
+  .mesh-b3 { width: 100vw; height: 100vw; left: 0; top: 55vh; }
+}
+
+/* movimento reduzido: a malha fica parada */
+@media (prefers-reduced-motion: reduce) {
+  .mesh-blob { animation: none; }
+}

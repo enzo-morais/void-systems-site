@@ -70,7 +70,7 @@ export function DashboardShell({ user, children }: ShellProps) {
         {user.image ? (
           <Image src={user.image} alt="" width={32} height={32} className="rounded-full" />
         ) : (
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(143,125,255,0.25)" }}>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(255, 255, 255, 0.1)" }}>
             {(user.username || user.name || "?")[0].toUpperCase()}
           </div>
         )}
@@ -129,7 +129,7 @@ export function DashboardShell({ user, children }: ShellProps) {
       )}
 
       <main className="flex-1 min-w-0 overflow-y-auto px-4 md:px-8 pt-20 md:pt-8 pb-12">
-        <div className="max-w-6xl mx-auto">{children}</div>
+        <div className="w-full max-w-[1600px]">{children}</div>
       </main>
     </div>
   );
