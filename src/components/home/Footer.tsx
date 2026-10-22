@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DISCORD_STORE_URL } from "@/config/store";
+import { CompanyInfo, DISCORD_DISCLAIMER } from "@/components/legal/CompanyInfo";
 
 const columns = [
   {
@@ -22,8 +23,9 @@ const columns = [
   {
     title: "Legal",
     links: [
-      { href: "/termos", label: "Termos" },
-      { href: "/privacidade", label: "Privacidade" },
+      { href: "/termos", label: "Termos de Uso" },
+      { href: "/privacidade", label: "Política de Privacidade" },
+      { href: "/reembolso", label: "Política de Reembolso" },
     ],
   },
 ];
@@ -60,16 +62,20 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
                 <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-silver hover:text-white transition-colors">
-                  Discord
+                  Suporte no Discord
                 </a>
               </li>
             </ul>
           </nav>
         </div>
 
-        <p className="mt-14 pt-6 text-xs text-zinc-500" style={{ borderTop: "1px solid #27272a" }}>
-          &copy; 2026 VØID Systems. Todos os direitos reservados.
-        </p>
+        <div className="mt-14 pt-6 space-y-2 text-xs text-zinc-500" style={{ borderTop: "1px solid #27272a" }}>
+          {/* identificação da empresa: aparece sozinha quando os dados forem preenchidos em src/config/legal.ts */}
+          <CompanyInfo />
+          <p>
+            &copy; 2026 VØID Systems. Todos os direitos reservados. {DISCORD_DISCLAIMER}
+          </p>
+        </div>
       </div>
     </footer>
   );

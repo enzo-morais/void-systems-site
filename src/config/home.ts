@@ -1,5 +1,6 @@
 // Conteúdo editável da home. Altere aqui, sem mexer nos componentes.
 import { PAYMENT_NOTE } from "./store";
+import { POLICY } from "./legal";
 
 /** Clientes exibidos na faixa em carrossel (ordem = ordem de exibição). */
 export const clients: string[] = ["Rust Brasil", "Junin", "IdosoZ", "RubyHub", "Berdo"];
@@ -46,7 +47,7 @@ export const faqs = [
   { q: "Qual combo escolher?", a: "O Simples cobre o essencial de qualquer servidor. O Community soma economia, loja, níveis e eventos. DayZ e Server Games são feitos para comunidades desses jogos. Na dúvida, chame a equipe no Discord." },
   { q: "Quanto tempo leva pra configurar?", a: "A maioria dos combos fica pronta no mesmo dia. Configurações mais complexas podem levar 48 horas ou mais." },
   { q: "O bot fica hospedado onde?", a: "Os bots ficam hospedados em servidores nossos. Você não precisa se preocupar com hospedagem nem com manutenção." },
-  { q: "Posso trocar de combo depois?", a: "Sim, você pode fazer upgrade ou downgrade a qualquer momento. A diferença é ajustada no próximo pagamento." },
+  { q: "Posso desistir depois de contratar?", a: `Sim. Você tem ${POLICY.ARREPENDIMENTO_DIAS} dias corridos para desistir sem dar motivo e receber o valor de volta pelo Pix. Depois disso, pode cancelar quando quiser, sem multa: o bot é desativado ao fim do período pago. Veja a Política de Reembolso.` },
   { q: "E se eu precisar de algo personalizado?", a: "Fazemos bots sob medida. Entre no Discord, abra um ticket e descreva o que precisa. Enviamos um orçamento sem compromisso." },
 ];
 

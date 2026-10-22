@@ -153,6 +153,11 @@ export default function EquipePage() {
 
                 {error && <p className="text-red-400 text-sm">{error}</p>}
 
+                <p className="text-xs leading-relaxed text-zinc-500">
+                  Usamos os dados deste formulário só para analisar a sua candidatura. Saiba mais na{" "}
+                  <Link href="/privacidade" className="underline underline-offset-2 hover:text-white">Política de Privacidade</Link>.
+                </p>
+
                 <div className="flex items-center gap-3 pt-2">
                   <button type="submit" disabled={loading}
                     className="bg-white text-black font-medium px-8 py-3 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 flex items-center gap-2 cursor-pointer"

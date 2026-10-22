@@ -6,6 +6,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { VoidBackgroundClient } from "@/components/void/VoidBackgroundClient";
 import { MeshBackground } from "@/components/void/MeshBackground";
+import { SITE_URL } from "@/config/store";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -29,24 +30,28 @@ const satoshi = localFont({
   ],
 });
 
+const OG_IMAGE = { url: "/og-image.png", width: 1200, height: 630, alt: "VØID Systems: bots e combos para Discord" };
+
 export const metadata: Metadata = {
   title: "VØID Systems — Bots para Discord",
-  description: "Estúdio de tecnologia especializado em bots e sistemas personalizados para Discord. Automação, organização e controle para seu servidor.",
-  metadataBase: new URL("https://voidsystems.store"),
+  description: "Combos e bots para Discord, hospedados e atendidos pela nossa equipe: tickets, boas-vindas, registro, verificação, economia, níveis e mais.",
+  metadataBase: new URL(SITE_URL),
   openGraph: {
-    title: "VØID Systems",
-    description: "Bots e sistemas personalizados para Discord. Automação profissional pro seu servidor.",
-    url: "https://voidsystems.store",
+    title: "VØID Systems — Bots para Discord",
+    description: "Combos e bots para Discord, hospedados e atendidos pela nossa equipe.",
+    url: SITE_URL,
     siteName: "VØID Systems",
     type: "website",
     locale: "pt_BR",
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "VØID Systems",
-    description: "Bots e sistemas personalizados para Discord.",
+    title: "VØID Systems — Bots para Discord",
+    description: "Combos e bots para Discord, hospedados e atendidos pela nossa equipe.",
+    images: [OG_IMAGE.url],
   },
-  icons: { icon: "/icon.png" },
+  icons: { icon: "/icon.png", apple: "/icon.png" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

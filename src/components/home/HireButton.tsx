@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { Check, Copy, ExternalLink, X } from "lucide-react";
 import { formatPrice } from "@/config/bots";
 import { DISCORD_STORE_URL } from "@/config/store";
+import { POLICY } from "@/config/legal";
+import { CompanyInfo, DISCORD_DISCLAIMER } from "@/components/legal/CompanyInfo";
 import "./hero.css";
 import "./hire-modal.css";
 
@@ -22,7 +25,7 @@ function priceText(price: number | null) {
 /** Instrução mostrada no modal: o que fazer no Discord. */
 export function hireInstruction(items: HireItem[]): string {
   const list = items.map((i) => `${i.name} – ${priceText(i.price)}`).join("; ");
-  return `Abra um ticket no nosso Discord e diga qual bot você quer: ${list}`;
+  return `Abra um ticket no nosso Discord e diga qual bot ou combo você quer: ${list}`;
 }
 
 /** Mensagem que o cliente copia e cola no ticket do Discord (só o que ele vai mandar). */
@@ -103,6 +106,17 @@ export function HireButton({ items, label = "Contratar pelo Discord", className 
                 <a href={DISCORD_STORE_URL} target="_blank" rel="noopener noreferrer" className="hero-cta hero-cta--primary hm-btn">
                   Ir para o Discord <ExternalLink className="w-4 h-4" />
                 </a>
+              </div>
+
+              {/* identificação do fornecedor e canais de suporte (Decreto 7.962/2013) */}
+              <div className="mt-5 pt-4 space-y-1.5 text-[11px] leading-relaxed text-zinc-500" style={{ borderTop: "1px solid #27272a" }}>
+                <CompanyInfo />
+                <p>
+                  Dúvidas ou desistência em até {POLICY.ARREPENDIMENTO_DIAS} dias: ticket no Discord. Veja os{" "}
+                  <Link href="/termos" className="underline underline-offset-2 hover:text-white">Termos</Link>, a{" "}
+                  <Link href="/reembolso" className="underline underline-offset-2 hover:text-white">Política de Reembolso</Link> e a{" "}
+                  <Link href="/privacidade" className="underline underline-offset-2 hover:text-white">Privacidade</Link>. {DISCORD_DISCLAIMER}
+                </p>
               </div>
             </div>
           </div>,

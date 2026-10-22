@@ -4,10 +4,16 @@ import { authOptions } from "@/lib/auth-options";
 import { DiscloudBots } from "@/components/dashboard/discloud-bots";
 import { HomeHeader } from "@/components/home/HomeHeader";
 import { Footer } from "@/components/home/Footer";
+import type { Metadata } from "next";
 import "@/components/home/home.css";
 
 // Área do cliente: sempre no layout do site e só com os bots da própria conta (GET /api/bots),
 // mesmo para staff. A visão de todos os bots hospedados continua em /discloud, dentro do painel.
+export const metadata: Metadata = {
+  title: "Meus bots — VØID Systems",
+  robots: { index: false, follow: false },
+};
+
 export default async function MeusBots() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login?callbackUrl=/meus-bots");

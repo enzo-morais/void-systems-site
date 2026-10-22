@@ -418,6 +418,12 @@ function LoginContent() {
                       {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                       {registering ? "Criar conta" : "Entrar"}
                     </button>
+                    {registering && (
+                      <p className="text-[11px] leading-relaxed text-zinc-500">
+                        Ao criar a conta, você concorda com os <Link href="/termos" className="underline underline-offset-2 hover:text-white">Termos de Uso</Link> e
+                        a <Link href="/privacidade" className="underline underline-offset-2 hover:text-white">Política de Privacidade</Link>.
+                      </p>
+                    )}
                   </form>
 
                   <p className="lg-switch">

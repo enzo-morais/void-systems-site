@@ -12,6 +12,9 @@ const PUBLIC_PATHS = [
   "/login",
   "/termos",
   "/privacidade",
+  "/reembolso",
+  "/robots.txt",
+  "/sitemap.xml",
   "/transcript",
   "/api/auth",
   "/api/public",
@@ -19,6 +22,9 @@ const PUBLIC_PATHS = [
   "/favicon",
   "/icon",
 ];
+
+/** Áreas que exigem login. A API (menos /api/auth e /api/public, liberadas acima) também. */
+const PRIVATE_PREFIXES = ["/dashboard", "/perfil", "/meus-bots", "/discloud", "/api"];
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
@@ -69,6 +75,12 @@ export async function proxy(request: NextRequest) {
 
   // Liberar arquivos estáticos
   if (pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|css|js|woff|woff2)$/)) {
+    return NextResponse.next();
+  }
+
+  // Só as áreas privadas exigem sessão. Qualquer outro caminho segue para o Next, que mostra a página ou a 404 do tema
+  // (antes, uma URL inexistente mandava o visitante para o login).
+  if (!PRIVATE_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     return NextResponse.next();
   }
 

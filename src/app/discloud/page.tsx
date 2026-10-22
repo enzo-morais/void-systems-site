@@ -5,7 +5,13 @@ import { DiscloudBots } from "@/components/dashboard/discloud-bots";
 import { DashboardShell } from "@/components/dashboard/shell";
 import { HomeHeader } from "@/components/home/HomeHeader";
 import { Footer } from "@/components/home/Footer";
+import type { Metadata } from "next";
 import "@/components/home/home.css";
+
+export const metadata: Metadata = {
+  title: "Bots hospedados — VØID Systems",
+  robots: { index: false, follow: false },
+};
 
 export default async function DiscloudDashboard() {
   const session = await getServerSession(authOptions);

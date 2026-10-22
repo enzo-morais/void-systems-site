@@ -128,7 +128,7 @@ function DayZ() {
         </div>
       </div>
       <div className="mk-uptime">
-        <p className="mk-title">Uptime · 30 dias</p>
+        <p className="mk-title">Uptime · 30 dias (exemplo)</p>
         <div className="mk-uptime-bars" aria-hidden="true">
           {bars.map((off, i) => (
             <i key={i} className={off ? "off" : ""} />

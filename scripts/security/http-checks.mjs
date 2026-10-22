@@ -188,6 +188,37 @@ try {
   check("comprovante: cliente comum não consegue URL assinada (401)", rcpt.status === 401, `status ${rcpt.status}`);
 
   console.log("\n== login: força bruta ==");
+  console.log("\n== páginas legais, robots e sitemap ==");
+  const pg = async (path) => {
+    const r = await fetch(`${BASE}${path}`, { redirect: "manual" });
+    return { status: r.status, body: await r.text(), headers: r.headers };
+  };
+  const reemb = await pg("/reembolso");
+  check("/reembolso é pública (200), cita os 7 dias e o Pix e só pede o ticket no Discord", reemb.status === 200 && /7 dias corridos/.test(reemb.body) && /Pix/.test(reemb.body), `status ${reemb.status}`);
+  check("nenhuma página legal mostra [PREENCHER]", !/PREENCHER/.test(reemb.body));
+  const termosPg = await pg("/termos");
+  check("/termos sem as frases antigas (99,9% e 'não realizamos reembolsos')", termosPg.status === 200 && !/99[.,]9/.test(termosPg.body) && !/não realizamos reembolsos/i.test(termosPg.body));
+  const priv = await pg("/privacidade");
+  check("/privacidade traz direitos (art. 18), operadora/controlador e cookies", priv.status === 200 && /OPERADORA/.test(priv.body) && /art\. 18/.test(priv.body) && /Cookies/.test(priv.body));
+  const home2 = await pg("/");
+  check("rodapé: Termos, Privacidade, Reembolso, Suporte no Discord, aviso do Discord e nada a preencher", /Política de Reembolso/.test(home2.body) && /Suporte no Discord/.test(home2.body) && /não é afiliada ao Discord Inc/.test(home2.body) && !/PREENCHER/.test(home2.body));
+  check("meta tags: Open Graph e Twitter com imagem", /property="og:image"/.test(home2.body) && /name="twitter:image"/.test(home2.body) && /summary_large_image/.test(home2.body));
+  const robots = await pg("/robots.txt");
+  check("robots.txt libera o site e bloqueia painel, perfil, api e transcripts", robots.status === 200 && /Disallow: \/dashboard/.test(robots.body) && /Disallow: \/perfil/.test(robots.body) && /Disallow: \/api\//.test(robots.body) && /Disallow: \/transcript\//.test(robots.body) && /Sitemap:/.test(robots.body));
+  const sm = await pg("/sitemap.xml");
+  check("sitemap.xml lista as páginas públicas e não lista o painel", sm.status === 200 && /\/reembolso/.test(sm.body) && /\/bots\/ticket/.test(sm.body) && !/dashboard|perfil|login/.test(sm.body));
+  const og = await fetch(`${BASE}/og-image.png`);
+  check("imagem de compartilhamento existe (PNG)", og.status === 200 && /image\/png/.test(og.headers.get("content-type") ?? ""));
+  const perfilPg = await fetch(`${BASE}/perfil`, { redirect: "manual", headers: { Cookie: l.session ?? "" } });
+  const perfilHtml = await perfilPg.text();
+  check("/perfil (logado) tem noindex", /name="robots" content="noindex/.test(perfilHtml));
+  const notFound = await pg("/pagina-que-nao-existe-xyz");
+  check("URL inexistente (sem login) mostra a 404 do tema, não o login", notFound.status === 404 && /Página não encontrada/.test(notFound.body), `status ${notFound.status}`);
+  for (const privatePath of ["/dashboard", "/perfil", "/meus-bots", "/discloud", "/api/bots", "/api/sales"]) {
+    const r = await fetch(`${BASE}${privatePath}`, { redirect: "manual" });
+    check(`área privada ${privatePath} sem login continua indo para /login (307)`, r.status === 307 && (r.headers.get("location") ?? "").includes("/login"), `status ${r.status}`);
+  }
+
   const t = await mkUser();
   const tentativas = [];
   for (let i = 0; i < 8; i++) tentativas.push(await login(t.email, "senhaerrada", freshIp()));
