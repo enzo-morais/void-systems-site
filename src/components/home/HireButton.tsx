@@ -6,8 +6,7 @@ import Link from "next/link";
 import { Check, Copy, ExternalLink, X } from "lucide-react";
 import { formatPrice } from "@/config/bots";
 import { DISCORD_STORE_URL } from "@/config/store";
-import { POLICY } from "@/config/legal";
-import { CompanyInfo, DISCORD_DISCLAIMER } from "@/components/legal/CompanyInfo";
+import { DISCORD_DISCLAIMER, POLICY } from "@/config/legal";
 import "./hero.css";
 import "./hire-modal.css";
 
@@ -108,9 +107,8 @@ export function HireButton({ items, label = "Contratar pelo Discord", className 
                 </a>
               </div>
 
-              {/* identificação do fornecedor e canais de suporte (Decreto 7.962/2013) */}
+              {/* canal de suporte e links legais */}
               <div className="mt-5 pt-4 space-y-1.5 text-[11px] leading-relaxed text-zinc-500" style={{ borderTop: "1px solid #27272a" }}>
-                <CompanyInfo />
                 <p>
                   Dúvidas ou desistência em até {POLICY.ARREPENDIMENTO_DIAS} dias: ticket no Discord. Veja os{" "}
                   <Link href="/termos" className="underline underline-offset-2 hover:text-white">Termos</Link>, a{" "}

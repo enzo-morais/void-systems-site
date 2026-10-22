@@ -1,24 +1,7 @@
-// TEXTOS JURÍDICOS E DADOS DA EMPRESA: o único arquivo para editar.
+// TEXTOS JURÍDICOS: o único arquivo para editar os Termos, a Política de Privacidade e a Política de Reembolso.
 //
 // ATENÇÃO: os textos abaixo são um MODELO e precisam de revisão de advogado antes de serem publicados.
-// Nada aqui inventa dados da empresa: o que estiver VAZIO em LEGAL é simplesmente omitido das páginas.
-// Quando você preencher um campo, ele passa a aparecer sozinho nos Termos, na Privacidade, no Reembolso,
-// no rodapé e na tela de contratar.
-//
-// Como preencher: escreva os dados entre aspas em LEGAL (ex.: CNPJ: "00.000.000/0001-00").
 // Prazos e números dos textos (7 dias, 5 dias úteis...) ficam em POLICY, logo abaixo.
-
-/** Dados da empresa. NUNCA preencher com dados que você não confirmou. */
-export const LEGAL = {
-  RAZAO_SOCIAL: "",
-  CNPJ: "",
-  ENDERECO: "",
-  EMAIL_CONTATO: "",
-  EMAIL_PRIVACIDADE: "",
-  NOME_ENCARREGADO: "",
-};
-
-export type LegalKey = keyof typeof LEGAL;
 
 /** Prazos e números usados nos textos (edite aqui, as páginas acompanham). */
 export const POLICY = {
@@ -39,13 +22,8 @@ export const POLICY = {
 export const LEGAL_VERSION = "1.0";
 export const LEGAL_UPDATED = "22/10/2026";
 
-/** Campos de LEGAL que ainda estão vazios (para conferência). */
-export function missingLegalFields(): LegalKey[] {
-  return (Object.keys(LEGAL) as LegalKey[]).filter((k) => !LEGAL[k].trim());
-}
-
-/** Dado preenchido (sem espaços nas pontas), ou "" se estiver vazio. */
-export const filled = (key: LegalKey): string => LEGAL[key].trim();
+/** Aviso de que a VØID não tem vínculo com o Discord. */
+export const DISCORD_DISCLAIMER = "VØID Systems não é afiliada ao Discord Inc.";
 
 // ---------------------------------------------------------------- estrutura dos documentos
 
@@ -65,16 +43,6 @@ export interface LegalDoc {
 const P = (p: string): LegalBlock => ({ p });
 const UL = (ul: string[]): LegalBlock => ({ ul });
 
-/** " (Razão Social, CNPJ ..., endereço)" só com o que estiver preenchido; vazio se não houver nada. */
-const dadosEmpresa = () => {
-  const partes = [filled("RAZAO_SOCIAL"), filled("CNPJ") && `CNPJ ${filled("CNPJ")}`, filled("ENDERECO")].filter(Boolean);
-  return partes.length ? ` (${partes.join(", ")})` : "";
-};
-
-/** Canal de contato: e-mail (se houver) e sempre o ticket no Discord. */
-const contato = (key: "EMAIL_CONTATO" | "EMAIL_PRIVACIDADE" = "EMAIL_CONTATO") =>
-  filled(key) ? `${filled(key)} ou ticket no nosso Discord` : "ticket no nosso Discord";
-
 // ---------------------------------------------------------------- TERMOS DE USO
 
 export const termos = (): LegalDoc => ({
@@ -85,7 +53,7 @@ export const termos = (): LegalDoc => ({
     {
       title: "Identificação, aceitação e idade",
       blocks: [
-        P(`Estes Termos valem para o uso deste site e dos serviços da VØID Systems${dadosEmpresa()}. Contato: ${contato()}.`),
+        P("Estes Termos valem para o uso deste site e dos serviços da VØID Systems (\"nós\"). Contato: ticket no nosso Discord."),
         P("A VØID Systems não é afiliada ao Discord Inc. \"Discord\" é marca dos seus titulares."),
         P("Ao contratar ou usar os serviços, você aceita estes Termos, a Política de Privacidade e a Política de Reembolso."),
         P("O serviço é para maiores de 18 anos. Menores de idade só podem contratar com autorização e acompanhamento do responsável legal, que responde pela contratação."),
@@ -172,7 +140,7 @@ export const termos = (): LegalDoc => ({
     {
       title: "Contato",
       blocks: [
-        P(`Dúvidas sobre estes Termos: ${contato()}.`),
+        P("Dúvidas sobre estes Termos: ticket no nosso Discord."),
       ],
     },
   ],
@@ -194,10 +162,7 @@ export const reembolso = (): LegalDoc => ({
     {
       title: "Como pedir",
       blocks: [
-        UL([
-          "Abra um ticket no nosso Discord e diga que quer desistir",
-          ...(filled("EMAIL_CONTATO") ? [`Ou mande um e-mail para ${filled("EMAIL_CONTATO")} com o seu nome, o seu usuário do Discord e o combo ou bot contratado.`] : []),
-        ]),
+        UL(["Abra um ticket no nosso Discord e diga que quer desistir"]),
         P("Confirmamos o pedido na mesma conversa."),
       ],
     },
@@ -222,7 +187,7 @@ export const reembolso = (): LegalDoc => ({
     {
       title: "Fale com a gente",
       blocks: [
-        P(`Ticket no Discord${filled("EMAIL_CONTATO") ? ` ou ${filled("EMAIL_CONTATO")}` : ""}.`),
+        P("Ticket no Discord."),
       ],
     },
   ],
@@ -238,25 +203,10 @@ export const privacidade = (): LegalDoc => ({
     {
       title: "Quem somos",
       blocks: [
-        P(`A controladora dos dados tratados neste site é a VØID Systems${dadosEmpresa()}. Contato: ${contato()}.${filled("EMAIL_PRIVACIDADE") ? ` Para assuntos de privacidade: ${filled("EMAIL_PRIVACIDADE")}.` : ""}`),
+        P("A controladora dos dados tratados neste site é a VØID Systems. Contato e assuntos de privacidade: ticket no nosso Discord."),
         P("A VØID Systems não é afiliada ao Discord Inc."),
       ],
     },
-    // só aparece quando o encarregado (nome ou canal) estiver preenchido em LEGAL
-    ...(filled("NOME_ENCARREGADO") || filled("EMAIL_PRIVACIDADE")
-      ? [
-          {
-            title: "Encarregado de dados (DPO)",
-            blocks: [
-              P(
-                `${filled("NOME_ENCARREGADO") ? `Encarregado: ${filled("NOME_ENCARREGADO")}. ` : ""}${
-                  filled("EMAIL_PRIVACIDADE") ? `Canal: ${filled("EMAIL_PRIVACIDADE")}.` : "Canal: ticket no nosso Discord."
-                }`,
-              ),
-            ],
-          },
-        ]
-      : []),
     {
       title: "Dados que coletamos e como",
       blocks: [
@@ -336,7 +286,7 @@ export const privacidade = (): LegalDoc => ({
           "informação sobre a possibilidade de não dar consentimento e as consequências;",
           "revogação do consentimento.",
         ]),
-        P(`Para exercer qualquer direito, ${filled("EMAIL_PRIVACIDADE") ? `escreva para ${filled("EMAIL_PRIVACIDADE")} ou ` : ""}abra um ticket no Discord. É gratuito e respondemos em até ${POLICY.RESPOSTA_TITULAR_DIAS} dias. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).`),
+        P(`Para exercer qualquer direito, abra um ticket no nosso Discord. É gratuito e respondemos em até ${POLICY.RESPOSTA_TITULAR_DIAS} dias. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).`),
       ],
     },
     {

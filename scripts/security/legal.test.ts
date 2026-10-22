@@ -1,70 +1,38 @@
 // Testes dos textos jurídicos (src/config/legal.ts): estrutura, dados da empresa e frases que não podem voltar.
 // Rodar:  npx -y tsx --test scripts/security/legal.test.ts
-import { afterEach, describe, it } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { LEGAL, POLICY, missingLegalFields, privacidade, reembolso, termos, type LegalDoc } from "../../src/config/legal";
+import { POLICY, privacidade, reembolso, termos, type LegalDoc } from "../../src/config/legal";
 
 const text = (d: LegalDoc) =>
   d.sections.flatMap((s) => [s.title, ...s.blocks.flatMap((b) => ("p" in b ? [b.p] : b.ul))]).join("\n");
 const titles = (d: LegalDoc) => d.sections.map((s) => s.title);
 const allDocs = () => [termos(), privacidade(), reembolso()];
 
-// guarda e restaura os dados da empresa, para os testes poderem preenchê-los sem afetar os outros
-const original = { ...LEGAL };
-afterEach(() => Object.assign(LEGAL, original));
-
-describe("dados da empresa", () => {
-  it("campo vazio é omitido: nunca aparece [PREENCHER] nem lixo como 'undefined'", () => {
-    for (const k of Object.keys(LEGAL) as (keyof typeof LEGAL)[]) LEGAL[k] = "";
+describe("nada a preencher nos textos", () => {
+  it("nenhum texto tem placeholder, dado vazio ou lixo de template", () => {
     for (const d of allDocs()) {
       const t = text(d);
-      assert.doesNotMatch(t, /PREENCHER/);
-      assert.doesNotMatch(t, /undefined|null|\$\{/);
-      assert.doesNotMatch(t, /CNPJ\s*\./); // "CNPJ" sozinho, sem número
+      assert.doesNotMatch(t, /PREENCHER|undefined|null|\$\{|\[\s*\]/);
+      assert.doesNotMatch(t, /CNPJ|Razão Social|@\w+\.\w+/i); // sem dados de empresa nem e-mails
     }
-    assert.equal(missingLegalFields().length, Object.keys(LEGAL).length);
   });
 
-  it("sem dados, o contato é só o ticket no Discord", () => {
-    for (const k of Object.keys(LEGAL) as (keyof typeof LEGAL)[]) LEGAL[k] = "";
+  it("o contato é sempre o ticket no Discord", () => {
     assert.match(text(termos()), /Contato: ticket no nosso Discord\./);
     assert.match(text(termos()), /Dúvidas sobre estes Termos: ticket no nosso Discord\./);
     assert.match(text(reembolso()), /Ticket no Discord\./);
+    assert.match(text(privacidade()), /abra um ticket no nosso Discord/);
   });
 
-  it("'Como pedir' tem só o ticket no Discord quando não há e-mail", () => {
-    for (const k of Object.keys(LEGAL) as (keyof typeof LEGAL)[]) LEGAL[k] = "";
+  it("'Como pedir' tem só o ticket no Discord, sem ponto final", () => {
     const how = reembolso().sections.find((s) => s.title === "Como pedir")!;
     const list = how.blocks.find((b) => "ul" in b) as { ul: string[] };
     assert.deepEqual(list.ul, ["Abra um ticket no nosso Discord e diga que quer desistir"]);
   });
 
-  it("sem encarregado preenchido a seção de DPO não aparece", () => {
-    for (const k of Object.keys(LEGAL) as (keyof typeof LEGAL)[]) LEGAL[k] = "";
+  it("não há seção de encarregado", () => {
     assert.ok(!titles(privacidade()).some((x) => x.includes("Encarregado")));
-  });
-
-  it("quando você preenche, os dados aparecem sozinhos nas três páginas", () => {
-    Object.assign(LEGAL, {
-      RAZAO_SOCIAL: "Empresa Teste Ltda",
-      CNPJ: "00.000.000/0001-00",
-      ENDERECO: "Rua Teste, 1",
-      EMAIL_CONTATO: "contato@teste.dev",
-      EMAIL_PRIVACIDADE: "privacidade@teste.dev",
-      NOME_ENCARREGADO: "Fulano de Tal",
-    });
-    const t = text(termos());
-    assert.match(t, /Empresa Teste Ltda/);
-    assert.match(t, /CNPJ 00\.000\.000\/0001-00/);
-    assert.match(t, /contato@teste\.dev ou ticket no nosso Discord/);
-    const p = privacidade();
-    assert.ok(titles(p).some((x) => x.includes("Encarregado")));
-    assert.match(text(p), /Fulano de Tal/);
-    assert.match(text(p), /privacidade@teste\.dev/);
-    const r = text(reembolso());
-    assert.match(r, /Mande um e-mail para|Ou mande um e-mail para/);
-    assert.match(r, /contato@teste\.dev/);
-    assert.equal(missingLegalFields().length, 0);
   });
 });
 
